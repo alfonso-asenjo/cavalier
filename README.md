@@ -19,7 +19,8 @@ pytest
 
 cavalier replay cuba1962 -n 1000                                    # secuencia histórica forzada
 cavalier montecarlo cuba1962 --usa scripted:halcon --ussr scripted:paloma -n 1000 --workers 16
-cavalier run cuba1962 --usa scripted:pragmatica --ussr scripted:impredecible --log runs/p.jsonl
+cavalier run cuba1962 --usa scripted:pragmatica --ussr scripted:impredecible --seed 112 --view   # + visor HTML
+cavalier view runs/p.jsonl                                           # visor de una partida registrada
 cavalier sensitivity cuba1962 -n 300                                # supuestos ±20 %
 cavalier morris cuba1962 --historical -n 300 -r 10 --workers 16     # sensibilidad global (ranges.toml)
 cavalier montecarlo cuba1962 --variant sin_armas_tacticas -n 1000   # contrafactual

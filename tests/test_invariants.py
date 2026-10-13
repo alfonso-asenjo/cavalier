@@ -71,3 +71,9 @@ def test_ranges_cover_base_values(bundle):
     raw = {"rules": bundle.rules.model_dump()}
     for path, rg in load_ranges("cuba1962").items():
         assert rg.low <= _get(raw, path.split(".")) <= rg.high, path
+
+
+def test_scripted_agents_never_produce_invalid_actions(bundle):
+    for pair in [("pragmatica", "impredecible"), ("halcon", "paloma"), ("defensiva", "pragmatica")]:
+        res = run_batch(bundle, scripted_factory({"USA": pair[0], "USSR": pair[1]}), 100)
+        assert sum(s.invalid_actions for s in res.summaries) == 0, pair

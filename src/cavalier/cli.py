@@ -78,8 +78,19 @@ def _print_table(result: BatchResult, title: str) -> None:
 def cmd_run(args) -> None:
     bundle = load_scenario(args.scenario, args.variant)
     agents = _factory(args)(bundle, args.seed)
-    summary = play(bundle, agents, args.seed, anonymized=args.anon, log_path=Path(args.log) if args.log else None)
+    log = Path(args.log) if args.log else (Path("runs") / f"{args.scenario}_{args.seed}.jsonl" if args.view else None)
+    summary = play(bundle, agents, args.seed, anonymized=args.anon, log_path=log)
     print(json.dumps(summary.__dict__, ensure_ascii=False, indent=2))
+    if args.view:
+        from .viewer import render
+
+        print(f"Visor: {render(log).resolve()}")
+
+
+def cmd_view(args) -> None:
+    from .viewer import render
+
+    print(f"Visor: {render(args.log, args.out).resolve()}")
 
 
 def cmd_montecarlo(args) -> None:
@@ -181,7 +192,13 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("run", help="una partida")
     common(p)
     p.add_argument("--log", help="fichero JSONL de la partida")
+    p.add_argument("--view", action="store_true", help="generar el visor HTML al terminar")
     p.set_defaults(func=cmd_run)
+
+    p = sub.add_parser("view", help="visor HTML de una partida registrada")
+    p.add_argument("log", help="fichero JSONL de la partida")
+    p.add_argument("-o", "--out", help="HTML de salida (por defecto, junto al JSONL)")
+    p.set_defaults(func=cmd_view)
 
     p = sub.add_parser("montecarlo", help="lote de partidas")
     common(p)

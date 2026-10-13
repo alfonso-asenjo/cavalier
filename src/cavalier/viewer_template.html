@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cavalier · Partida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #02040f;
+    --panel: rgba(8, 16, 52, 0.72);
+    --panel-solid: #070e2e;
+    --line: #1c2c78;
+    --glow: #4f7dff;
+    --text: #cdd8ff;
+    --dim: #6b7bb5;
+    --usa: #4db2ff;
+    --ussr: #ff4f62;
+    --warn: #ffd23f;
+    --ok: #47ffa3;
+    --orange: #ff9a3d;
+    --mono: 'Share Tech Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: radial-gradient(ellipse 120% 70% at 50% 0%, #0b1650 0%, #050a2a 45%, var(--bg) 100%) fixed;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.45;
+    min-height: 100vh;
+  }
+  body::after { /* líneas de barrido tipo monitor */
+    content: ""; position: fixed; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px);
+  }
+  .glow { text-shadow: 0 0 6px currentColor; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px 48px; }
+
+  /* barra superior */
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(2, 4, 15, 0.92); border-bottom: 1px solid var(--line);
+    box-shadow: 0 0 18px rgba(79,125,255,0.25);
+  }
+  .topbar .wrap { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; padding-top: 8px; padding-bottom: 8px; }
+  .brand { letter-spacing: 0.35em; color: #fff; font-size: 15px; }
+  .clock { color: #fff; font-size: 15px; min-width: 150px; }
+  .defcon { display: flex; align-items: center; gap: 6px; }
+  .defcon .who { font-size: 12px; min-width: 36px; }
+  .defcon .boxes { display: flex; gap: 2px; }
+  .defcon .box {
+    width: 18px; height: 18px; display: grid; place-items: center; font-size: 11px;
+    border: 1px solid var(--line); color: var(--dim);
+  }
+  .defcon .box.on { color: #fff; border-color: currentColor; }
+  .controls { display: flex; gap: 4px; margin-left: auto; }
+  button {
+    font: inherit; color: var(--text); background: var(--panel-solid); border: 1px solid var(--line);
+    padding: 3px 10px; cursor: pointer;
+  }
+  button:hover { border-color: var(--glow); color: #fff; }
+  button.active { border-color: var(--glow); color: #fff; box-shadow: 0 0 8px rgba(79,125,255,0.6) inset; }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); box-shadow: 0 0 14px rgba(79,125,255,0.12) inset; }
+  .panel h2 { margin: 0; padding: 7px 12px; font-size: 12px; letter-spacing: 0.25em; color: var(--dim); font-weight: normal;
+              border-bottom: 1px solid var(--line); }
+  .panel .body { padding: 10px 12px; }
+
+  /* cabecera de partida */
+  .summary { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin: 16px 0 12px; }
+  .summary h1 { margin: 0; font-size: 20px; font-weight: normal; color: #fff; letter-spacing: 0.06em; }
+  .summary .meta { color: var(--dim); font-size: 13px; margin-top: 2px; }
+  .outcome { padding: 8px 14px; border: 1px solid currentColor; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .o-acuerdo_negociado { color: var(--ok); }
+  .o-desescalada { color: #7fe8ff; }
+  .o-sin_resolver { color: var(--dim); }
+  .o-conflicto_convencional { color: var(--orange); }
+  .o-uso_nuclear { color: var(--ussr); }
+
+  /* gráfico */
+  .chart svg { display: block; width: 100%; height: 190px; }
+  .chart .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--dim); padding: 0 12px 8px; }
+  .chart .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+
+  .viewbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 14px 0 10px; }
+  .viewbar span { color: var(--dim); font-size: 12px; margin-right: 4px; }
+
+  /* turno */
+  .turn { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .col-usa h2 { color: var(--usa); }
+  .col-ussr h2 { color: var(--ussr); }
+  .col-world h2 { color: #fff; }
+  .sec { margin-bottom: 12px; }
+  .sec:last-child { margin-bottom: 0; }
+  .sec h3 { margin: 0 0 4px; font-size: 11px; letter-spacing: 0.2em; color: var(--dim); font-weight: normal; }
+  ul.items { list-style: none; margin: 0; padding: 0; }
+  ul.items li { padding: 3px 0 3px 12px; border-left: 2px solid var(--line); margin-bottom: 4px; }
+  .k-incident { border-left-color: var(--warn) !important; color: var(--warn); }
+  .k-intel { border-left-color: #b98bff !important; }
+  .k-deal { border-left-color: var(--ok) !important; }
+  .k-outcome { border-left-color: var(--ussr) !important; color: #fff; }
+  .false { color: #b98bff; font-size: 11px; border: 1px solid #b98bff; padding: 0 4px; margin-left: 6px; }
+  .act { color: #fff; }
+  .act.escalate { color: var(--orange); }
+  .act.deescalate { color: var(--ok); }
+  .act.terminal { color: var(--ussr); }
+  .reason { color: var(--text); font-style: normal; border-left: 2px solid var(--glow); padding: 4px 10px; margin: 6px 0 0;
+            background: rgba(79,125,255,0.06); white-space: pre-wrap; }
+  .tag { font-size: 11px; color: var(--dim); }
+  .bad { color: var(--ussr); border: 1px solid var(--ussr); font-size: 11px; padding: 0 4px; }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: 13px; }
+  .kv .v { color: #fff; text-align: right; }
+  .meter { height: 4px; background: var(--line); margin: 2px 0 6px; position: relative; }
+  .meter > div { position: absolute; inset: 0 auto 0 0; background: var(--glow); box-shadow: 0 0 6px var(--glow); }
+  .hidden-note { color: var(--dim); font-size: 13px; padding: 24px 0; text-align: center; }
+
+  /* cronología */
+  .log { margin-top: 16px; }
+  .log .row { display: grid; grid-template-columns: 70px 140px 1fr; gap: 10px; padding: 4px 12px; cursor: pointer;
+              border-bottom: 1px solid rgba(28,44,120,0.5); font-size: 13px; }
+  .log .row:hover { background: rgba(79,125,255,0.08); }
+  .log .row.current { background: rgba(79,125,255,0.16); color: #fff; }
+  .log .row .d { color: var(--dim); }
+
+  @media (max-width: 900px) {
+    .turn { grid-template-columns: 1fr; }
+    .summary { grid-template-columns: 1fr; }
+    .controls { margin-left: 0; }
+    .log .row { grid-template-columns: 50px 1fr; }
+    .log .row .d { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand glow">CAVALIER</div>
+    <div class="clock glow" id="clock"></div>
+    <div class="defcon" id="defcon-USA"></div>
+    <div class="defcon" id="defcon-USSR"></div>
+    <div class="controls">
+      <button id="first" title="Inicio (Inicio)">|◀</button>
+      <button id="prev" title="Anterior (←)">◀</button>
+      <button id="play" title="Reproducir (espacio)">▶</button>
+      <button id="next" title="Siguiente (→)">▶|</button>
+      <button id="last" title="Final (Fin)">▶▶|</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="summary">
+    <div>
+      <h1 id="title"></h1>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="outcome glow" id="outcome"></div>
+  </div>
+
+  <div class="panel chart">
+    <h2>TENSIÓN INTERNACIONAL (REAL)</h2>
+    <svg id="chart" viewBox="0 0 1000 190" preserveAspectRatio="none" role="img" aria-label="Tensión por turno"></svg>
+    <div class="legend">
+      <span><i style="background:var(--glow)"></i>tensión</span>
+      <span><i style="background:var(--warn)"></i>incidente</span>
+      <span><i style="background:var(--ok)"></i>acuerdo</span>
+      <span><i style="background:#b98bff"></i>inteligencia falsa</span>
+    </div>
+  </div>
+
+  <div class="viewbar">
+    <span>VISTA:</span>
+    <button data-view="truth" class="active">Verdad (todo)</button>
+    <button data-view="USA">Lo que sabía EE. UU.</button>
+    <button data-view="USSR">Lo que sabía la URSS</button>
+  </div>
+
+  <div class="turn" id="turn"></div>
+
+  <div class="panel log">
+    <h2>CRONOLOGÍA</h2>
+    <div id="log"></div>
+  </div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const C = DATA.catalog;
+const T = DATA.turns;
+const SIDES = Object.keys(C.sides);
+let idx = 0, view = "truth", timer = null;
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const sideColor = s => s === "USA" ? "var(--usa)" : "var(--ussr)";
+const sideName = s => (C.sides[s] || {}).name || s;
+const pct = x => (x * 100).toFixed(0) + "%";
+const OUTCOMES = {
+  acuerdo_negociado: "Acuerdo cumplido", desescalada: "Desescalada", sin_resolver: "Sin resolver",
+  conflicto_convencional: "Conflicto convencional", uso_nuclear: "Uso nuclear",
+};
+
+function actionHtml(a) {
+  const rule = C.actions[a.kind] || {label: a.kind, stance: "neutral"};
+  let extra = "";
+  if (a.terms) extra += " — " + a.terms.map(t => esc(C.terms[t.term] || t.term) + (t.secret ? " <span class='tag'>(secreto)</span>" : "")).join("; ");
+  if (a.deal_id) extra += ` <span class="tag">[${esc(a.deal_id)}]</span>`;
+  if (a.channel) extra += ` <span class="tag">vía ${esc(a.channel)}</span>`;
+  if (a.text) extra += `<div class="tag">«${esc(a.text)}»</div>`;
+  return `<li><span class="act ${rule.stance}">${esc(rule.label)}</span>${extra}</li>`;
+}
+
+function eventHtml(e, showFalse) {
+  const flag = e.is_false && showFalse ? "<span class='false'>FALSO</span>" : "";
+  return `<li class="k-${e.kind}">${esc(e.description)}${flag}</li>`;
+}
+
+function defconHtml(side, level) {
+  const boxes = [5, 4, 3, 2, 1].map(n => `<div class="box ${n === level ? "on glow" : ""}" style="${n === level ? "color:" + sideColor(side) : ""}">${n}</div>`).join("");
+  return `<span class="who" style="color:${sideColor(side)}">${side}</span><span class="tag">DEFCON</span><div class="boxes">${boxes}</div>`;
+}
+
+function sideColumn(side, t) {
+  const obs = (t.observations || {})[side];
+  const dec = (t.decisions || {})[side];
+  const name = sideName(side), leader = (C.sides[side] || {}).leader || "";
+  const head = `<h2>${esc(side)} · ${esc(name)}<span class="tag"> · ${esc(leader)}</span></h2>`;
+  if (view !== "truth" && view !== side) {
+    return `<div class="panel col-${side.toLowerCase()}">${head}<div class="body"><div class="hidden-note">Información no disponible para ${esc(sideName(view))}.<br>Sus decisiones solo se conocen por sus efectos visibles.</div></div></div>`;
+  }
+  let html = `<div class="panel col-${side.toLowerCase()}">${head}<div class="body">`;
+  if (obs) {
+    const est = obs.other_estimate || {};
+    html += `<div class="sec"><h3>LO QUE VEÍA AL DECIDIR</h3><div class="kv">
+      <span>Tensión estimada</span><span class="v">${obs.tension_estimate.toFixed(0)}</span>
+      <span>DEFCON propio</span><span class="v">${obs.own.defcon}</span>
+      <span>DEFCON rival (estimado)</span><span class="v">${(est.defcon ?? 0).toFixed(0)}</span>
+      <span>Movilización rival (est.)</span><span class="v">${(est.mobilization ?? 0).toFixed(0)}</span>
+      <span>Presión interna propia</span><span class="v">${obs.own.domestic_pressure.toFixed(0)}</span>
+      <span>Credibilidad propia</span><span class="v">${obs.own.credibility.toFixed(0)}</span>
+      <span>Control de mando</span><span class="v">${pct(obs.own.control)}</span>
+    </div></div>`;
+    if (obs.events && obs.events.length) {
+      html += `<div class="sec"><h3>EVENTOS PERCIBIDOS</h3><ul class="items">${obs.events.map(e => eventHtml(e, view === "truth")).join("")}</ul></div>`;
+    }
+    if (obs.inbox && obs.inbox.length) {
+      html += `<div class="sec"><h3>MENSAJES RECIBIDOS</h3><ul class="items">${obs.inbox.map(m => `<li class="k-deal">(${esc(m.channel)}) ${esc(m.text)}</li>`).join("")}</ul></div>`;
+    }
+    const deals = (obs.open_deals || []).filter(d => d.proposer !== side);
+    if (deals.length) {
+      html += `<div class="sec"><h3>PROPUESTAS RECIBIDAS</h3><ul class="items">${deals.map(d => `<li class="k-deal">${esc(d.id)}: ${d.terms.map(x => esc(C.terms[x.term] || x.term) + (x.secret ? " (secreto)" : "")).join("; ")}</li>`).join("")}</ul></div>`;
+    }
+  }
+  if (dec) {
+    html += `<div class="sec"><h3>DECISIÓN ${dec.fallback ? "<span class='bad'>RESPALDO</span>" : ""}</h3><ul class="items">${(dec.actions || []).map(actionHtml).join("")}</ul>`;
+    if (dec.reasoning) html += `<div class="reason">${esc(dec.reasoning)}</div>`;
+    html += `<div class="tag" style="margin-top:4px">confianza ${pct(dec.confidence ?? 0)}${dec.cited_docs && dec.cited_docs.length ? " · documentos: " + dec.cited_docs.map(esc).join(", ") : ""}</div></div>`;
+  }
+  return html + "</div></div>";
+}
+
+function worldColumn(t) {
+  const st = t.state;
+  const events = (t.events || []).filter(e => view === "truth" || e.seen_by.includes(view));
+  let html = `<div class="panel col-world"><h2>${view === "truth" ? "EL MUNDO (VERDAD)" : "VISIBLE PARA " + esc(view)}</h2><div class="body">`;
+  if (view === "truth") {
+    html += `<div class="sec"><h3>TENSIÓN REAL TRAS EL TURNO</h3><div class="kv"><span>Tensión</span><span class="v">${st.tension.toFixed(1)}</span></div>
+      <div class="meter"><div style="width:${st.tension}%"></div></div></div>`;
+  }
+  html += `<div class="sec"><h3>QUÉ OCURRIÓ ESTE TURNO</h3><ul class="items">${events.length ? events.map(e => {
+    const who = e.actor ? `<span style="color:${sideColor(e.actor)}">${esc(e.actor)}</span> · ` : "";
+    return `<li class="k-${e.kind}">${who}${esc(e.description)}${e.is_false && view === "truth" ? "<span class='false'>FALSO</span>" : ""}</li>`;
+  }).join("") : "<li>Nada visible.</li>"}</ul></div>`;
+  if (view === "truth") {
+    const commitments = st.commitments || [];
+    if (commitments.length) {
+      const label = {pending: "pendiente", fulfilled: "cumplido", broken: "roto"};
+      html += `<div class="sec"><h3>COMPROMISOS</h3><ul class="items">${commitments.map(c =>
+        `<li class="k-deal"><span style="color:${sideColor(c.obligor)}">${esc(c.obligor)}</span> · ${esc(C.terms[c.term] || c.term)}${c.secret ? " (secreto)" : ""} — ${label[c.status] || c.status}${c.status === "fulfilled" ? (c.verified ? ", verificado" : ", sin verificar") : ""}${c.leaked ? ", FILTRADO" : ""}</li>`).join("")}</ul></div>`;
+    }
+    html += `<div class="sec"><h3>VARIABLES REALES</h3><div class="kv">${Object.entries(st.vars).map(([k, v]) =>
+      `<span>${esc(C.vars[k] || k)}</span><span class="v">${v.toFixed(2)}</span>`).join("")}</div></div>`;
+  }
+  return html + "</div></div>";
+}
+
+function drawChart() {
+  const svg = document.getElementById("chart");
+  const W = 1000, H = 190, padL = 30, padR = 10, padT = 10, padB = 22;
+  const n = T.length;
+  const x = i => padL + (n <= 1 ? 0 : (i / (n - 1)) * (W - padL - padR));
+  const y = v => padT + (1 - v / 100) * (H - padT - padB);
+  let g = `<defs><filter id="gl"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4f7dff" stop-opacity="0.35"/><stop offset="1" stop-color="#4f7dff" stop-opacity="0"/></linearGradient></defs>`;
+  for (const v of [0, 25, 50, 75, 100]) {
+    g += `<line x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}" stroke="#1c2c78" stroke-dasharray="${v % 50 ? "2 4" : ""}"/>`;
+    g += `<text x="${padL - 6}" y="${y(v) + 4}" fill="#6b7bb5" font-size="10" text-anchor="end">${v}</text>`;
+  }
+  const pts = T.map((t, i) => `${x(i)},${y(t.state.tension)}`).join(" ");
+  g += `<polygon points="${x(0)},${y(0)} ${pts} ${x(n - 1)},${y(0)}" fill="url(#fill)"/>`;
+  g += `<polyline points="${pts}" fill="none" stroke="#4f7dff" stroke-width="2" filter="url(#gl)" vector-effect="non-scaling-stroke"/>`;
+  T.forEach((t, i) => {
+    const evs = t.events || [];
+    const cx = x(i), cy = y(t.state.tension);
+    if (evs.some(e => e.kind === "incident")) g += `<path d="M${cx},${cy - 12} l6,10 h-12z" fill="#ffd23f" filter="url(#gl)"/>`;
+    if (evs.some(e => e.kind === "deal" && /aceptado|cumplido/.test(e.description))) g += `<circle cx="${cx}" cy="${cy + 9}" r="4" fill="#47ffa3" filter="url(#gl)"/>`;
+    if (evs.some(e => e.is_false)) g += `<rect x="${cx - 3}" y="${y(0) + 4}" width="6" height="6" fill="#b98bff"/>`;
+    g += `<rect x="${cx - (W / n) / 2}" y="0" width="${W / n}" height="${H}" fill="transparent" data-i="${i}" style="cursor:pointer"/>`;
+  });
+  g += `<line id="cursor" x1="0" x2="0" y1="${padT}" y2="${H - padB}" stroke="#ffffff" stroke-opacity="0.6"/>`;
+  svg.innerHTML = g;
+  svg.querySelectorAll("rect[data-i]").forEach(r => r.addEventListener("click", () => go(+r.dataset.i)));
+  svg._x = x;
+}
+
+function drawLog() {
+  const el = document.getElementById("log");
+  el.innerHTML = T.map((t, i) => {
+    const evs = (t.events || []).filter(e => e.kind !== "action" && e.kind !== "message").map(e => e.description);
+    const acts = SIDES.map(s => {
+      const d = (t.decisions || {})[s];
+      if (!d) return "";
+      const labels = (d.actions || []).filter(a => a.kind !== "wait").map(a => (C.actions[a.kind] || {}).label || a.kind);
+      return labels.length ? `<span style="color:${sideColor(s)}">${s}</span>: ${esc(labels.join(", "))}` : "";
+    }).filter(Boolean);
+    return `<div class="row" data-i="${i}"><span>T${String(t.turn).padStart(2, "0")}</span><span class="d">${esc(t.date)}</span><span>${acts.join(" · ") || "<span class='d'>—</span>"}${evs.length ? ` <span style="color:var(--warn)">· ${esc(evs.join(" · "))}</span>` : ""}</span></div>`;
+  }).join("");
+  el.querySelectorAll(".row").forEach(r => r.addEventListener("click", () => { go(+r.dataset.i); window.scrollTo({top: 0, behavior: "smooth"}); }));
+}
+
+function render() {
+  const t = T[idx];
+  document.getElementById("clock").textContent = `T${String(t.turn).padStart(2, "0")} · ${t.date}`;
+  for (const s of SIDES) document.getElementById("defcon-" + s).innerHTML = defconHtml(s, t.state.sides[s].defcon);
+  document.getElementById("turn").innerHTML = sideColumn("USA", t) + worldColumn(t) + sideColumn("USSR", t);
+  const svg = document.getElementById("chart");
+  const cur = document.getElementById("cursor");
+  if (cur && svg._x) { const cx = svg._x(idx); cur.setAttribute("x1", cx); cur.setAttribute("x2", cx); }
+  document.querySelectorAll(".log .row").forEach(r => r.classList.toggle("current", +r.dataset.i === idx));
+}
+
+function go(i) { idx = Math.max(0, Math.min(T.length - 1, i)); render(); }
+
+function init() {
+  const h = DATA.header || {};
+  const last = T[T.length - 1].state;
+  document.title = `Cavalier · ${C.title}`;
+  document.getElementById("title").textContent = C.title;
+  const agents = h.agents ? Object.entries(h.agents).map(([s, a]) => `${s}: ${a}`).join(" · ") : "";
+  document.getElementById("meta").textContent = `${agents}${h.seed !== undefined ? " · semilla " + h.seed : ""} · ${T.length} turnos de ${C.hours_per_turn} h`;
+  const oc = document.getElementById("outcome");
+  if (last.outcome) {
+    oc.textContent = OUTCOMES[last.outcome] || last.outcome;
+    oc.className = "outcome glow o-" + last.outcome;
+    oc.title = last.outcome_reason || "";
+  } else { oc.textContent = "En curso"; oc.className = "outcome o-sin_resolver"; }
+  drawChart(); drawLog(); go(0);
+
+  document.getElementById("first").onclick = () => go(0);
+  document.getElementById("prev").onclick = () => go(idx - 1);
+  document.getElementById("next").onclick = () => go(idx + 1);
+  document.getElementById("last").onclick = () => go(T.length - 1);
+  const play = document.getElementById("play");
+  play.onclick = () => {
+    if (timer) { clearInterval(timer); timer = null; play.textContent = "▶"; play.classList.remove("active"); return; }
+    if (idx >= T.length - 1) go(0);
+    play.textContent = "❚❚"; play.classList.add("active");
+    timer = setInterval(() => { if (idx >= T.length - 1) play.onclick(); else go(idx + 1); }, 900);
+  };
+  document.querySelectorAll(".viewbar button").forEach(b => b.onclick = () => {
+    view = b.dataset.view;
+    document.querySelectorAll(".viewbar button").forEach(x => x.classList.toggle("active", x === b));
+    render();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight") go(idx + 1);
+    else if (e.key === "ArrowLeft") go(idx - 1);
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(T.length - 1);
+    else if (e.key === " ") { e.preventDefault(); play.onclick(); }
+  });
+}
+init();
+</script>
+</body>
+</html>

@@ -112,40 +112,55 @@ tests/                 26 tests: motor, invariantes cualitativos, agente LLM con
 
 ### 3.1 Resultados con el motor v2 (2.000 partidas por fila)
 
+> **Corrección (13‑oct‑2026)**: la primera versión de esta tabla tenía un fallo. Las observaciones
+> ofrecían el término "levantar la cuarentena" aunque no hubiera cuarentena, y el motor descartaba
+> esas propuestas enteras. Las cifras de abajo ya están corregidas, y un test impide que los agentes
+> scripted generen acciones inválidas. La secuencia histórica no estaba afectada.
+
 | Emparejamiento | Acuerdo | Desescalada | Sin resolver | Convencional | Nuclear | Turnos |
 |---|---|---|---|---|---|---|
 | Histórico (forzado) | 83,2 % | 0 % | 1,2 % | 0 % | 15,6 % | 28,4 |
-| halcón × halcón | 0 % | 0 % | 0 % | 59,0 % | 41,0 % | 7,3 |
-| paloma × paloma | 19,6 % | 76,6 % | 3,6 % | 0 % | 0,1 % | 14,7 |
-| pragmática × pragmática | 59,2 % | 8,6 % | 6,5 % | 10,7 % | 15,0 % | 17,8 |
-| pragmática × defensiva | 58,5 % | 4,9 % | 5,0 % | 12,8 % | 18,9 % | 16,9 |
-| halcón × paloma | 14,8 % | 1,6 % | 3,1 % | 48,6 % | 32,0 % | 12,7 |
-| impredecible × pragmática | 48,2 % | 1,8 % | 1,3 % | 26,6 % | 22,1 % | 12,8 |
-| prag × def, sin armas tácticas | 58,5 % | 4,9 % | 5,0 % | 17,3 % | 14,4 % | 16,9 |
-| prag × def, comunicaciones lentas | 55,4 % | 5,0 % | 4,5 % | 15,0 % | 20,2 % | 17,2 |
+| halcón × halcón | 0 % | 0 % | 0 % | 59,6 % | 40,4 % | 7,4 |
+| paloma × paloma | 86,3 % | 13,7 % | 0 % | 0 % | 0,1 % | 6,4 |
+| pragmática × pragmática | 74,6 % | 12,0 % | 5,0 % | 2,9 % | 5,5 % | 15,6 |
+| pragmática × defensiva | 77,8 % | 7,2 % | 3,4 % | 4,2 % | 7,3 % | 14,7 |
+| halcón × paloma | 26,9 % | 2,2 % | 3,9 % | 38,9 % | 28,1 % | 13,9 |
+| impredecible × pragmática | 77,5 % | 4,0 % | 0,3 % | 10,4 % | 7,8 % | 9,3 |
+| prag × def, sin armas tácticas | 77,8 % | 7,2 % | 3,4 % | 5,2 % | 6,3 % | 14,7 |
+| prag × def, comunicaciones lentas | 77,3 % | 7,1 % | 2,8 % | 4,3 % | 8,4 % | 14,6 |
 
-Las cifras son de agentes scripted: validan el motor, no dicen nada sobre 1962.
+Las cifras son de agentes scripted: validan el motor, no dicen nada sobre 1962. Dos palomas
+cierran un acuerdo en ~3 días: aceptan casi cualquier propuesta, y la duración la marca solo el
+plazo de cumplimiento.
 
 ### 3.2 Sensibilidad global (Morris, 10 trayectorias × 300 partidas por punto)
 
 | Métrica | Secuencia histórica | pragmática × defensiva |
 |---|---|---|
-| Uso nuclear | `incidents.1.nuclear_risk` (submarino) **49,3 %** · Maultsby 10,5 % · resto < 9 % | submarino 21,0 % · multiplicador de incidentes 13,4 % · `tension_decay` 11,6 % |
-| Guerra (convencional + nuclear) | igual que nuclear (las acciones fijas no incluyen ataques) | **`tension_decay` 20,5 %** · `implementation_turns` 16,9 % · incidentes 14,2 % |
-| Acuerdo | submarino 36,2 % · `verification_rate` 13,7 % | `implementation_turns` 23,3 % · incidentes 14,6 % |
+| Uso nuclear | `incidents.1.nuclear_risk` (submarino) **49,3 %** · Maultsby 10,5 % · resto < 9 % | submarino 20,3 % · `implementation_turns` 14,9 % · penalización por ceder 12,9 % |
+| Guerra (convencional + nuclear) | igual que nuclear (las acciones fijas no incluyen ataques) | `implementation_turns` 21,5 % · **penalización por ceder 15,8 %** · submarino 12,8 % |
+| Acuerdo | submarino 36,2 % · `verification_rate` 13,7 % | `implementation_turns` 21,1 % · `tension_decay` 18,7 % · penalización por ceder 18,5 % |
 
 Lectura:
-- **El riesgo nuclear del submarino es el supuesto crítico del modelo.** En la secuencia histórica, recorrer su rango plausible (2 %–30 %) mueve el uso nuclear en ~24 puntos. Coincide con la historiografía (el B‑59 se considera el momento más peligroso), pero significa que **ningún porcentaje de uso nuclear se puede dar como un número**. Se presentará siempre como una **curva en función de ese parámetro**.
-- **`tension_decay` domina la probabilidad de guerra con agentes que deciden, y es un supuesto mío sin base empírica.** Es el siguiente candidato a justificar o a presentar como condicionante.
-- Con agentes que deciden, la influencia se reparte (ningún parámetro pasa del 23 %): los resultados contrafactuales son más robustos que la repetición histórica.
+- **El riesgo nuclear del submarino es el supuesto crítico del modelo.** En la secuencia histórica,
+  recorrer su rango plausible (2 %–30 %) mueve el uso nuclear en ~24 puntos. Coincide con la
+  historiografía (el B‑59 se considera el momento más peligroso), pero significa que **ningún
+  porcentaje de uso nuclear se puede dar como un número**. Se presentará siempre como una curva
+  en función de ese parámetro.
+- **Con agentes que deciden, lo que más pesa es la mecánica de los acuerdos.** `implementation_turns`
+  tiene base en fuentes; `concession_low_tension_penalty` es un supuesto mío y es el siguiente
+  candidato a justificar o a presentar como condicionante. (Una versión anterior señalaba
+  `tension_decay`: era un artefacto del fallo corregido arriba.)
+- Con agentes, ningún parámetro pasa del 22 %: los resultados contrafactuales son más robustos
+  que la repetición histórica.
 
 ### 3.3 Criterios de salida de la fase 1
 | Criterio | Estado |
 |---|---|
 | Invariantes cualitativos en verde | ✅ 38 tests en verde |
 | Secuencia histórica con P(acuerdo) ∈ [50 %, 95 %] | ✅ 83,2 % |
-| Duración media ≥ 8 turnos | ✅ histórico 28,4; cooperativos 15–18 (antes 2–4) |
-| Parámetros dominantes identificados y tratados (criterio revisado; el original pedía "ningún parámetro > 50 %") | ✅ Submarino (49,3 % en la secuencia histórica, rango con base en fuentes): todo resultado de uso nuclear se presenta como curva sobre `incidents.1.nuclear_risk`. `tension_decay` (20,5 % de la guerra con agentes, supuesto del autor): pendiente de justificar; mientras tanto, condicionante declarado |
+| Duración media ≥ 8 turnos | ✅ histórico 28,4; pragmáticos 15–16 (antes 2–4) · ⚠️ paloma × paloma 6,4 (aceptan casi todo; la duración es solo el plazo de cumplimiento) |
+| Parámetros dominantes identificados y tratados (criterio revisado; el original pedía "ningún parámetro > 50 %") | ✅ Submarino (49,3 % en la secuencia histórica, rango con base en fuentes): todo resultado de uso nuclear se presenta como curva sobre `incidents.1.nuclear_risk`. `concession_low_tension_penalty` (15,8 % de la guerra con agentes, supuesto del autor): pendiente de justificar; mientras tanto, condicionante declarado |
 | Secuencia histórica y puntos de control verificados y congelados | ✅ verificados con fuentes y congelados con la etiqueta `prereg-v1` |
 
 ### 3.4 Pendiente, conocido
