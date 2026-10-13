@@ -92,3 +92,45 @@ def test_commitments_are_rendered_and_renege_is_validated(bundle):
     assert agent.decide(obs).actions[0].kind == "renege_deal"
     usa_agent = LLMAgent(bundle, "USA", FakeLLMClient([_answer(agent, "renege_deal", deal_id="P1")]))
     assert usa_agent.decide(game.observe("USA")).fallback  # EE. UU. no tiene compromisos pendientes en P1
+
+
+def test_schema_restricts_codes_to_this_turn(bundle):
+    client = FakeLLMClient([])
+    agent = LLMAgent(bundle, "USSR", client)
+    obs = _obs(bundle, "USSR")
+    schema = agent.schema_for(obs)
+    codes = schema["$defs"]["LLMAction"]["properties"]["code"]["enum"]
+    assert agent._action_to_code["impose_quarantine"] not in codes  # solo puede EE. UU.
+    assert agent._action_to_code["turn_back_ships"] not in codes  # no hay cuarentena todavía
+    assert agent._action_to_code["gather_intel"] in codes
+    terms = schema["$defs"]["LLMTerm"]["properties"]["code"]["enum"]
+    assert agent._term_to_code["lift_quarantine"] not in terms  # requiere cuarentena
+    assert schema["$defs"]["LLMAction"]["properties"]["deal_id"] == {"type": "null", "default": None}
+    assert schema["properties"]["actions"]["maxItems"] == obs.max_actions
+
+
+def test_lenient_fixes_that_do_not_change_the_decision(bundle):
+    from cavalier.models import Action, DealTerm
+
+    usa = ReplayAgent({0: [Action(kind="propose_deal", channel="backchannel", terms=[DealTerm(term="withdraw_missiles")])]})
+    game = Game(bundle, {"USA": usa, "USSR": ReplayAgent({})}, stochastic_events=False)
+    game.step()
+    client = FakeLLMClient([])
+    agent = LLMAgent(bundle, "USSR", client)
+    code = agent._action_to_code["accept_deal"]
+    client._responder = [json.dumps({"reasoning": "r", "actions": [{"code": code}], "confidence": 80})]
+    decision = agent.decide(game.observe("USSR"))
+    assert not decision.fallback and decision.actions[0].deal_id == "P1" and decision.confidence == 0.8
+
+
+def test_trap_variant_hides_the_missiles_entirely():
+    from cavalier.scenario import load_scenario
+
+    trap = load_scenario("cuba1962", "sin_jupiter")
+    game = Game(trap, {s: ReplayAgent({}) for s in trap.scenario.sides})
+    for side in trap.scenario.sides:
+        obs = game.observe(side)
+        assert "jupiters_turkey" not in obs.vars and "withdraw_jupiters" not in obs.deal_terms
+        agent = LLMAgent(trap, side, FakeLLMClient([]))
+        text = (agent.system_prompt + agent.render(obs, [])).lower()
+        assert "jupiter" not in text and "turquía" not in text
