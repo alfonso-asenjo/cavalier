@@ -31,11 +31,11 @@ TRAP_MARKERS = [r"jupiter", r"turqu", r"estado fronterizo", r"misiles .{0,40}(at
 TRAP_CHECKPOINTS = ("usa_respuesta_inicial", "ussr_linea_cuarentena")  # antes de que la historia mencione Turquía
 
 
-def _decide(bundle, scenario, cp, client, anonymized, seed, variant=None) -> dict:
+def _decide(bundle, scenario, cp, client, anonymized, seed, variant=None, persona="historico") -> dict:
     state = reconstruct_state(bundle, scenario, cp)
     idle = {s: ReplayAgent({}) for s in bundle.scenario.sides}
     game = Game(bundle, idle, seed=seed, state=state, anonymized=anonymized)
-    agent = LLMAgent(bundle, cp.side, client, anonymized=anonymized)
+    agent = LLMAgent(bundle, cp.side, client, persona=persona, anonymized=anonymized)
     client.seed = seed
     before = len(client.metrics)
     decision = agent.decide(game.observe(cp.side))
@@ -43,6 +43,7 @@ def _decide(bundle, scenario, cp, client, anonymized, seed, variant=None) -> dic
     text = " ".join([decision.reasoning] + [a.text or "" for a in decision.actions]).lower()
     return {
         "checkpoint": cp.id, "side": cp.side, "anonymized": anonymized, "variant": variant, "seed": seed,
+        "persona": persona,
         "calls": len(calls),
         "first_try_valid": len(calls) == 1 and not decision.fallback,
         "fallback": decision.fallback,

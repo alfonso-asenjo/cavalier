@@ -217,6 +217,51 @@ def cmd_checkpoints(args) -> None:
               f"  azar={res['uniform_baseline']:.0%}  {res['choices']}  respaldo={res['fallbacks']}")
 
 
+def cmd_fidelity(args) -> None:
+    from .agents.llm_client import OllamaClient
+    from .eval.fidelity import report, run_fidelity, scripted_choices
+
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    saved = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {}
+    meta = {"model": args.model, "k": args.k, "seed": args.seed, "temperature": args.temperature,
+            "num_ctx": args.num_ctx}
+    if saved and saved.get("meta") != meta:
+        raise SystemExit(f"{out} es de otra configuración ({saved.get('meta')}); usa otro --out")
+
+    scripted = scripted_choices(args.scenario, args.k, args.seed)  # referencia sin LLM: barata y determinista
+
+    def save(records, complete=False) -> None:
+        data = {"meta": meta, "complete": complete, "records": list(records), "scripted": scripted,
+                "report": report(list(records) + scripted, args.scenario)}
+        tmp = out.with_suffix(".tmp")
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+        tmp.replace(out)
+
+    if saved.get("complete"):
+        print(f"{out} ya está completo")
+        records = saved["records"]
+    else:
+        client = OllamaClient(args.model, base_url=args.base_url, temperature=args.temperature, num_ctx=args.num_ctx)
+        records = run_fidelity(client, args.scenario, k=args.k, seed=args.seed, done=saved.get("records"),
+                               on_progress=lambda r: save(r) if len(r) % 4 == 0 else None,
+                               log=lambda m: print(m, flush=True))
+        save(records, complete=True)
+    _print_fidelity(json.loads(out.read_text(encoding="utf-8"))["report"])
+
+
+def _print_fidelity(rep: dict) -> None:
+    for cp_id, r in rep.items():
+        print(f"
+{cp_id} ({r['side']}) — histórica: {r['historical']} · azar {r['uniform']:.0%}")
+        for cond, row in r["conditions"].items():
+            lo, hi = row["ci95"]
+            top = ", ".join(f"{k} {v}" for k, v in list(row["choices"].items())[:3])
+            print(f"  {cond:<24} {row['p']:5.0%} [{lo:4.0%}, {hi:4.0%}] n={row['n']:<3} {top}")
+        for persona, lk in r["real_vs_anon"].items():
+            print(f"  real − anon ({persona}): {lk['real_minus_anon']:+.0%}  Fisher p = {lk['fisher_p']:.3g}")
+
+
 def main(argv: list[str] | None = None) -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -285,6 +330,12 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("-k", type=int, default=5, help="muestras por punto de control y modo")
     p.add_argument("--out", default="runs/bench.json")
     p.set_defaults(func=cmd_bench)
+
+    p = sub.add_parser("fidelity", help="fidelidad en los puntos de control con referencias (fase 3)")
+    common(p, agents=False)
+    p.add_argument("-k", type=int, default=30)
+    p.add_argument("--out", default="runs/fidelity_v1.json")
+    p.set_defaults(func=cmd_fidelity)
 
     p = sub.add_parser("probe", help="sonda de fuga (requiere LLM)")
     common(p, agents=False)

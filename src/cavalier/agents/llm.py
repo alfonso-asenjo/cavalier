@@ -37,6 +37,8 @@ PERSONAS = {
     "defensiva": "Priorizas la supervivencia y la disuasión; no das el primer paso militar.",
     "pragmatica": "Intentas maximizar tus objetivos políticos minimizando riesgos y pérdidas.",
     "impredecible": "Desconfías de la información que recibes y tiendes a interpretar las señales del rival como amenazas.",
+    # Referencia de la fase 3: el mismo briefing, sin instrucción de imitar al dirigente.
+    "ninguna": "Decide según tu propio criterio.",
 }
 
 

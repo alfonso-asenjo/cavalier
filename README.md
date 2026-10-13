@@ -31,6 +31,7 @@ cavalier probe cuba1962 --model qwen3.5:9b                          # sonda de f
 cavalier run cuba1962 --usa llm:historico --ussr llm:historico --model qwen3.5:9b --anon --log runs/llm.jsonl
 cavalier run cuba1962 ... --log runs/llm.jsonl --resume              # continuar una partida cortada (guarda cada turno)
 cavalier checkpoints cuba1962 --agent llm:historico --model qwen3.5:9b -k 30
+cavalier fidelity cuba1962 -k 30                                     # fase 3: fidelidad con referencias (reanudable)
 ```
 
 Agentes: `scripted:{halcon,paloma,defensiva,pragmatica,impredecible}` y
