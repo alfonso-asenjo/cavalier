@@ -76,7 +76,8 @@ def observe(
         ],
         commitments=[_commitment_view(c, side) for c in state.commitments],
         legal_actions=legal_actions(bundle, state, side),
-        deal_terms={k: f"{t.label} (obliga a {t.obligor})" for k, t in bundle.scenario.deal_terms.items() if t.enabled},
+        deal_terms={k: f"{t.label} (obliga a {t.obligor})" for k, t in bundle.scenario.deal_terms.items()
+                    if t.enabled and state_ops.matches(state, t.requires)},
         channels=list(rules.channels),
         max_actions=rules.max_actions_per_turn,
     )

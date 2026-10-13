@@ -227,9 +227,10 @@ class LLMAgent:
             raise ValueError(f"Código de acción no disponible: {a.code}")
         terms = None
         if a.terms:
-            unknown = [t.code for t in a.terms if t.code not in self.term_codes]
+            unknown = [t.code for t in a.terms
+                       if t.code not in self.term_codes or self.term_codes[t.code] not in obs.deal_terms]
             if unknown:
-                raise ValueError(f"Términos desconocidos: {unknown}")
+                raise ValueError(f"Términos no disponibles ahora: {unknown}")
             terms = [DealTerm(term=self.term_codes[t.code], secret=t.secret) for t in a.terms]
         if kind in ("private_message", "propose_deal") and a.channel and a.channel not in obs.channels:
             raise ValueError(f"Canal desconocido: {a.channel}. Opciones: {obs.channels}")

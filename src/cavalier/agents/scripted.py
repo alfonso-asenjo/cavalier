@@ -63,10 +63,10 @@ class ScriptedAgent:
 
     def _proposal(self, obs: Observation) -> list[DealTerm]:
         catalog = self.bundle.scenario.deal_terms
-        terms = [DealTerm(term=k) for k, c in catalog.items() if c.enabled and c.obligor == obs.other_side and c.value.get(self.side, 0) > 0]
+        terms = [DealTerm(term=k) for k, c in catalog.items() if k in obs.deal_terms and c.obligor == obs.other_side and c.value.get(self.side, 0) > 0]
         if self.p.concede:
             own = sorted(
-                (k for k, c in catalog.items() if c.enabled and c.obligor == self.side),
+                (k for k, c in catalog.items() if k in obs.deal_terms and c.obligor == self.side),
                 key=lambda k: catalog[k].value.get(self.side, 0.0),
                 reverse=True,
             )
