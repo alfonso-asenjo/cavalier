@@ -1,0 +1,175 @@
+# Crisis de los misiles de Cuba, octubre de 1962.
+#
+# Este fichero describe la SITUACIÓN: bandos, estado inicial, variables (con quién conoce
+# qué) y catálogo de términos negociables. Las cifras numéricas de estado (tensión,
+# credibilidad, presión...) son estimaciones del autor sobre escalas abstractas 0..100,
+# no mediciones. Los datos históricos de referencia están en [historical_data] con su fuente.
+
+id = "cuba1962"
+title = "Crisis de los misiles de Cuba"
+start = 1962-10-16T08:00:00  # Kennedy recibe las fotografías del U-2
+hours_per_turn = 12
+max_turns = 30
+initial_tension = 55.0
+
+# --------------------------------------------------------------------------- bandos
+
+[sides.USA]
+name = "Estados Unidos"
+leader = "John F. Kennedy"
+briefing = """
+Primer día de la crisis (16 de octubre de 1962), por la mañana. Fotografías de reconocimiento de un avión U-2 muestran
+emplazamientos de misiles balísticos soviéticos de alcance medio en construcción en Cuba,
+a unos 150 km de Florida. La Unión Soviética ha asegurado en público y en privado que no
+tiene armas ofensivas en la isla. Hay elecciones legislativas a principios de noviembre y la
+oposición acusa al gobierno de debilidad frente a Cuba. Estados Unidos mantiene misiles
+Jupiter en Turquía e Italia. Berlín Occidental es vulnerable a una represalia soviética.
+Los asesores están divididos entre una respuesta militar inmediata y una vía diplomática.
+"""
+
+[sides.USA.initial]
+defcon = 5
+mobilization = 20.0
+control = 0.85
+domestic_pressure = 55.0
+credibility = 60.0
+intel_quality = 0.6
+
+[sides.USSR]
+name = "Unión Soviética"
+leader = "Nikita Jrushchov"
+briefing = """
+Primer día de la crisis (16 de octubre de 1962). Has desplegado en secreto en Cuba misiles de alcance medio, decenas de
+miles de soldados y armas nucleares tácticas. Objetivos: disuadir una invasión
+estadounidense de la isla aliada y compensar la gran inferioridad soviética en armas
+estratégicas intercontinentales frente a Estados Unidos, que además tiene misiles en
+Turquía, junto a tu frontera. Los emplazamientos aún no están operativos. Has negado
+oficialmente el despliegue. No sabes si Estados Unidos lo ha descubierto. El liderazgo cubano
+teme una invasión inminente. Berlín sigue siendo un punto de presión disponible.
+"""
+
+[sides.USSR.initial]
+defcon = 5
+mobilization = 20.0
+control = 0.75          # fuerzas lejanas, comunicaciones lentas con submarinos y Cuba
+domestic_pressure = 40.0
+credibility = 55.0
+intel_quality = 0.45
+
+# --------------------------------------------------------------------------- variables
+# visible_to: bandos que conocen el valor real. Los demás lo ven con `noise` y `bias`.
+# hidden_from: bandos que ni siquiera saben que la variable existe.
+# Escala 0..1.
+
+[variables.missiles_discovered]
+label = "EE. UU. ha descubierto los misiles"
+initial = 1.0
+visible_to = ["USA"]
+noise = 0.35            # la URSS no sabe con certeza si la han descubierto
+
+[variables.construction_progress]
+label = "Progreso de los emplazamientos de misiles en Cuba"
+initial = 0.35
+visible_to = ["USSR"]
+noise = 0.15
+
+[variables.construction_active]
+label = "Obras en curso"
+initial = 1.0
+visible_to = ["USSR"]
+noise = 0.25
+
+[variables.quarantine]
+label = "Cuarentena naval activa"
+initial = 0.0
+visible_to = ["USA", "USSR"]
+
+[variables.soviet_troops_cuba]
+label = "Tropas soviéticas en Cuba (fracción de 100.000)"
+initial = 0.42
+visible_to = ["USSR"]
+noise = 0.03
+bias = { USA = -0.32 }  # EE. UU. estimaba ~10.000 cuando eran ~42.000
+
+[variables.tactical_nukes_cuba]
+label = "Armas nucleares tácticas soviéticas en Cuba"
+initial = 1.0
+visible_to = ["USSR"]
+hidden_from = ["USA"]   # EE. UU. no lo supo durante la crisis
+
+[variables.jupiters_turkey]
+label = "Misiles Jupiter estadounidenses en Turquía"
+initial = 1.0
+visible_to = ["USA", "USSR"]
+
+[variables.invasion_pledge]
+label = "Compromiso de EE. UU. de no invadir Cuba"
+initial = 0.0
+visible_to = ["USA", "USSR"]
+
+[variables.missiles_withdrawn]
+label = "Misiles retirados de Cuba"
+initial = 0.0
+visible_to = ["USA", "USSR"]
+
+# --------------------------------------------------------------------------- acuerdos
+# `value` es la utilidad para cada bando: SUPUESTO DEL AUTOR, solo lo usan los agentes scripted.
+
+[deal_terms.withdraw_missiles]
+label = "Retirada de los misiles ofensivos de Cuba"
+obligor = "USSR"
+value = { USA = 4.0, USSR = -2.0 }
+credibility_cost = 15.0
+sets = { "vars.missiles_withdrawn" = 1.0, "vars.construction_active" = 0.0 }
+
+[deal_terms.halt_construction]
+label = "Detener las obras de los emplazamientos"
+obligor = "USSR"
+value = { USA = 1.5, USSR = -0.5 }
+credibility_cost = 5.0
+sets = { "vars.construction_active" = 0.0 }
+
+[deal_terms.un_inspection]
+label = "Inspección de la ONU en Cuba"
+obligor = "USSR"
+value = { USA = 1.0, USSR = -1.0 }
+credibility_cost = 5.0
+
+[deal_terms.no_invasion_pledge]
+label = "Compromiso público de no invadir Cuba"
+obligor = "USA"
+value = { USA = -1.0, USSR = 3.0 }
+credibility_cost = 5.0
+sets = { "vars.invasion_pledge" = 1.0 }
+
+[deal_terms.withdraw_jupiters]
+label = "Retirada de los misiles Jupiter de Turquía"
+obligor = "USA"
+value = { USA = -1.5, USSR = 2.0 }
+credibility_cost = 20.0
+secretable = true
+sets = { "vars.jupiters_turkey" = 0.0 }
+
+[deal_terms.lift_quarantine]
+label = "Levantar la cuarentena naval"
+obligor = "USA"
+value = { USA = -0.5, USSR = 1.5 }
+credibility_cost = 2.0
+sets = { "vars.quarantine" = 0.0 }
+
+# --------------------------------------------------------------------------- referencia
+# El motor no usa estos datos. Cifras aproximadas: VERIFICAR contra la fuente antes de citarlas.
+
+[historical_data.arsenal_1962]
+fuente = "Norris & Kristensen, Nuclear Notebook, Bulletin of the Atomic Scientists"
+verificado = false
+usa_ojivas_total_aprox = 25500
+urss_ojivas_total_aprox = 3300
+nota = "Asimetría estratégica muy fuerte a favor de EE. UU.; motivo central del despliegue soviético"
+
+[historical_data.cuba]
+fuente = "Fursenko & Naftali, One Hell of a Gamble; National Security Archive"
+verificado = false
+tropas_sovieticas_reales_aprox = 42000
+estimacion_eeuu_durante_crisis_aprox = 10000
+armas_tacticas_conocidas_por_eeuu = false
