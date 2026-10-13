@@ -134,3 +134,16 @@ def test_trap_variant_hides_the_missiles_entirely():
         agent = LLMAgent(trap, side, FakeLLMClient([]))
         text = (agent.system_prompt + agent.render(obs, [])).lower()
         assert "jupiter" not in text and "turquía" not in text
+
+
+def test_secret_flag_dropped_for_terms_that_cannot_be_secret(bundle):
+    client = FakeLLMClient([])
+    agent = LLMAgent(bundle, "USSR", client)
+    c = agent._term_to_code
+    client._responder = [json.dumps({"reasoning": "r", "confidence": 0.5, "actions": [{
+        "code": agent._action_to_code["propose_deal"], "channel": "official",
+        "terms": [{"code": c["un_inspection"], "secret": True}, {"code": c["withdraw_jupiters"], "secret": True}]}]})]
+    decision = agent.decide(_obs(bundle, "USSR"))
+    assert not decision.fallback
+    secret = {t.term: t.secret for t in decision.actions[0].terms}
+    assert secret == {"un_inspection": False, "withdraw_jupiters": True}

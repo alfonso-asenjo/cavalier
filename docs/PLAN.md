@@ -215,9 +215,40 @@ También se corrigió la trampa: la variable de los Jupiter seguía visible con 
    cabe en la GPU (deja casi todo en RAM): descartada.
 
 **Criterios de salida de la fase 2:** JSON ✅ (9B) · respaldo ✅ · coste medido ✅ · fuga reportada en
-modo real, anonimizado y trampa ✅ · visor mínimo ✅ (adelantado, con estética DEFCON).
-Pendiente para cerrar la fase: la primera partida completa entre dos LLM, y que las partidas largas se
-puedan reanudar, porque una partida entera con el 9B dura unos 10 minutos.
+modo real, anonimizado y trampa ✅ · visor mínimo ✅ (adelantado, con estética DEFCON) ·
+partidas reanudables ✅ · primeras partidas completas entre dos LLM ✅. **Fase 2 cerrada.**
+
+### Primeras partidas completas LLM contra LLM (9B, anonimizado, `llm:historico`)
+
+Las partidas guardan tras cada turno un punto de control (`runs/<partida>.ckpt.json`) con el estado,
+el generador aleatorio y la memoria de los agentes. `cavalier run ... --log X --resume` continúa desde
+ahí, y un test comprueba que una partida cortada y reanudada termina igual que una sin cortes. Cada
+turno cuesta unos 25 s (dos decisiones), así que una partida de 10–20 turnos dura 4–8 minutos.
+
+| Semilla | Resultado | Turnos | Tensión máx. | Respaldos | Inválidas |
+|---|---|---|---|---|---|
+| 0 | conflicto convencional (ataque aéreo de EE. UU., día 5) | 10 | 70 | 0 | 1 |
+| 1 | "acuerdo negociado" **falso** (ver abajo) | 19 | 97 | 0 | 0 |
+
+Son dos partidas: sirven para encontrar fallos, no para medir nada. Encontraron tres.
+
+1. **Propuestas descartadas en silencio.** El modelo marcó como secreta la inspección de la ONU, que
+   no admite secreto, y el motor descartó la propuesta entera. Ahora el prompt indica qué términos
+   pueden pactarse en secreto, y el agente pacta en público un término no secretable (corrección
+   tolerante, con test).
+2. **Un acuerdo que no resuelve la crisis la cerraba.** En la semilla 1, la URSS propuso la retirada
+   secreta de los Jupiter sin dar nada a cambio, EE. UU. aceptó en DEFCON 1 y el motor declaró
+   "acuerdo negociado" con los misiles todavía en la isla. Ahora los términos llevan `resolves_crisis`
+   (en Cuba, solo la retirada de los misiles). Otro acuerdo cumplido baja la tensión, pero la crisis
+   sigue. La tabla 3.1 no cambia, porque los acuerdos de los agentes scripted siempre incluyen la retirada.
+3. **El registro guardaba propuestas ya caducadas como abiertas.** La observación compartía objetos
+   con el estado real y el JSONL las grababa ya modificadas. No afectaba a las decisiones; ahora se copian.
+
+Comportamiento a vigilar en la fase 3, sin sacar conclusiones con n = 2:
+- La URSS no responde a las propuestas de EE. UU.: ni las acepta ni las rechaza, solo contrapropone.
+- EE. UU. sube a DEFCON 1 en el día 3 (en 1962 nunca pasó de DEFCON 2) y se queda ahí una semana.
+- En modo anonimizado, la URSS llega sola a la estructura del pacto histórico: retirada secreta de los
+  Jupiter más compromiso de no invasión. No es necesariamente fuga, porque los Jupiter están en su briefing.
 
 ---
 

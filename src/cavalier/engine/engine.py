@@ -350,8 +350,12 @@ class Game:
                             for c in mine):
                 deal.status = "fulfilled"
                 state_ops.add(self.state, "tension", -rules.fulfillment_tension_relief)
-                self._end(Outcome.NEGOTIATED, f"Acuerdo {deal.id} cumplido y verificado")
-                return
+                core = [k for k, t in catalog.items() if t.resolves_crisis]
+                if not core or any(c.term in core for c in mine):
+                    self._end(Outcome.NEGOTIATED, f"Acuerdo {deal.id} cumplido y verificado")
+                    return
+                self._event("deal", f"Acuerdo {deal.id} cumplido, pero no resuelve la crisis", None,
+                            list(self.state.sides))
 
     def incident_probability(self, incident) -> float:
         rules = self.bundle.rules

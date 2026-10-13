@@ -7,11 +7,11 @@ from pathlib import Path
 
 
 class JsonlRecorder:
-    def __init__(self, path: str | Path, header: dict | None = None):
+    def __init__(self, path: str | Path, header: dict | None = None, append: bool = False):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._f = self.path.open("w", encoding="utf-8")
-        if header:
+        self._f = self.path.open("a" if append else "w", encoding="utf-8")
+        if header and not append:
             self._write({"type": "header", **header})
 
     def _write(self, record: dict) -> None:

@@ -172,3 +172,18 @@ def test_terminal_action_ends_game(bundle):
     state = Game(bundle, {"USA": usa, "USSR": ReplayAgent({})}, seed=0).run()
     assert state.outcome in (Outcome.CONVENTIONAL, Outcome.NUCLEAR)
     assert state.turn == 1
+
+
+def test_deal_that_does_not_remove_the_missiles_does_not_end_the_crisis(bundle):
+    from cavalier.agents.scripted import ReplayAgent
+    from cavalier.models import Action, DealTerm, Outcome
+
+    ussr = ReplayAgent({0: [Action(kind="propose_deal", channel="backchannel",
+                                   terms=[DealTerm(term="withdraw_jupiters", secret=True)])]})
+    usa = ReplayAgent({1: [Action(kind="accept_deal")]})
+    game = Game(bundle, {"USA": usa, "USSR": ussr}, stochastic_events=False)
+    for _ in range(bundle.rules.implementation_turns + 3):
+        game.step()
+    assert game.state.deals["P1"].status == "fulfilled"
+    assert game.state.outcome != Outcome.NEGOTIATED
+    assert any("no resuelve la crisis" in e.description for e in game.state.events)

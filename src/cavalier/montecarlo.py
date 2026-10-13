@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from collections.abc import Callable
 from concurrent.futures import Executor
@@ -13,7 +14,7 @@ from .agents.scripted import ReplayAgent, ScriptedAgent
 from .engine import Game
 from .eval.stats import wilson_interval
 from .history import load_historical_script
-from .models import Outcome
+from .models import Outcome, WorldState
 from .recorder import JsonlRecorder
 from .scenario import ScenarioBundle
 
@@ -63,17 +64,62 @@ class BatchResult:
         return {"n": self.n, "table": self.table(), "games": [asdict(s) for s in self.summaries]}
 
 
+def checkpoint_path(log_path: str | Path) -> Path:
+    return Path(log_path).with_suffix(".ckpt.json")
+
+
+def _save_checkpoint(path: Path, game: Game, max_tension: float) -> None:
+    data = {
+        "state": game.state.model_dump(mode="json"),
+        "rng": game.rng.bit_generator.state,
+        "agents": {s: a.snapshot() for s, a in game.agents.items() if hasattr(a, "snapshot")},
+        "max_tension": max_tension,
+    }
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)  # atómico: un corte a mitad de escritura no deja un punto de control roto
+
+
+def _restore_checkpoint(path: Path, game: Game, log_path: Path) -> float:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    game.state = WorldState.model_validate(data["state"])
+    game.rng.bit_generator.state = data["rng"]
+    for side, snap in data["agents"].items():
+        game.agents[side].restore(snap)
+    # El registro puede llevar algún turno posterior al punto de control (corte entre ambas escrituras).
+    records = [(ln, json.loads(ln)) for ln in log_path.read_text(encoding="utf-8").splitlines(keepends=True)]
+    keep = [ln for ln, r in records if r.get("type") != "turn" or r["turn"] < game.state.turn]
+    log_path.write_text("".join(keep), encoding="utf-8")
+    return data["max_tension"]
+
+
 def play(bundle: ScenarioBundle, agents: dict[str, Agent], seed: int, anonymized: bool = False,
-         log_path: Path | None = None) -> GameSummary:
-    recorder = JsonlRecorder(log_path, {"scenario": bundle.scenario.id, "seed": seed,
-                                        "agents": {s: a.name for s, a in agents.items()}}) if log_path else None
-    game = Game(bundle, agents, seed=seed, anonymized=anonymized, recorder=recorder)
+         log_path: str | Path | None = None, resume: bool = False, log=None) -> GameSummary:
+    """Con `log_path`, guarda tras cada turno un punto de control (`.ckpt.json`) con el estado real,
+    el generador aleatorio y la memoria de los agentes; con `resume=True` continúa desde él. Con
+    agentes deterministas el resultado es idéntico al de una partida sin interrupción."""
+    ckpt = checkpoint_path(log_path) if log_path else None
+    resuming = bool(resume and ckpt and ckpt.exists() and Path(log_path).exists())
+    header = {"scenario": bundle.scenario.id, "seed": seed, "agents": {s: a.name for s, a in agents.items()}}
+    game = Game(bundle, agents, seed=seed, anonymized=anonymized)
     max_tension = game.state.tension
+    if resuming:
+        max_tension = _restore_checkpoint(ckpt, game, Path(log_path))
+        if log:
+            log(f"reanudando en el turno {game.state.turn}")
+    recorder = JsonlRecorder(log_path, header, append=resuming) if log_path else None
+    game.recorder = recorder
     while game.state.outcome is None:
         game.step()
         max_tension = max(max_tension, game.state.tension)
+        if ckpt:
+            _save_checkpoint(ckpt, game, max_tension)
+        if log:
+            log(f"turno {game.state.turn - 1} ({game.date_label(game.state.turn - 1)}) · tensión {game.state.tension:.0f}")
     if recorder:
         recorder.close()
+    if ckpt and ckpt.exists():
+        ckpt.unlink()
     st = game.state
     return GameSummary(
         seed=seed,

@@ -40,7 +40,8 @@ def _agent_builder(args, spec: str, side: str):
 
         def build(bundle: ScenarioBundle, seed: int) -> Agent:
             if args.backend == "ollama":
-                client = OllamaClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed)
+                client = OllamaClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed,
+                                      num_ctx=args.num_ctx)
             else:
                 client = OpenAICompatibleClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed)
             return LLMAgent(bundle, side, client, persona=persona or "historico", anonymized=args.anon, retriever=retriever)
@@ -82,7 +83,8 @@ def cmd_run(args) -> None:
     bundle = load_scenario(args.scenario, args.variant)
     agents = _factory(args)(bundle, args.seed)
     log = Path(args.log) if args.log else (Path("runs") / f"{args.scenario}_{args.seed}.jsonl" if args.view else None)
-    summary = play(bundle, agents, args.seed, anonymized=args.anon, log_path=log)
+    summary = play(bundle, agents, args.seed, anonymized=args.anon, log_path=log, resume=args.resume,
+                   log=lambda m: print(m, flush=True))
     print(json.dumps(summary.__dict__, ensure_ascii=False, indent=2))
     if args.view:
         from .viewer import render
@@ -233,6 +235,8 @@ def main(argv: list[str] | None = None) -> None:
         p.add_argument("--temperature", type=float, default=0.7)
         p.add_argument("--corpus", help="carpeta con documentos .jsonl para el RAG")
         p.add_argument("--workers", type=int, default=1, help="procesos en paralelo (solo agentes scripted/históricos)")
+        p.add_argument("--num-ctx", type=int, default=4096,
+                       help="contexto de Ollama; 4096 cabe entero en una GPU de 8 GB con el modelo de 9B")
         if agents:
             p.add_argument("--usa", default="scripted:pragmatica")
             p.add_argument("--ussr", default="scripted:pragmatica")
@@ -241,6 +245,7 @@ def main(argv: list[str] | None = None) -> None:
     common(p)
     p.add_argument("--log", help="fichero JSONL de la partida")
     p.add_argument("--view", action="store_true", help="generar el visor HTML al terminar")
+    p.add_argument("--resume", action="store_true", help="continuar desde el último turno guardado de --log")
     p.set_defaults(func=cmd_run)
 
     p = sub.add_parser("view", help="visor HTML de una partida registrada")
@@ -278,7 +283,6 @@ def main(argv: list[str] | None = None) -> None:
     common(p, agents=False)
     p.add_argument("--models", default="qwen3.5:9b,qwen3.5:4b,gemma4:e4b")
     p.add_argument("-k", type=int, default=5, help="muestras por punto de control y modo")
-    p.add_argument("--num-ctx", type=int, default=8192)
     p.add_argument("--out", default="runs/bench.json")
     p.set_defaults(func=cmd_bench)
 
