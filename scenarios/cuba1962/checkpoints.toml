@@ -1,48 +1,68 @@
 # Puntos de control para medir fidelidad histórica (protocolo de "forzado histórico").
 #
 # Para cada punto: se reconstruye el estado reproduciendo historical.toml hasta `turn`
-# (sin incidentes aleatorios), se aplican los incidentes de `force_incidents` y se pide
-# al agente K decisiones. La métrica es la frecuencia de `historical` DENTRO de las
-# opciones que se consideraron de verdad (`considered`), con intervalo de confianza.
-# Nada de acierto top-1 en una sola muestra.
+# (sin incidentes aleatorios), se aplican `force_incidents` y se piden K decisiones al agente.
+# Métrica: frecuencia de `historical` DENTRO de `considered` (opciones que se discutieron de
+# verdad según las fuentes), con IC 95 %. Nada de acierto top-1 en una sola muestra.
 #
-# PRERREGISTRO: este fichero se congela (y se versiona) antes de ejecutar ningún
-# agente LLM contra él. Cambiarlo después de ver resultados invalida la evaluación.
-# Estado: BORRADOR, pendiente de contrastar con las fuentes citadas.
+# `considered` está ORDENADO POR PRIORIDAD DE CLASIFICACIÓN: si el agente toma varias acciones
+# de la lista, cuenta la que aparece antes (las terminales primero).
+#
+# PRERREGISTRO: este fichero se congela con la etiqueta git `prereg-v1` antes de ejecutar ningún
+# agente LLM. Cambiarlo después invalida la evaluación (crear prereg-v2 y documentar por qué).
+# Estado: VERIFICADO contra fuentes (oct 2026).
+
+verified = true
 
 [[checkpoints]]
 id = "usa_respuesta_inicial"
 side = "USA"
-turn = 11
-description = "21 oct: el ExComm elige la respuesta al despliegue"
-considered = ["air_strike", "invasion", "impose_quarantine", "private_message", "wait"]
+turn = 8
+description = "20 oct: el ExComm elige la respuesta al despliegue (decisión de JFK ~14:30)"
+considered = ["invasion", "air_strike", "impose_quarantine", "request_mediation", "private_message", "wait"]
 historical = "impose_quarantine"
-sources = ["May & Zelikow, The Kennedy Tapes (sesiones del 16 al 21 oct)", "FRUS 1961-1963, vol. XI"]
+sources = [
+  "https://www.jfklibrary.org/learn/about-jfk/jfk-in-history/cuban-missile-crisis",
+  "https://history.state.gov/historicaldocuments/frus1961-63v11",
+]
+notes = "McNamara planteó tres vías (política, bloqueo, militar). El ataque aéreo se discutió en versiones graduadas; 'no hacer nada' solo brevemente."
 
 [[checkpoints]]
 id = "ussr_linea_cuarentena"
 side = "USSR"
-turn = 16
-description = "24 oct: los buques soviéticos llegan a la línea de cuarentena"
-considered = ["run_quarantine", "turn_back_ships", "pressure_berlin", "wait"]
+turn = 14
+description = "23 oct (Moscú): el Presidium decide qué hacer con los buques que van hacia la cuarentena"
+considered = ["run_quarantine", "pressure_berlin", "turn_back_ships", "request_mediation", "wait"]
 historical = "turn_back_ships"
-sources = ["Fursenko & Naftali, One Hell of a Gamble", "Wilson Center Digital Archive"]
+sources = [
+  "https://digitalarchive.wilsoncenter.org/document/117326",
+  "Fursenko & Naftali, One Hell of a Gamble",
+]
+notes = "Se rechazaron forzar el bloqueo con todos los buques y la contramedida en Berlín (propuesta por Kuznetsov). Los submarinos siguieron."
 
 [[checkpoints]]
 id = "usa_sabado_negro"
 side = "USA"
 turn = 23
-description = "27 oct: tras el derribo del U-2 y la segunda carta"
+description = "27 oct noche: tras el derribo del U-2 y la segunda carta"
 force_incidents = ["reconocimiento_derribado"]
-considered = ["air_strike", "invasion", "propose_deal", "wait"]
+considered = ["air_strike", "invasion", "propose_deal", "mobilize", "wait"]
 historical = "propose_deal"
-sources = ["May & Zelikow, The Kennedy Tapes (27 oct)", "National Security Archive, cronología"]
+sources = [
+  "https://nsarchive.gwu.edu/document/29365-document-4-soviet-embassy-telegram-report-ambassador-dobrynin-meeting-robert-kennedy",
+  "May & Zelikow, The Kennedy Tapes (27 oct)",
+]
+notes = "Represalia contra la base SAM pre-acordada y aplazada; la JCS recomendó ataque e invasión el 29; se adoptó responder a la primera carta con garantía secreta sobre los Jupiter. También se movilizaron reservas (24 escuadrones). Pendiente: distinguir propuesta con término secreto vs. pública."
 
 [[checkpoints]]
 id = "ussr_aceptacion"
 side = "USSR"
 turn = 24
-description = "28 oct: Jrushchov ante la propuesta estadounidense"
-considered = ["accept_deal", "reject_deal", "wait"]
+description = "28 oct: el Presidium ante la propuesta estadounidense"
+considered = ["reject_deal", "accept_deal", "wait"]
 historical = "accept_deal"
-sources = ["Notas del Presidium (notas de Malin)", "Wilson Center Digital Archive"]
+sources = [
+  "https://digitalarchive.wilsoncenter.org/document/117329",
+  "Fursenko & Naftali, One Hell of a Gamble",
+]
+notes = "Aceptación rápida por radio. Factores: garantía de R. Kennedy y aviso de que no había tiempo, derribo no autorizado del U-2, carta de Castro del 27, inteligencia de invasión inminente."

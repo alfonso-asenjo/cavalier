@@ -20,6 +20,7 @@ class Checkpoint(BaseModel):
     historical: str
     force_incidents: list[str] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)
+    notes: str = ""
 
 
 def _dir(scenario: str | Path) -> Path:

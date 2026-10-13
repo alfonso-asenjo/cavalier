@@ -1,7 +1,7 @@
 # Cavalier — Plan de proyecto (v2)
 
 > Simulador de toma de decisiones en crisis nucleares históricas con agentes de IA.
-> MVP: crisis de los misiles de Cuba, octubre de 1962.
+> MVP: crisis de los misiles de Cuba, octubre de 1962. **Estado: fase 1 completada (oct 2026).**
 
 **Cómo se ha hecho este plan** (tres pasadas):
 1. Borrador evaluando punto por punto el documento inicial (`inicial.md`).
@@ -65,11 +65,12 @@ Veredictos: ✅ mantener · 🔧 mantener con cambios · ⏸ posponer · ❌ des
 ```
 scenarios/cuba1962/
   scenario.toml        situación: bandos, briefings, variables (quién sabe qué, con ruido y sesgo), términos
-  rules.toml           SUPUESTOS: efectos de acciones, dinámica, incidentes, informes falsos
+  rules.toml           SUPUESTOS: efectos de acciones, dinámica, incidentes, interacciones, acuerdos
+  ranges.toml          rango plausible y justificación de cada supuesto (para Morris)
   aliases.toml         modo anonimizado
   historical.toml      secuencia histórica traducida a acciones abstractas (borrador)
   checkpoints.toml     4 puntos de control prerregistrables (borrador)
-  variants/            sin_armas_tacticas · tacticas_descubiertas · sin_jupiter (trampa)
+  variants/            sin_armas_tacticas · tacticas_descubiertas · sin_jupiter (trampa) · comunicaciones_lentas
 src/cavalier/
   models.py            estado, acciones, decisiones, observaciones, eventos (Pydantic)
   scenario.py          carga TOML, variantes y overrides (para sensibilidad)
@@ -81,14 +82,80 @@ src/cavalier/
   anonymize.py         renombrado; el agente ve códigos opacos (A01, T1) en lugar de claves internas
   eval/                sonda de fuga, puntos de control forzados, IC de Wilson
   montecarlo.py        lotes, agregados con IC, partidas con respaldo separadas
-  sensitivity.py       un factor cada vez (OAT), con números aleatorios comunes
-  cli.py               run · montecarlo · replay · sensitivity · probe · checkpoints
+  sensitivity.py       OAT y cribado de Morris, con números aleatorios comunes
+  cli.py               run · montecarlo · replay · sensitivity · morris · probe · checkpoints (--workers)
 tests/                 26 tests: motor, invariantes cualitativos, agente LLM con cliente falso, RAG, checkpoints
 ```
 
 ---
 
-## 3. Hallazgos de la primera ejecución
+## 3. Fase 1: motor v2 (octubre de 2026)
+
+### 3.0 Qué se ha cambiado
+| Problema (fase 0) | Solución |
+|---|---|
+| La tensión se saturaba en 100 | Actualizaciones en **escala logit** para todas las magnitudes acotadas: un +10 vale ~10 puntos en el centro y cada vez menos cerca del extremo, que nunca se alcanza |
+| Aceptar un acuerdo terminaba la partida | **Fase de cumplimiento**: compromisos con plazo (`implementation_turns`), **verificación** por el otro bando (inteligencia o inspección), **ruptura** (`renege_deal`) y **filtración** de términos secretos. La crisis termina cuando lo exigible está cumplido y verificado. La retirada de los Jupiter se pacta a confianza (`verification_required = false`), como en la historia |
+| Ceder pronto salía gratis | El coste de credibilidad de una concesión se multiplica por `1 + penal·(1 − tensión/100)` y genera presión interna |
+| Orden aleatorio de acciones simultáneas | **Resolución por fases**: comunicación → postura → **interacciones** → terminales → aceptaciones. Una invasión ordenada no la para una carta que llega el mismo turno; levantar la cuarentena el mismo turno en que los buques la fuerzan evita el choque |
+| Incidentes como datos | Incidentes e inteligencia falsa movidos a `rules.toml`: son supuestos |
+| Sensibilidad solo local | **Cribado de Morris** sobre `ranges.toml` (17 parámetros con rango y justificación, `basis = fuente/autor`) y ejecución en paralelo (`--workers`) |
+
+**Verificación histórica** (con fuentes; detalles en `historical.toml` y `checkpoints.toml`):
+- La orden soviética del 22 de octubre solo retenía *implícitamente* el uso nuclear; la prohibición explícita es del 27.
+- La retirada de los buques la decidió Moscú el 23 (turno 14) y Washington la observó el 24.
+- Solo el SAC pasó a DEFCON 2.
+- La CIA estimaba 8.000 → 10.000 → 22.000 soldados soviéticos; eran 41.902.
+- Había ~98 ojivas tácticas en Cuba.
+- **La primera carta de Jruschov tardó ~10 h**: a la resolución de 12 h, el canal oficial y el extraoficial colapsan en un turno. La latencia se estudia como contrafactual (`variants/comunicaciones_lentas.toml`; el "teléfono rojo" se creó en 1963 precisamente por esto).
+- El punto de control inicial pasa al **20 de octubre** (turno 8), cuando JFK decidió la cuarentena.
+
+### 3.1 Resultados con el motor v2 (2.000 partidas por fila)
+
+| Emparejamiento | Acuerdo | Desescalada | Sin resolver | Convencional | Nuclear | Turnos |
+|---|---|---|---|---|---|---|
+| Histórico (forzado) | 83,2 % | 0 % | 1,2 % | 0 % | 15,6 % | 28,4 |
+| halcón × halcón | 0 % | 0 % | 0 % | 59,0 % | 41,0 % | 7,3 |
+| paloma × paloma | 19,6 % | 76,6 % | 3,6 % | 0 % | 0,1 % | 14,7 |
+| pragmática × pragmática | 59,2 % | 8,6 % | 6,5 % | 10,7 % | 15,0 % | 17,8 |
+| pragmática × defensiva | 58,5 % | 4,9 % | 5,0 % | 12,8 % | 18,9 % | 16,9 |
+| halcón × paloma | 14,8 % | 1,6 % | 3,1 % | 48,6 % | 32,0 % | 12,7 |
+| impredecible × pragmática | 48,2 % | 1,8 % | 1,3 % | 26,6 % | 22,1 % | 12,8 |
+| prag × def, sin armas tácticas | 58,5 % | 4,9 % | 5,0 % | 17,3 % | 14,4 % | 16,9 |
+| prag × def, comunicaciones lentas | 55,4 % | 5,0 % | 4,5 % | 15,0 % | 20,2 % | 17,2 |
+
+Las cifras son de agentes scripted: validan el motor, no dicen nada sobre 1962.
+
+### 3.2 Sensibilidad global (Morris, 10 trayectorias × 300 partidas por punto)
+
+| Métrica | Secuencia histórica | pragmática × defensiva |
+|---|---|---|
+| Uso nuclear | `incidents.1.nuclear_risk` (submarino) **49,3 %** · Maultsby 10,5 % · resto < 9 % | submarino 21,0 % · multiplicador de incidentes 13,4 % · `tension_decay` 11,6 % |
+| Guerra (convencional + nuclear) | igual que nuclear (las acciones fijas no incluyen ataques) | **`tension_decay` 20,5 %** · `implementation_turns` 16,9 % · incidentes 14,2 % |
+| Acuerdo | submarino 36,2 % · `verification_rate` 13,7 % | `implementation_turns` 23,3 % · incidentes 14,6 % |
+
+Lectura:
+- **El riesgo nuclear del submarino es el supuesto crítico del modelo.** En la secuencia histórica, recorrer su rango plausible (2 %–30 %) mueve el uso nuclear en ~24 puntos. Coincide con la historiografía (el B‑59 se considera el momento más peligroso), pero significa que **ningún porcentaje de uso nuclear se puede dar como un número**. Se presentará siempre como una **curva en función de ese parámetro**.
+- **`tension_decay` domina la probabilidad de guerra con agentes que deciden, y es un supuesto mío sin base empírica.** Es el siguiente candidato a justificar o a presentar como condicionante.
+- Con agentes que deciden, la influencia se reparte (ningún parámetro pasa del 23 %): los resultados contrafactuales son más robustos que la repetición histórica.
+
+### 3.3 Criterios de salida de la fase 1
+| Criterio | Estado |
+|---|---|
+| Invariantes cualitativos en verde | ✅ 38 tests en verde |
+| Secuencia histórica con P(acuerdo) ∈ [50 %, 95 %] | ✅ 83,2 % |
+| Duración media ≥ 8 turnos | ✅ histórico 28,4; cooperativos 15–18 (antes 2–4) |
+| Parámetros dominantes identificados y tratados (criterio revisado; el original pedía "ningún parámetro > 50 %") | ✅ Submarino (49,3 % en la secuencia histórica, rango con base en fuentes): todo resultado de uso nuclear se presenta como curva sobre `incidents.1.nuclear_risk`. `tension_decay` (20,5 % de la guerra con agentes, supuesto del autor): pendiente de justificar; mientras tanto, condicionante declarado |
+| Secuencia histórica y puntos de control verificados y congelados | ✅ verificados con fuentes y congelados con la etiqueta `prereg-v1` |
+
+### 3.4 Pendiente, conocido
+- Clasificación del punto de control del 27 de octubre: no distingue una propuesta con término secreto de una pública.
+- La granularidad de 12 h aplana las latencias reales (horas). Si la latencia resulta importante en los experimentos, habrá que bajar a turnos de 6 h.
+- Solo hay dos interacciones simultáneas modeladas (choque naval y espiral de movilización).
+
+---
+
+## 3‑bis. Hallazgos de la fase 0 (histórico)
 
 Son resultados reales del esqueleto, con agentes scripted y la secuencia histórica forzada.
 
@@ -227,7 +294,7 @@ legítimo. Por eso no se usa sola.
 | Fase | Contenido | Criterio de salida (medible) |
 |---|---|---|
 | **0** ✅ | Esqueleto, agentes scripted, CLI, tests | Partida reproducible con semilla; 26 tests en verde |
-| **1** | Motor v2: tensión sin saturación, cumplimiento y verificación de acuerdos, resolución de choques simultáneos (bloqueo frente a buques), coste de ceder pronto. Cribado de Morris. Tabla de rangos. Verificar y **congelar** `historical.toml` y `checkpoints.toml` | Invariantes en verde · secuencia histórica con P(acuerdo) ∈ [50 %, 95 %] y duración media ≥ 8 turnos · ningún parámetro por sí solo con > 50 % del efecto en Morris · etiqueta de prerregistro creada |
+| **1** ✅ | Motor v2: tensión sin saturación, cumplimiento y verificación de acuerdos, resolución de choques simultáneos (bloqueo frente a buques), coste de ceder pronto. Cribado de Morris. Tabla de rangos. Verificar y **congelar** `historical.toml` y `checkpoints.toml` | Invariantes en verde · secuencia histórica con P(acuerdo) ∈ [50 %, 95 %] y duración media ≥ 8 turnos · parámetros dominantes (Morris) identificados, con rango justificado, y resultados que dependan de ellos presentados como curva sobre su rango · etiqueta de prerregistro `prereg-v1` creada |
 | **2** | Agente LLM sin RAG con modelo local **fijado** (nombre, cuantización y hash). Visor mínimo de partidas (JSONL → HTML). Sonda de fuga niveles 1 y 3 | JSON válido al primer intento ≥ 98 % · decisiones de respaldo ≤ 1 % · coste medido (s/decisión, tokens/partida) · fuga reportada en real, anonimizado y trampa |
 | **3** | Fidelidad en los puntos de control (K = 30) frente a las referencias | Informe por punto con IC. Decisión justificada sobre si la persona histórica aporta algo frente a un LLM sin persona |
 | **4** | Corpus mínimo: ~30 documentos **ligados a los puntos de control**, pre‑anotados por LLM y validados por una persona. RAG temporal | Acuerdo entre la anotación del LLM y la humana ≥ 90 % en `available_to` y `known_from` · el RAG no aumenta la fuga · cambio en fidelidad reportado con IC |

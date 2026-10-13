@@ -4,11 +4,18 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..models import Observation, WorldState
+from ..models import Commitment, Observation, WorldState
 from ..scenario import ScenarioBundle
 from . import state_ops
 
 _ESTIMATED_FIELDS = ("mobilization", "domestic_pressure", "credibility")
+
+
+def _commitment_view(c: Commitment, side: str) -> Commitment:
+    """Quien no es el obligado no sabe si se ha cumplido hasta que lo verifica."""
+    if c.obligor != side and c.status == "fulfilled" and not c.verified:
+        return c.model_copy(update={"status": "pending"})
+    return c.model_copy()
 
 
 def legal_actions(bundle: ScenarioBundle, state: WorldState, side: str) -> dict[str, str]:
@@ -67,6 +74,7 @@ def observe(
             d for d in state.deals.values()
             if d.status == "open" and (d.proposer == side or d.deliver_turn <= state.turn)
         ],
+        commitments=[_commitment_view(c, side) for c in state.commitments],
         legal_actions=legal_actions(bundle, state, side),
         deal_terms={k: f"{t.label} (obliga a {t.obligor})" for k, t in bundle.scenario.deal_terms.items() if t.enabled},
         channels=list(rules.channels),

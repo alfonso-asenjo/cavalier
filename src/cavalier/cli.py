@@ -18,7 +18,7 @@ from pathlib import Path
 
 from .agents.base import Agent
 from .agents.scripted import ScriptedAgent
-from .montecarlo import BatchResult, play, replay_factory, run_batch
+from .montecarlo import BatchResult, play, replay_factory, run_batch, scripted_factory
 from .scenario import ScenarioBundle, load_scenario
 
 
@@ -46,8 +46,23 @@ def _agent_builder(args, spec: str, side: str):
 
 
 def _factory(args):
+    if args.usa.startswith("scripted") and args.ussr.startswith("scripted"):
+        # serializable: permite repartir partidas entre procesos
+        return scripted_factory({"USA": args.usa.partition(":")[2] or "pragmatica",
+                                 "USSR": args.ussr.partition(":")[2] or "pragmatica"})
     builders = {"USA": _agent_builder(args, args.usa, "USA"), "USSR": _agent_builder(args, args.ussr, "USSR")}
     return lambda bundle, seed: {side: b(bundle, seed * 7919 + i) for i, (side, b) in enumerate(builders.items())}
+
+
+def _executor(args):
+    """Pool de procesos si se pide (--workers > 1) y los agentes son scripted o históricos."""
+    from concurrent.futures import ProcessPoolExecutor
+    from contextlib import nullcontext
+
+    llm = any(getattr(args, a, "").startswith("llm") for a in ("usa", "ussr"))
+    if args.workers > 1 and not llm:
+        return ProcessPoolExecutor(max_workers=args.workers)
+    return nullcontext()
 
 
 def _print_table(result: BatchResult, title: str) -> None:
@@ -69,7 +84,9 @@ def cmd_run(args) -> None:
 
 def cmd_montecarlo(args) -> None:
     bundle = load_scenario(args.scenario, args.variant)
-    result = run_batch(bundle, _factory(args), args.n, args.seed, anonymized=args.anon, log_dir=args.log_dir)
+    with _executor(args) as ex:
+        result = run_batch(bundle, _factory(args), args.n, args.seed, anonymized=args.anon, log_dir=args.log_dir,
+                           executor=ex)
     _print_table(result, f"{args.usa} vs {args.ussr}")
     if any(s.fallback_decisions for s in result.summaries):
         _print_table(result.clean(), "Solo partidas sin respaldo")
@@ -79,7 +96,8 @@ def cmd_montecarlo(args) -> None:
 
 def cmd_replay(args) -> None:
     bundle = load_scenario(args.scenario, args.variant)
-    result = run_batch(bundle, replay_factory(args.scenario), args.n, args.seed)
+    with _executor(args) as ex:
+        result = run_batch(bundle, replay_factory(args.scenario), args.n, args.seed, executor=ex)
     _print_table(result, "Secuencia histórica forzada")
 
 
@@ -94,6 +112,25 @@ def cmd_sensitivity(args) -> None:
         lo, hi = row["low"], row["high"]
         print(f"  {row['param']:<52} nuclear {lo['uso_nuclear']:+6.1%} / {hi['uso_nuclear']:+6.1%}"
               f"   acuerdo {lo['acuerdo_negociado']:+6.1%} / {hi['acuerdo_negociado']:+6.1%}")
+
+
+def cmd_morris(args) -> None:
+    from .sensitivity import morris
+
+    factory = replay_factory(args.scenario) if args.historical else _factory(args)
+    label = "secuencia histórica" if args.historical else f"{args.usa} vs {args.ussr}"
+    with _executor(args) as ex:
+        res = morris(args.scenario, factory, args.n, trajectories=args.r, seed=args.seed, variant=args.variant,
+                     executor=ex)
+    print(f"Morris ({label}): {args.r} trayectorias x {args.n} partidas por punto")
+    for metric, rows in res["metrics"].items():
+        print(f"\n  {metric}")
+        for row in rows:
+            flag = "  <-- domina" if row["share"] > 0.5 else ""
+            print(f"    {row['param']:<52} mu*={row['mu_star']:.3f} sigma={row['sigma']:.3f} "
+                  f"cuota={row['share']:5.1%} [{row['basis']}]{flag}")
+    if args.out:
+        Path(args.out).write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def cmd_probe(args) -> None:
@@ -136,6 +173,7 @@ def main(argv: list[str] | None = None) -> None:
         p.add_argument("--base-url", default="http://localhost:11434/v1")
         p.add_argument("--temperature", type=float, default=0.7)
         p.add_argument("--corpus", help="carpeta con documentos .jsonl para el RAG")
+        p.add_argument("--workers", type=int, default=1, help="procesos en paralelo (solo agentes scripted/históricos)")
         if agents:
             p.add_argument("--usa", default="scripted:pragmatica")
             p.add_argument("--ussr", default="scripted:pragmatica")
@@ -162,6 +200,14 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("-n", type=int, default=300)
     p.add_argument("--delta", type=float, default=0.2)
     p.set_defaults(func=cmd_sensitivity)
+
+    p = sub.add_parser("morris", help="sensibilidad global sobre ranges.toml")
+    common(p)
+    p.add_argument("-n", type=int, default=300, help="partidas por punto")
+    p.add_argument("-r", type=int, default=10, help="trayectorias")
+    p.add_argument("--historical", action="store_true", help="usar la secuencia histórica forzada")
+    p.add_argument("--out")
+    p.set_defaults(func=cmd_morris)
 
     p = sub.add_parser("probe", help="sonda de fuga (requiere LLM)")
     common(p, agents=False)

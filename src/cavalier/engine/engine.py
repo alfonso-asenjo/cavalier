@@ -3,9 +3,15 @@
 Cada turno:
   1. Cada bando recibe su observación (niebla de guerra) y decide a la vez.
   2. Se validan las decisiones; las acciones inválidas se descartan y se cuentan.
-  3. Se aplican las acciones en orden aleatorio (acuerdos, mensajes, efectos).
-  4. Dinámica del escenario, incidentes de la cadena de mando e inteligencia falsa.
-  5. Comprobación de estados terminales.
+  3. Se resuelven las acciones de ambos bandos por FASES (orden determinista, no aleatorio):
+       a. comunicación: mensajes, declaraciones, propuestas y rechazos
+       b. postura y acciones de escenario no terminales (incluida la ruptura de acuerdos)
+       c. interacciones: acciones que coinciden en el mismo turno (p. ej. forzar una cuarentena)
+       d. acciones terminales (ataque, invasión): una orden ya dada no la detiene una carta
+       e. aceptación de acuerdos: abre una fase de cumplimiento, no termina la crisis
+  4. Dinámica: derivas, cumplimiento y verificación de compromisos, filtraciones,
+     incidentes de la cadena de mando, inteligencia falsa.
+  5. Estados terminales.
 """
 
 from __future__ import annotations
@@ -17,13 +23,13 @@ from datetime import timedelta
 import numpy as np
 
 from ..agents.base import Agent
-from ..models import Action, Deal, Decision, Event, Message, Observation, Outcome, Visibility, WorldState
+from ..models import (Action, Commitment, Deal, Decision, Event, Message, Observation, Outcome,
+                      Visibility, WorldState)
 from ..scenario import ScenarioBundle
 from . import state_ops
 from .observation import legal_actions, observe
 
-MESSAGE_KINDS = {"private_message", "public_statement"}
-DEAL_KINDS = {"propose_deal", "accept_deal", "reject_deal"}
+COMMUNICATION_KINDS = {"private_message", "public_statement", "propose_deal", "reject_deal"}
 
 TurnRecorder = Callable[[dict], None]
 
@@ -54,7 +60,8 @@ class Game:
         self.state = state.model_copy(deep=True) if state else initial_state(bundle)
         self.anonymized = anonymized
         self.recorder = recorder
-        # False desactiva incidentes e inteligencia falsa (reconstrucción de puntos de control).
+        # False desactiva incidentes, interacciones aleatorias, filtraciones e inteligencia falsa
+        # (reconstrucción de puntos de control).
         self.stochastic_events = stochastic_events
         missing = set(self.state.sides) - set(self.agents)
         if missing:
@@ -85,6 +92,9 @@ class Game:
             self.state.outcome_reason = reason
             self._event("outcome", f"{outcome.value}: {reason}", None, list(self.state.sides))
 
+    def _chance(self, p: float) -> bool:
+        return self.rng.random() < p
+
     # ------------------------------------------------------------------ bucle
 
     def run(self) -> WorldState:
@@ -99,17 +109,11 @@ class Game:
         observations = {s: self.observe(s) for s in sides}
         decisions = {s: self.agents[s].decide(observations[s]) for s in sides}
         valid = {s: self._validate(s, decisions[s]) for s in sides}
-
-        for s in self.rng.permutation(sides):
-            for action in valid[s]:
-                self._apply(str(s), action)
-                if self.state.outcome:
-                    break
-            if self.state.outcome:
-                break
+        self._resolve(valid)
 
         if self.state.outcome is None:
             self._dynamics()
+            self._commitments()
             if self.stochastic_events:
                 self._incidents()
                 self._false_reports()
@@ -126,6 +130,25 @@ class Game:
                 "events": [e.model_dump(mode="json") for e in self.state.events if e.turn == self.state.turn],
             })
         self.state.turn += 1
+
+    def _resolve(self, valid: dict[str, list[Action]]) -> None:
+        rules = self.bundle.rules.actions
+
+        def phase(select: Callable[[Action], bool]) -> list[tuple[str, Action]]:
+            return [(s, a) for s, actions in valid.items() for a in actions if select(a)]
+
+        for side, action in phase(lambda a: a.kind in COMMUNICATION_KINDS):
+            self._apply(side, action)
+        for side, action in phase(lambda a: a.kind not in COMMUNICATION_KINDS and a.kind != "accept_deal"
+                                  and not rules[a.kind].outcome):
+            self._apply(side, action)
+        self._interactions({s: {a.kind for a in actions} for s, actions in valid.items()})
+        for side, action in phase(lambda a: bool(rules[a.kind].outcome)):
+            if self.state.outcome is None:
+                self._apply(side, action)
+        for side, action in phase(lambda a: a.kind == "accept_deal"):
+            if self.state.outcome is None:
+                self._apply(side, action)
 
     # ------------------------------------------------------------------ validación
 
@@ -155,11 +178,16 @@ class Game:
         if action.kind == "propose_deal":
             terms = self.bundle.scenario.deal_terms
             return bool(action.terms) and all(
-                t.term in terms and terms[t.term].enabled and (not t.secret or terms[t.term].secretable) for t in action.terms
+                t.term in terms and terms[t.term].enabled and (not t.secret or terms[t.term].secretable)
+                and state_ops.matches(self.state, terms[t.term].requires)
+                for t in action.terms
             ) and (action.channel is None or action.channel in channels)
         if action.kind in ("accept_deal", "reject_deal"):
             deal = self.state.deals.get(action.deal_id or "")
             return bool(deal) and deal.status == "open" and deal.proposer != side and deal.deliver_turn <= self.state.turn
+        if action.kind == "renege_deal":
+            return any(c.deal_id == action.deal_id and c.obligor == side and c.status == "pending"
+                       for c in self.state.commitments)
         return True
 
     # ------------------------------------------------------------------ aplicación
@@ -177,12 +205,14 @@ class Game:
             self._event("message", f"Mensaje enviado por canal {action.channel}", side, [side])
         elif action.kind == "public_statement":
             self._event("action", f"Declaración pública: {action.text}", side, [side, other])
-        elif action.kind in DEAL_KINDS:
+        elif action.kind in ("propose_deal", "reject_deal", "accept_deal"):
             self._apply_deal_action(side, other, action)
+        elif action.kind == "renege_deal":
+            self._renege(side, other, action.deal_id or "")
         else:
             seen = [side]
             if rule.visibility == Visibility.PUBLIC or (
-                rule.visibility == Visibility.DETECTABLE and self.rng.random() < self.state.sides[other].intel_quality
+                rule.visibility == Visibility.DETECTABLE and self._chance(self.state.sides[other].intel_quality)
             ):
                 seen.append(other)
             self._event("action", rule.label, side, seen)
@@ -217,37 +247,111 @@ class Game:
             self._send(side, other, deal.channel, f"Propuesta {deal.id} rechazada")
             self._event("deal", f"Propuesta {deal.id} rechazada", side, [side])
             return
+        self._accept(side, other, deal)
 
-        deal.status = "accepted"
+    def concession_multiplier(self) -> float:
+        """Ceder con poca tensión cuesta más: no hay crisis que lo justifique."""
+        rules = self.bundle.rules
+        return 1.0 + rules.concession_low_tension_penalty * (1.0 - self.state.tension / 100.0)
+
+    def _accept(self, side: str, other: str, deal: Deal) -> None:
+        rules = self.bundle.rules
         catalog = self.bundle.scenario.deal_terms
+        deal.status = "accepted"
+        deal.accepted_turn = self.state.turn
+        multiplier = self.concession_multiplier()
         for t in deal.terms:
             cfg = catalog[t.term]
-            for path, value in cfg.sets.items():
-                state_ops.put(self.state, path, value)
-            # Un término público cuesta credibilidad a quien cede; uno secreto, mucho menos.
-            cost = cfg.credibility_cost * (0.2 if t.secret else 1.0)
+            cost = cfg.credibility_cost * multiplier * (0.2 if t.secret else 1.0)
             state_ops.add(self.state, f"{cfg.obligor}.credibility", -cost)
-        self.state.tension = max(0.0, self.state.tension - self.bundle.rules.deal_tension_relief)
-        self._end(Outcome.NEGOTIATED, f"{side} acepta la propuesta {deal.id} de {deal.proposer}")
+            state_ops.add(self.state, f"{cfg.obligor}.domestic_pressure", cost * rules.concession_pressure_factor)
+            self.state.commitments.append(Commitment(
+                deal_id=deal.id, term=t.term, obligor=cfg.obligor, secret=t.secret,
+                due_turn=self.state.turn + rules.implementation_turns,
+            ))
+        state_ops.add(self.state, "tension", -rules.deal_tension_relief)
+        self._event("deal", f"Acuerdo {deal.id} aceptado: comienza la fase de cumplimiento", side, [side, other])
+
+    def _renege(self, side: str, other: str, deal_id: str) -> None:
+        deal = self.state.deals[deal_id]
+        deal.status = "broken"
+        for c in self.state.commitments:
+            if c.deal_id == deal_id and c.status == "pending":
+                c.status = "broken"
+        self._event("deal", f"Ruptura del acuerdo {deal_id}", side, [side, other])
 
     def _open_conflict(self, side: str, label: str, escalation: dict[str, float]) -> None:
         p = escalation.get("base", 0.0)
         for path, weight in escalation.items():
             if path != "base":
                 p += weight * state_ops.get(self.state, path, actor=side)
-        if self.rng.random() < min(1.0, p):
+        if self._chance(min(1.0, p)):
             self._end(Outcome.NUCLEAR, f"'{label}' ({side}) escala a uso nuclear")
         else:
             self._end(Outcome.CONVENTIONAL, f"'{label}' ({side}) abre un conflicto convencional")
+
+    def _interactions(self, kinds: dict[str, set[str]]) -> None:
+        for rule in self.bundle.rules.interactions:
+            if not all(k in kinds.get(s, set()) for s, k in rule.actions.items()):
+                continue
+            if not state_ops.matches(self.state, rule.requires):
+                continue
+            if rule.prob < 1.0 and not (self.stochastic_events and self._chance(rule.prob)):
+                continue
+            for path, delta in rule.effects.items():
+                state_ops.add(self.state, path, delta)
+            self._event("incident", rule.label, None, list(self.state.sides))
+            if rule.nuclear_risk and self.stochastic_events and self._chance(rule.nuclear_risk):
+                self._end(Outcome.NUCLEAR, f"Escalada sin control: {rule.label}")
+                return
 
     # ------------------------------------------------------------------ dinámica
 
     def _dynamics(self) -> None:
         rules = self.bundle.rules
-        self.state.tension = max(0.0, self.state.tension - rules.tension_decay)
+        state_ops.add(self.state, "tension", -rules.tension_decay)
         for drift in rules.drifts:
             if state_ops.matches(self.state, drift.when, drift.when_gte):
                 state_ops.add(self.state, drift.target, drift.delta)
+
+    def _commitments(self) -> None:
+        """Cumplimiento al vencer el plazo, verificación por el otro bando y filtraciones."""
+        rules = self.bundle.rules
+        catalog = self.bundle.scenario.deal_terms
+        for c in self.state.commitments:
+            other = state_ops.other_side(self.state, c.obligor)
+            if c.status == "pending" and self.state.turn >= c.due_turn:
+                c.status = "fulfilled"
+                for path, value in catalog[c.term].sets.items():
+                    state_ops.put(self.state, path, value)
+                self._event("deal", f"Cumplido: {catalog[c.term].label}", c.obligor, [c.obligor])
+            if c.status == "fulfilled" and not c.verified:
+                deal_terms = {t.term for t in self.state.deals[c.deal_id].terms}
+                inspected = any(catalog[t].verifies_deal for t in deal_terms)
+                floor = 1.0 if inspected else catalog[c.term].verification
+                p = max(floor, self.state.sides[other].intel_quality * rules.verification_rate)
+                if self._chance(p):
+                    c.verified = True
+                    self._event("deal", f"Verificado: {catalog[c.term].label}", other, [other, c.obligor])
+            if c.secret and not c.leaked and c.status != "broken" and self.stochastic_events \
+                    and self._chance(rules.secret_leak_prob):
+                c.leaked = True
+                cost = catalog[c.term].credibility_cost * 0.8  # se paga el resto del coste público
+                state_ops.add(self.state, f"{c.obligor}.credibility", -cost)
+                state_ops.add(self.state, f"{c.obligor}.domestic_pressure", cost * rules.concession_pressure_factor)
+                self._event("deal", f"Se filtra un término secreto: {catalog[c.term].label}", c.obligor,
+                            list(self.state.sides))
+
+        for deal in self.state.deals.values():
+            if deal.status != "accepted":
+                continue
+            mine = [c for c in self.state.commitments if c.deal_id == deal.id]
+            if mine and all(c.status == "fulfilled" and (c.verified or not catalog[c.term].verification_required)
+                            for c in mine):
+                deal.status = "fulfilled"
+                state_ops.add(self.state, "tension", -rules.fulfillment_tension_relief)
+                self._end(Outcome.NEGOTIATED, f"Acuerdo {deal.id} cumplido y verificado")
+                return
 
     def incident_probability(self, incident) -> float:
         rules = self.bundle.rules
@@ -260,14 +364,14 @@ class Game:
 
     def _incidents(self) -> None:
         for inc in self.bundle.rules.incidents:
+            if self.state.outcome:
+                return
             if inc.once and inc.id in self.state.fired_incidents:
                 continue
             if self.state.tension < inc.min_tension or not state_ops.matches(self.state, inc.requires):
                 continue
-            if self.rng.random() < self.incident_probability(inc):
+            if self._chance(self.incident_probability(inc)):
                 self.fire_incident(inc.id)
-                if self.state.outcome:
-                    return
 
     def fire_incident(self, incident_id: str, allow_nuclear: bool = True) -> None:
         inc = next(i for i in self.bundle.rules.incidents if i.id == incident_id)
@@ -275,12 +379,12 @@ class Game:
         for path, delta in inc.effects.items():
             state_ops.add(self.state, path, delta, actor=inc.actor)
         self._event("incident", inc.label, inc.actor, list(self.state.sides))
-        if allow_nuclear and inc.nuclear_risk and self.rng.random() < inc.nuclear_risk:
+        if allow_nuclear and inc.nuclear_risk and self._chance(inc.nuclear_risk):
             self._end(Outcome.NUCLEAR, f"Pérdida de control: {inc.label}")
 
     def _false_reports(self) -> None:
         for fr in self.bundle.rules.false_reports:
-            if self.rng.random() < fr.prob:
+            if self._chance(fr.prob):
                 self._event("intel", fr.label, None, [fr.target], is_false=True)
 
     def _expire_deals(self) -> None:
@@ -289,6 +393,8 @@ class Game:
                 deal.status = "expired"
 
     def _check_termination(self) -> None:
+        if self.state.outcome:
+            return
         rules = self.bundle.rules
         if self.state.tension < rules.deescalation_threshold:
             self.state.low_tension_streak += 1

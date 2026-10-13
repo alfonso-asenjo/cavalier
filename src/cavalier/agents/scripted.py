@@ -15,7 +15,7 @@ from ..models import Action, Deal, DealTerm, Decision, Observation
 from ..scenario import ScenarioBundle
 
 
-_STRUCTURED_KINDS = {"private_message", "public_statement", "propose_deal", "accept_deal", "reject_deal"}
+_STRUCTURED_KINDS = {"private_message", "public_statement", "propose_deal", "accept_deal", "reject_deal", "renege_deal"}
 
 
 @dataclass(frozen=True)
@@ -28,14 +28,15 @@ class Personality:
     secret_concessions: bool  # prefiere ceder en secreto cuando se puede
     misperception: float  # ruido extra al percibir la tensión
     terminal_threshold: float  # tensión percibida a partir de la que considera acciones terminales
+    renege_prob: float  # prob. por turno de romper un acuerdo con compromisos propios pendientes
 
 
 PERSONALITIES = {
-    "halcon": Personality("halcon", 0.70, 0.15, 2.0, False, False, 0.0, 75.0),
-    "paloma": Personality("paloma", 0.10, 0.70, -1.0, True, True, 0.0, 999.0),
-    "defensiva": Personality("defensiva", 0.35, 0.40, 0.0, True, False, 0.0, 999.0),
-    "pragmatica": Personality("pragmatica", 0.30, 0.45, 0.5, True, True, 0.0, 90.0),
-    "impredecible": Personality("impredecible", 0.45, 0.35, 0.0, True, False, 20.0, 80.0),
+    "halcon": Personality("halcon", 0.70, 0.15, 2.0, False, False, 0.0, 75.0, 0.10),
+    "paloma": Personality("paloma", 0.10, 0.70, -1.0, True, True, 0.0, 999.0, 0.0),
+    "defensiva": Personality("defensiva", 0.35, 0.40, 0.0, True, False, 0.0, 999.0, 0.02),
+    "pragmatica": Personality("pragmatica", 0.30, 0.45, 0.5, True, True, 0.0, 90.0, 0.02),
+    "impredecible": Personality("impredecible", 0.45, 0.35, 0.0, True, False, 20.0, 80.0, 0.08),
 }
 
 
@@ -49,13 +50,15 @@ class ScriptedAgent:
 
     # ------------------------------------------------------------------ acuerdos
 
-    def deal_utility(self, terms: list[DealTerm], side: str) -> float:
+    def deal_utility(self, terms: list[DealTerm], side: str, tension: float = 50.0) -> float:
+        """Utilidad de un acuerdo, incluido el coste de credibilidad de ceder (mayor con poca tensión)."""
+        multiplier = 1.0 + self.bundle.rules.concession_low_tension_penalty * (1.0 - tension / 100.0)
         total = 0.0
         for t in terms:
             cfg = self.bundle.scenario.deal_terms[t.term]
             total += cfg.value.get(side, 0.0)
             if cfg.obligor == side:
-                total -= cfg.credibility_cost * (0.2 if t.secret else 1.0) / 10.0
+                total -= cfg.credibility_cost * multiplier * (0.2 if t.secret else 1.0) / 10.0
         return total
 
     def _proposal(self, obs: Observation) -> list[DealTerm]:
@@ -68,7 +71,7 @@ class ScriptedAgent:
                 reverse=True,
             )
             for k in own:
-                if self.deal_utility(terms, obs.other_side) >= 0:
+                if self.deal_utility(terms, obs.other_side, obs.tension_estimate) >= 0:
                     break
                 terms.append(DealTerm(term=k, secret=self.p.secret_concessions and catalog[k].secretable))
         return terms
@@ -85,8 +88,14 @@ class ScriptedAgent:
         relief = max(0.0, tension - 60.0) / 40.0 * 2.0  # bajo presión se aceptan peores acuerdos
         incoming: list[Deal] = [d for d in obs.open_deals if d.proposer != self.side]
 
+        pending = {c.deal_id for c in obs.commitments if c.obligor == self.side and c.status == "pending"}
+        if pending and "renege_deal" in obs.legal_actions and self.rng.random() < self.p.renege_prob:
+            deal_id = sorted(pending)[0]
+            return Decision(actions=[Action(kind="renege_deal", deal_id=deal_id)],
+                            reasoning="El acuerdo ya no compensa", confidence=0.5)
+
         for deal in incoming:
-            utility = self.deal_utility(deal.terms, self.side)
+            utility = self.deal_utility(deal.terms, self.side, tension)
             if utility + relief >= self.p.min_deal_utility:
                 return Decision(
                     actions=[Action(kind="accept_deal", deal_id=deal.id)],
@@ -100,7 +109,8 @@ class ScriptedAgent:
         stances = {k: self.bundle.rules.actions[k].stance for k in legal if k not in _STRUCTURED_KINDS}
 
         has_own_offer = any(d.proposer == self.side for d in obs.open_deals)
-        if "propose_deal" in legal and not has_own_offer and self.rng.random() < self.p.conciliation * (0.4 + tension / 100):
+        in_implementation = any(c.status == "pending" for c in obs.commitments)
+        if "propose_deal" in legal and not has_own_offer and not in_implementation and self.rng.random() < self.p.conciliation * (0.4 + tension / 100):
             terms = self._proposal(obs)
             if terms:
                 channel = "backchannel" if "backchannel" in obs.channels and self.p.concede else None

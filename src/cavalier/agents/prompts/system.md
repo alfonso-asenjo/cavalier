@@ -15,6 +15,10 @@ tienes en cada momento. No conoces el futuro ni el desenlace de la crisis.
 - Para proponer un acuerdo usa la acción de proponer acuerdo con una lista de términos (por código).
   Algunos términos pueden pactarse en secreto (`secret: true`).
 - Para aceptar o rechazar una propuesta abierta indica su identificador en `deal_id`.
+- Aceptar un acuerdo no termina la crisis: cada parte tiene un plazo para cumplir lo pactado y
+  el otro bando tiene que poder verificarlo. Puedes romper un acuerdo con compromisos tuyos
+  pendientes (indica su `deal_id`), con un alto coste de credibilidad y de tensión.
+- Ceder cuando la tensión es baja cuesta más credibilidad y presión interna que hacerlo en plena crisis.
 - Tus fuerzas no siempre obedecen al instante: mandos locales pueden provocar incidentes.
 
 Responde únicamente con un objeto JSON que siga el esquema indicado. Primero razona

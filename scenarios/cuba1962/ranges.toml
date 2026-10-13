@@ -1,0 +1,108 @@
+# Rango plausible de cada supuesto del motor (rules.toml) para el análisis de sensibilidad global
+# (cribado de Morris: `cavalier morris cuba1962`).
+#
+# `basis`: "fuente" (apoyado en literatura) o "autor" (criterio del autor, declarado como tal).
+# Un resultado del simulador solo es publicable si se mantiene en todo el rango de los parámetros
+# que lo dominan, o si se presenta explícitamente condicionado a su valor.
+
+[params."rules.tension_decay"]
+low = 0.5
+high = 3.0
+basis = "autor"
+why = "Puntos de tensión que se disipan por turno de 12 h sin acciones. Sin referencia empírica; rango amplio a propósito."
+
+[params."rules.incident_tension_scale"]
+low = 15.0
+high = 40.0
+basis = "autor"
+why = "Cuánto multiplica la tensión la probabilidad de incidentes (x e por cada `scale` puntos sobre 50)."
+
+[params."rules.incident_defcon_factor"]
+low = 0.25
+high = 1.0
+basis = "autor"
+why = "Más alerta = más fuerzas desplegadas y con autoridad delegada (Sagan, The Limits of Safety, cualitativo)."
+
+[params."rules.incident_prob_multiplier"]
+low = 0.5
+high = 2.0
+basis = "autor"
+why = "Escala global de incidentes de la cadena de mando."
+
+[params."rules.observation_noise"]
+low = 6.0
+high = 20.0
+basis = "autor"
+why = "Ruido de la estimación del estado del rival."
+
+[params."rules.incidents.0.base_prob"]
+low = 0.10
+high = 0.40
+basis = "fuente"
+why = "Derribo de reconocimiento por mando local: ocurrió una vez (U-2 de Anderson, 27 oct) en ~13 días de alta tensión."
+
+[params."rules.incidents.1.base_prob"]
+low = 0.10
+high = 0.35
+basis = "fuente"
+why = "Submarino acosado: cuatro submarinos Foxtrot fueron perseguidos y forzados a emerger; el B-59 fue el caso crítico."
+
+[params."rules.incidents.1.nuclear_risk"]
+low = 0.02
+high = 0.30
+basis = "fuente"
+why = "En el B-59 el uso del torpedo nuclear dependió del veto de un oficial (Arkhipov). Incertidumbre muy grande: rango ancho a propósito."
+
+[params."rules.incidents.2.nuclear_risk"]
+low = 0.0
+high = 0.05
+basis = "autor"
+why = "U-2 extraviado sobre territorio soviético (Maultsby): cazas despegaron en ambos lados; no consta riesgo nuclear directo."
+
+[params."rules.interactions.0.nuclear_risk"]
+low = 0.0
+high = 0.08
+basis = "autor"
+why = "Enfrentamiento naval al forzar la cuarentena. No ocurrió históricamente."
+
+[params."rules.actions.impose_quarantine.effects.tension"]
+low = 6.0
+high = 18.0
+basis = "autor"
+why = "Salto de tensión al anunciar la cuarentena."
+
+[params."rules.actions.invasion.nuclear_escalation.base"]
+low = 0.03
+high = 0.15
+basis = "autor"
+why = "Escalada nuclear tras invadir, sin contar las armas tácticas (que suman aparte)."
+
+[params."rules.deal_tension_relief"]
+low = 8.0
+high = 25.0
+basis = "autor"
+why = "Alivio de tensión al aceptar un acuerdo."
+
+[params."rules.implementation_turns"]
+low = 2
+high = 6
+basis = "fuente"
+why = "Desmantelamiento visible en 2-3 días; carga de los misiles en buques hasta ~7-11 nov. Turnos de 12 h."
+
+[params."rules.verification_rate"]
+low = 0.3
+high = 0.8
+basis = "autor"
+why = "Ritmo de verificación por reconocimiento (sin inspección in situ, que Castro rechazó)."
+
+[params."rules.secret_leak_prob"]
+low = 0.0
+high = 0.08
+basis = "fuente"
+why = "El acuerdo secreto sobre los Jupiter no se filtró en décadas: el valor bajo es el plausible."
+
+[params."rules.concession_low_tension_penalty"]
+low = 0.5
+high = 2.0
+basis = "autor"
+why = "Cuánto más cuesta ceder sin una crisis visible que lo justifique."

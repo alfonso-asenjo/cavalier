@@ -1,70 +1,80 @@
-# Secuencia histórica aproximada, traducida al catálogo de acciones abstractas.
-# Uso: `cavalier replay cuba1962` reproduce estas acciones en el motor N veces.
-# Es la ÚNICA validación posible con n=1: con la historia real como entrada, el motor
-# no debería terminar casi siempre en guerra ni ser trivialmente pacífico.
+# Secuencia histórica traducida al catálogo de acciones abstractas.
+# Uso: `cavalier replay cuba1962` la reproduce en el motor N veces (validación del motor con n=1).
 #
-# Turno n = 16-oct-1962 08:00 + 12h·n. Estado: BORRADOR, fechas a verificar contra
-# cronologías del National Security Archive.
+# Turno n = 16-oct-1962 08:00 (hora de Washington) + 12h·n. El 28-oct ya rige EST.
+# Estado: VERIFICADO contra fuentes (oct 2026). Aproximaciones declaradas en cada `note`.
+# Límite del motor: 3 acciones por turno; cuando hay más, se desplaza la menos relevante.
+
+verified = true
+sources = [
+  "https://www.jfklibrary.org/learn/about-jfk/jfk-in-history/cuban-missile-crisis",
+  "https://history.state.gov/milestones/1961-1968/cuban-missile-crisis",
+  "https://nsarchive.gwu.edu/nsa/cuba_mis_cri/dobbs/sac.htm",
+  "https://digitalarchive.wilsoncenter.org/document/117326",
+  "https://nsarchive.gwu.edu/document/29365-document-4-soviet-embassy-telegram-report-ambassador-dobrynin-meeting-robert-kennedy",
+]
 
 [[actions]]
 turn = 0
 side = "USA"
 kind = "gather_intel"
-note = "16-21 oct: deliberaciones secretas del ExComm y más vuelos de reconocimiento"
+note = "16 oct ~09:00: Bundy informa a JFK; ExComm a las 11:50. 16-21 oct: deliberación secreta y más vuelos U-2"
 
 [[actions]]
 turn = 4
 side = "USA"
 kind = "gather_intel"
+note = "Vuelos de reconocimiento adicionales"
 
 [[actions]]
 turn = 12
-side = "USSR"
+side = "USA"
 kind = "restrain_forces"
-note = "22 oct: Moscú prohíbe usar armas nucleares en Cuba sin orden expresa"
+note = "22 oct mañana: orden de no disparar los Jupiter (Turquía, Italia) sin autorización presidencial expresa"
 
 [[actions]]
 turn = 12
 side = "USA"
 kind = "impose_quarantine"
-note = "22 oct, discurso televisado: cuarentena"
-
-[[actions]]
-turn = 12
-side = "USA"
-kind = "raise_alert"
-note = "22 oct: DEFCON 3"
+note = "22 oct 19:00: discurso televisado. La cuarentena entra en vigor el 24 a las 10:00; el motor la activa al anunciarse"
 
 [[actions]]
 turn = 12
 side = "USA"
 kind = "public_statement"
-text = "Exigimos la retirada de las armas ofensivas de Cuba; cualquier lanzamiento desde la isla se considerará un ataque soviético."
+text = "Exigimos la retirada de las armas ofensivas de Cuba; cualquier lanzamiento desde la isla se considerará un ataque soviético que exigirá una respuesta de represalia completa."
+note = "Discurso del 22 oct"
 
 [[actions]]
 turn = 13
 side = "USA"
+kind = "raise_alert"
+note = "DEFCON 3 efectivo ~19:00 del 22 oct (turno 12); desplazado al 13 por el límite de 3 acciones"
+
+[[actions]]
+turn = 12
+side = "USSR"
 kind = "restrain_forces"
-note = "Órdenes de no disparar los Jupiter sin autorización presidencial"
+note = "Noche del 22-23 oct (Moscú): Malinovski ordena repeler ataques SIN los medios de Statsenko ni la carga de Beloborodov (retención implícita del uso nuclear)"
+
+[[actions]]
+turn = 14
+side = "USSR"
+kind = "turn_back_ships"
+note = "23 oct (Moscú): el Presidium ordena dar la vuelta a la mayoría de los buques con armas. Washington lo observa el 24 ~10:25. Los submarinos siguen"
 
 [[actions]]
 turn = 16
 side = "USA"
 kind = "raise_alert"
-note = "24 oct: el SAC pasa a DEFCON 2"
+note = "24 oct: solo el SAC pasa a DEFCON 2 (el resto sigue en DEFCON 3); el motor no distingue mandos"
 
 [[actions]]
-turn = 16
-side = "USSR"
-kind = "turn_back_ships"
-note = "24 oct: buques soviéticos se detienen o dan la vuelta ante la línea de cuarentena"
-
-[[actions]]
-turn = 21
+turn = 20
 side = "USSR"
 kind = "propose_deal"
 channel = "official"
-note = "26 oct, carta privada: retirada a cambio de no invasión"
+note = "26 oct: primera carta privada (entregada en Moscú ~09:40, llega a Estado 18:00-21:00): retirada a cambio de no invasión"
 terms = [{ term = "withdraw_missiles" }, { term = "no_invasion_pledge" }]
 
 [[actions]]
@@ -72,18 +82,24 @@ turn = 22
 side = "USSR"
 kind = "public_statement"
 text = "Retiraremos los medios de Cuba si Estados Unidos retira sus misiles de Turquía."
-note = "27 oct, segunda carta por radio: añade los Jupiter"
+note = "27 oct ~09:00: segunda carta por Radio Moscú, añade los Jupiter"
+
+[[actions]]
+turn = 22
+side = "USSR"
+kind = "restrain_forces"
+note = "27 oct: telegrama explícito: ningún uso nuclear (incluidos Luna, FKR y aviación) sin orden de Moscú"
 
 [[actions]]
 turn = 23
 side = "USA"
 kind = "propose_deal"
 channel = "backchannel"
-note = "27 oct noche: acepta la primera carta y da garantía secreta sobre los Jupiter (R. Kennedy – Dobrynin)"
+note = "27 oct: R. Kennedy - Dobrynin 19:45 (garantía secreta sobre los Jupiter) y carta de JFK ~20:05 aceptando los términos de la primera carta. Se agrupan en el turno 23"
 terms = [{ term = "withdraw_missiles" }, { term = "no_invasion_pledge" }, { term = "withdraw_jupiters", secret = true }]
 
 [[actions]]
 turn = 24
 side = "USSR"
 kind = "accept_deal"
-note = "28 oct: Jrushchov anuncia por radio la retirada"
+note = "28 oct ~09:00 EST: Jrushchov anuncia la retirada por Radio Moscú"
