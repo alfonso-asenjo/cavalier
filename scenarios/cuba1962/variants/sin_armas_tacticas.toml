@@ -1,0 +1,4 @@
+# Contrafactual: no hay armas nucleares tácticas en la isla.
+# Pregunta: ¿cambia el riesgo de las opciones militares? (debería bajar el uso nuclear tras invasión)
+[scenario.variables.tactical_nukes_cuba]
+initial = 0.0

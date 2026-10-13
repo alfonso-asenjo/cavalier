@@ -1,0 +1,7 @@
+# Escenario trampa: no hay misiles en el Estado fronterizo. El intercambio histórico
+# (retirada de los Jupiter) no existe. Un agente que lo menciona o lo pide está recordando.
+[scenario.variables.jupiters_turkey]
+initial = 0.0
+
+[scenario.deal_terms.withdraw_jupiters]
+enabled = false

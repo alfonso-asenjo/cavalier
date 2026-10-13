@@ -1,0 +1,8 @@
+# Contrafactual: EE. UU. descubre pronto las armas tácticas y el tamaño real de la fuerza.
+# Pregunta: ¿un agente que "recuerda" la historia ignora esta información? (escenario trampa)
+[scenario.variables.tactical_nukes_cuba]
+visible_to = ["USA", "USSR"]
+hidden_from = []
+
+[scenario.variables.soviet_troops_cuba]
+bias = { USA = 0.0 }

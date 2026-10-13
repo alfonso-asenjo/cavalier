@@ -1,0 +1,239 @@
+# SUPUESTOS DEL MOTOR para cuba1962.
+#
+# Nada de lo que hay aquí es un dato histórico: son decisiones de modelado del autor.
+# Todo resultado del simulador está condicionado a estos valores. Se someten a
+# análisis de sensibilidad (cavalier sensitivity) y se versionan junto a cada experimento.
+#
+# Rutas de efectos: tension · self.<campo> · other.<campo> · <BANDO>.<campo> · vars.<variable>
+
+max_actions_per_turn = 3
+tension_decay = 1.5            # la tensión baja sola si nadie hace nada
+deal_tension_relief = 30.0
+deal_expiry_turns = 4
+deescalation_threshold = 20.0
+deescalation_turns = 3
+incident_tension_scale = 25.0
+incident_defcon_factor = 0.5
+incident_prob_multiplier = 1.0
+observation_noise = 12.0
+
+# Retraso adicional en turnos de 12 h. Un mensaje enviado en el turno t llega en t+1+retraso.
+[channels]
+official = 1      # embajadas, cifrado y traducción: las cartas tardaban horas
+backchannel = 0   # canal extraoficial (p. ej. Dobrynin – R. Kennedy)
+
+# --------------------------------------------------------------------------- acciones genéricas
+
+[actions.wait]
+label = "Esperar y observar"
+
+[actions.gather_intel]
+label = "Intensificar la obtención de inteligencia"
+visibility = "covert"
+effects = { "self.intel_quality" = 0.15 }
+
+[actions.raise_alert]
+label = "Subir el nivel de alerta de las fuerzas"
+stance = "escalate"
+visibility = "detectable"
+effects = { "self.defcon" = -1, tension = 5.0 }
+
+[actions.lower_alert]
+label = "Bajar el nivel de alerta de las fuerzas"
+stance = "deescalate"
+visibility = "detectable"
+effects = { "self.defcon" = 1, tension = -3.0 }
+
+[actions.mobilize]
+label = "Movilizar fuerzas convencionales"
+stance = "escalate"
+visibility = "detectable"
+effects = { "self.mobilization" = 15.0, tension = 5.0, "self.domestic_pressure" = -5.0 }
+
+[actions.demobilize]
+label = "Desmovilizar fuerzas convencionales"
+stance = "deescalate"
+visibility = "detectable"
+effects = { "self.mobilization" = -15.0, tension = -4.0, "self.domestic_pressure" = 4.0, "self.credibility" = -2.0 }
+
+[actions.restrain_forces]
+label = "Dar órdenes restrictivas a los mandos (no disparar sin autorización expresa)"
+stance = "deescalate"
+visibility = "covert"
+effects = { "self.control" = 0.1 }
+
+[actions.request_mediation]
+label = "Solicitar la mediación de la ONU"
+stance = "deescalate"
+effects = { tension = -4.0, "self.credibility" = -1.0 }
+
+[actions.private_message]
+label = "Enviar un mensaje privado"
+
+[actions.public_statement]
+label = "Hacer una declaración pública"
+effects = { tension = 2.0, "self.credibility" = 2.0 }
+
+[actions.propose_deal]
+label = "Proponer un acuerdo"
+stance = "deescalate"
+effects = { tension = -2.0 }
+
+[actions.accept_deal]
+label = "Aceptar un acuerdo propuesto"
+
+[actions.reject_deal]
+label = "Rechazar un acuerdo propuesto"
+effects = { tension = 3.0 }
+
+# --------------------------------------------------------------------------- acciones de escenario
+
+[actions.impose_quarantine]
+label = "Imponer una cuarentena naval alrededor de la isla"
+actor = "USA"
+stance = "escalate"
+requires = { "vars.quarantine" = 0.0, "vars.missiles_withdrawn" = 0.0 }
+sets = { "vars.quarantine" = 1.0 }
+effects = { tension = 12.0, "self.credibility" = 8.0, "self.domestic_pressure" = -10.0 }
+
+[actions.lift_quarantine]
+label = "Levantar la cuarentena naval"
+actor = "USA"
+stance = "deescalate"
+requires = { "vars.quarantine" = 1.0 }
+sets = { "vars.quarantine" = 0.0 }
+effects = { tension = -6.0, "self.credibility" = -6.0, "self.domestic_pressure" = 8.0 }
+
+[actions.air_strike]
+label = "Ataque aéreo contra los emplazamientos de la isla"
+actor = "USA"
+stance = "terminal"
+outcome = "conflict"
+nuclear_escalation = { base = 0.05, "vars.tactical_nukes_cuba" = 0.15, "vars.construction_progress" = 0.10 }
+
+[actions.invasion]
+label = "Invasión de la isla"
+actor = "USA"
+stance = "terminal"
+outcome = "conflict"
+nuclear_escalation = { base = 0.08, "vars.tactical_nukes_cuba" = 0.25, "vars.construction_progress" = 0.10 }
+
+[actions.halt_construction]
+label = "Detener las obras de los emplazamientos"
+actor = "USSR"
+stance = "deescalate"
+visibility = "detectable"
+requires = { "vars.construction_active" = 1.0 }
+sets = { "vars.construction_active" = 0.0 }
+effects = { tension = -6.0, "self.credibility" = -5.0 }
+
+[actions.resume_construction]
+label = "Reanudar las obras de los emplazamientos"
+actor = "USSR"
+stance = "escalate"
+visibility = "detectable"
+requires = { "vars.construction_active" = 0.0, "vars.missiles_withdrawn" = 0.0 }
+sets = { "vars.construction_active" = 1.0 }
+effects = { tension = 6.0 }
+
+[actions.run_quarantine]
+label = "Ordenar a los buques que crucen la línea de cuarentena"
+actor = "USSR"
+stance = "escalate"
+requires = { "vars.quarantine" = 1.0 }
+effects = { tension = 15.0, "self.credibility" = 5.0 }
+
+[actions.turn_back_ships]
+label = "Ordenar a los buques que se detengan o den la vuelta"
+actor = "USSR"
+stance = "deescalate"
+requires = { "vars.quarantine" = 1.0 }
+effects = { tension = -8.0, "self.credibility" = -4.0 }
+
+[actions.pressure_berlin]
+label = "Aumentar la presión sobre Berlín"
+actor = "USSR"
+stance = "escalate"
+effects = { tension = 8.0, "other.domestic_pressure" = 5.0 }
+
+# --------------------------------------------------------------------------- dinámica por turno
+
+[[drifts]]
+target = "vars.construction_progress"
+delta = 0.07
+when = { "vars.construction_active" = 1.0 }
+
+[[drifts]]
+target = "USA.domestic_pressure"
+delta = 3.0
+when_gte = { "vars.construction_progress" = 0.6 }
+
+[[drifts]]
+target = "tension"
+delta = 3.0
+when_gte = { "vars.construction_progress" = 0.8 }
+
+[[drifts]]
+target = "tension"
+delta = 2.0
+when = { "vars.quarantine" = 1.0 }
+
+# --------------------------------------------------------------------------- cadena de mando
+# Incidentes que nadie ordena. Probabilidad por turno:
+#   base_prob · exp((tensión-50)/escala) · (1 + f·(5-defcon)) · (1 - control)
+# Inspirados en episodios reales, pero modelados de forma abstracta.
+
+[[incidents]]
+id = "reconocimiento_derribado"
+label = "Un avión de reconocimiento es derribado por un mando local sin orden expresa"
+actor = "USSR"
+min_tension = 55.0
+base_prob = 0.25
+effects = { tension = 12.0, "other.domestic_pressure" = 10.0 }
+
+[[incidents]]
+id = "submarino_acosado"
+label = "Un submarino acosado en la línea de cuarentena, sin contacto con su mando, se plantea usar su armamento"
+actor = "USSR"
+min_tension = 60.0
+base_prob = 0.20
+requires = { "vars.quarantine" = 1.0 }
+effects = { tension = 15.0 }
+nuclear_risk = 0.15
+
+[[incidents]]
+id = "reconocimiento_extraviado"
+label = "Un avión de reconocimiento se extravía sobre territorio del rival"
+actor = "USA"
+min_tension = 55.0
+base_prob = 0.15
+effects = { tension = 8.0 }
+nuclear_risk = 0.02
+
+[[incidents]]
+id = "fuego_antiaereo_local"
+label = "Defensas antiaéreas locales abren fuego contra aviones de vuelo bajo"
+actor = "USSR"
+min_tension = 65.0
+base_prob = 0.15
+effects = { tension = 8.0 }
+
+[[incidents]]
+id = "alerta_sin_cifrar"
+label = "Un mando estratégico difunde la orden de alerta sin cifrar, más allá de lo autorizado"
+actor = "USA"
+min_tension = 60.0
+base_prob = 0.10
+effects = { tension = 6.0 }
+
+# --------------------------------------------------------------------------- inteligencia falsa
+
+[[false_reports]]
+target = "USA"
+label = "Un radar de alerta temprana informa de un posible lanzamiento desde Cuba"
+prob = 0.03
+
+[[false_reports]]
+target = "USSR"
+label = "Informes del aliado insular aseguran que la invasión es inminente en 24-72 horas"
+prob = 0.06

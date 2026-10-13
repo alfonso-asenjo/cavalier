@@ -1,0 +1,48 @@
+# Puntos de control para medir fidelidad histórica (protocolo de "forzado histórico").
+#
+# Para cada punto: se reconstruye el estado reproduciendo historical.toml hasta `turn`
+# (sin incidentes aleatorios), se aplican los incidentes de `force_incidents` y se pide
+# al agente K decisiones. La métrica es la frecuencia de `historical` DENTRO de las
+# opciones que se consideraron de verdad (`considered`), con intervalo de confianza.
+# Nada de acierto top-1 en una sola muestra.
+#
+# PRERREGISTRO: este fichero se congela (y se versiona) antes de ejecutar ningún
+# agente LLM contra él. Cambiarlo después de ver resultados invalida la evaluación.
+# Estado: BORRADOR, pendiente de contrastar con las fuentes citadas.
+
+[[checkpoints]]
+id = "usa_respuesta_inicial"
+side = "USA"
+turn = 11
+description = "21 oct: el ExComm elige la respuesta al despliegue"
+considered = ["air_strike", "invasion", "impose_quarantine", "private_message", "wait"]
+historical = "impose_quarantine"
+sources = ["May & Zelikow, The Kennedy Tapes (sesiones del 16 al 21 oct)", "FRUS 1961-1963, vol. XI"]
+
+[[checkpoints]]
+id = "ussr_linea_cuarentena"
+side = "USSR"
+turn = 16
+description = "24 oct: los buques soviéticos llegan a la línea de cuarentena"
+considered = ["run_quarantine", "turn_back_ships", "pressure_berlin", "wait"]
+historical = "turn_back_ships"
+sources = ["Fursenko & Naftali, One Hell of a Gamble", "Wilson Center Digital Archive"]
+
+[[checkpoints]]
+id = "usa_sabado_negro"
+side = "USA"
+turn = 23
+description = "27 oct: tras el derribo del U-2 y la segunda carta"
+force_incidents = ["reconocimiento_derribado"]
+considered = ["air_strike", "invasion", "propose_deal", "wait"]
+historical = "propose_deal"
+sources = ["May & Zelikow, The Kennedy Tapes (27 oct)", "National Security Archive, cronología"]
+
+[[checkpoints]]
+id = "ussr_aceptacion"
+side = "USSR"
+turn = 24
+description = "28 oct: Jrushchov ante la propuesta estadounidense"
+considered = ["accept_deal", "reject_deal", "wait"]
+historical = "accept_deal"
+sources = ["Notas del Presidium (notas de Malin)", "Wilson Center Digital Archive"]

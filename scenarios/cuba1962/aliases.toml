@@ -1,0 +1,50 @@
+# Modo anonimizado: se aplica a todo el texto que ve un agente LLM (briefings,
+# eventos, documentos del RAG). Orden: las cadenas más largas se sustituyen primero.
+#
+# Limitación conocida: renombrar no oculta la ESTRUCTURA del episodio (isla junto a una
+# superpotencia, despliegue secreto, cuarentena, intercambio por misiles en un tercer país).
+# Por eso el control de fuga principal son las variantes perturbadas (variants/) y la
+# sonda de reconocimiento (cavalier probe).
+
+date_mode = "relative"
+
+# Las fechas reales de los briefings van entre paréntesis para poder eliminarlas.
+
+[replacements]
+" (16 de octubre de 1962)" = ""
+"Estados Unidos" = "Federación Atlántica"
+"EE. UU." = "Federación Atlántica"
+"estadounidenses" = "atlánticos"
+"estadounidense" = "atlántico"
+"Unión Soviética" = "Unión Oriental"
+"URSS" = "Unión Oriental"
+"soviéticos" = "orientales"
+"soviéticas" = "orientales"
+"soviético" = "oriental"
+"soviética" = "oriental"
+"John F. Kennedy" = "el Presidente"
+"Robert Kennedy" = "el Fiscal General"
+"Kennedy" = "el Presidente"
+"Nikita Jrushchov" = "el Primer Secretario"
+"Jrushchov" = "el Primer Secretario"
+"Khrushchev" = "el Primer Secretario"
+"Dobrynin" = "el Embajador oriental"
+"Fidel Castro" = "el líder insular"
+"Castro" = "el líder insular"
+"cubanos" = "insulares"
+"cubano" = "insular"
+"Cuba" = "la Isla"
+"Florida" = "la costa sur atlántica"
+"de Turquía" = "del Estado fronterizo"
+"en Turquía" = "en el Estado fronterizo"
+"Turquía" = "el Estado fronterizo"
+"Italia" = "un aliado continental"
+"Berlín Occidental" = "el enclave"
+"Berlín" = "el enclave"
+"Moscú" = "la capital oriental"
+"Washington" = "la capital atlántica"
+"ONU" = "Asamblea de Naciones"
+"U Thant" = "el Secretario de la Asamblea"
+"Jupiter" = "de alcance medio"
+"U-2" = "de gran altitud"
+"1962" = "año 0"
