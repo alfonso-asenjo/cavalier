@@ -49,6 +49,7 @@ def _decide(bundle, scenario, cp, client, anonymized, seed, variant=None) -> dic
         "choice": classify(decision, cp.considered),
         "historical": cp.historical,
         "actions": [a.kind for a in decision.actions],
+        "action_texts": [a.text for a in decision.actions if a.text],
         "reasoning": decision.reasoning,
         "errors": list(agent.errors),
         "latency_s": sum(c["latency_s"] for c in calls),
@@ -61,8 +62,15 @@ def _decide(bundle, scenario, cp, client, anonymized, seed, variant=None) -> dic
     }
 
 
+def _key(d: dict) -> tuple:
+    return (d["checkpoint"], d["anonymized"], d["variant"], d["seed"])
+
+
 def bench_model(model: str, scenario: str = "cuba1962", k: int = 5, seed: int = 0,
-                base_url: str = "http://localhost:11434", num_ctx: int = 8192, log=print) -> dict:
+                base_url: str = "http://localhost:11434", num_ctx: int = 8192, log=print,
+                done: list[dict] | None = None, on_progress=None) -> dict:
+    """`done`: decisiones ya medidas en una ejecución anterior interrumpida (se reutilizan).
+    `on_progress(decisions)`: se llama tras cada decisión para guardar el avance."""
     bundle = load_scenario(scenario)
     trap = load_scenario(scenario, "sin_jupiter")
     checkpoints = load_checkpoints(scenario)
@@ -73,18 +81,25 @@ def bench_model(model: str, scenario: str = "cuba1962", k: int = 5, seed: int = 
     load_s = time.perf_counter() - start
     log(f"[{model}] cargado en {load_s:.0f} s")
 
-    decisions = []
+    previous = {_key(d): d for d in (done or [])}
+    decisions: list[dict] = []
+
+    def measure(b, cp, anonymized, s, variant=None) -> dict:
+        key = (cp.id, anonymized, variant, s)
+        d = previous.get(key) or _decide(b, scenario, cp, client, anonymized, s, variant=variant)
+        decisions.append(d)
+        if key not in previous and on_progress:
+            on_progress(decisions)
+        return d
+
     for anonymized in (False, True):
         for cp in checkpoints:
-            for i in range(k):
-                decisions.append(_decide(bundle, scenario, cp, client, anonymized, seed + i))
+            batch = [measure(bundle, cp, anonymized, seed + i) for i in range(k)]
             log(f"[{model}] {cp.id} {'anon' if anonymized else 'real'}: "
-                f"{Counter(d['choice'] for d in decisions[-k:]).most_common()}")
+                f"{Counter(d['choice'] for d in batch).most_common()}")
     for cp in (c for c in checkpoints if c.id in TRAP_CHECKPOINTS):
-        for anonymized in (False, True):
-            for i in range(k):
-                decisions.append(_decide(trap, scenario, cp, client, anonymized, seed + i, variant="sin_jupiter"))
-        log(f"[{model}] trampa {cp.id}: menciones {sum(d['mentions_trap'] for d in decisions[-2 * k:])}/{2 * k}")
+        batch = [measure(trap, cp, anonymized, seed + i, "sin_jupiter") for anonymized in (False, True) for i in range(k)]
+        log(f"[{model}] trampa {cp.id}: menciones {sum(d['mentions_trap'] for d in batch)}/{len(batch)}")
 
     client.temperature, client.seed = 0.0, seed
     probes = [probe_recognition(bundle, client, side, anon) for anon in (False, True) for side in bundle.scenario.sides]
