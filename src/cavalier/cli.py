@@ -261,6 +261,27 @@ def _print_fidelity(rep: dict) -> None:
             print(f"  real − anon ({persona}): {lk['real_minus_anon']:+.0%}  Fisher p = {lk['fisher_p']:.3g}")
 
 
+def cmd_experiment(args) -> None:
+    from .experiments import BASE, load_results, report, run_experiment
+
+    cells = [c.strip() for c in args.cells.split(",")]
+    if BASE not in cells:
+        raise SystemExit(f"Las celdas deben incluir '{BASE}' (referencia de los contrastes)")
+    if not args.report_only:
+        run_experiment(args.scenario, args.fork, cells, args.n, args.out, _factory(args), seed=args.seed,
+                       anonymized=args.anon, log=lambda m: print(m, flush=True))
+    results = {c: g for c, g in load_results(args.out).items() if c in cells}
+    rep = report(results)
+    Path(args.out, "report.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
+    for cell, row in rep["cells"].items():
+        a, e = row["acuerdo"], row["escalada_militar"]
+        print(f"{cell:<20} n={row['n']:<3} acuerdo {a['p']:5.0%} [{a['ci95'][0]:4.0%}, {a['ci95'][1]:4.0%}]"
+              f"  escalada {e['p']:5.0%} [{e['ci95'][0]:4.0%}, {e['ci95'][1]:4.0%}]"
+              f"  turno medio {row['turns_mean']:.1f}  respaldo {row['fallback_games']}")
+    for key, c in rep["contrasts"].items():
+        print(f"  {key:<34} {c['diff']:+5.0%}  Fisher p = {c['fisher_p']:.3g}  Holm p = {c['holm_p']:.3g}")
+
+
 def main(argv: list[str] | None = None) -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -335,6 +356,15 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("-k", type=int, default=30)
     p.add_argument("--out", default="runs/fidelity_v1.json")
     p.set_defaults(func=cmd_fidelity)
+
+    p = sub.add_parser("experiment", help="contrafactual por bifurcación desde un punto de control (fase 5)")
+    common(p)
+    p.add_argument("--fork", default="usa_sabado_negro", help="punto de control desde el que se bifurca")
+    p.add_argument("--cells", default="base,sin_canal_secreto,mando_debil", help="'base' y variantes")
+    p.add_argument("-n", type=int, default=30, help="partidas por celda")
+    p.add_argument("--out", default="runs/exp1")
+    p.add_argument("--report-only", action="store_true", help="solo recalcular el informe")
+    p.set_defaults(func=cmd_experiment)
 
     p = sub.add_parser("probe", help="sonda de fuga (requiere LLM)")
     common(p, agents=False)

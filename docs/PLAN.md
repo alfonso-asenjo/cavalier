@@ -336,6 +336,60 @@ primario (sección 0); ahora está justificado con datos y no solo como precauci
 
 ---
 
+## 3‑quinquies. Fase 5, experimento 1: bifurcación desde el Sábado Negro (prerregistro `prereg-v3`)
+
+Fijado el 13‑oct‑2026 **antes** de ejecutar ninguna partida LLM del experimento. Solo se jugó una
+partida piloto (semilla 1000, fuera del rango) para medir la duración: 13 turnos, 334 s, sin respaldos.
+
+**Diseño.** Se reconstruye el estado histórico del 27 de octubre por la noche (punto de control
+`usa_sabado_negro`, con el derribo del U‑2 forzado). Todas las celdas parten de ese mismo pasado y
+juegan hasta el final (como mucho 13 turnos) con su variante:
+
+| Celda | Cambio desde el Sábado Negro | Mecánica en el motor |
+|---|---|---|
+| `base` | ninguno | — |
+| `sin_canal_secreto` | sin el canal R. Kennedy–Dobrynin; los Jupiter no pueden pactarse en secreto | ceder los Jupiter cuesta 5 veces más credibilidad; el canal solo cambia lo que ve el agente (en el motor ambos canales tienen la misma latencia) |
+| `mando_debil` | el doble de incidentes de la cadena de mando | `incident_prob_multiplier` = 2,0 (extremo superior de `ranges.toml`) |
+
+**Agentes.** `llm:historico` en ambos bandos (la regla de la fase 3 la mantiene), `qwen3.5:9b`
+(`56671c2ab938`), temperatura 0,7, `num_ctx` 4096, **modo anonimizado**. Los agentes empiezan la
+bifurcación sin memoria de turnos anteriores; el pasado les llega por el estado y los eventos.
+n = 30 partidas por celda, semillas 0–29 intercaladas. Comando:
+`cavalier experiment cuba1962 --usa llm:historico --ussr llm:historico --anon -n 30 --out runs/exp1`.
+
+**Métricas.** P(acuerdo negociado) y P(escalada militar = conflicto convencional o uso nuclear), con
+IC 95 % de Wilson. El uso nuclear se reporta solo como descripción, porque depende sobre todo del
+parámetro del submarino (Morris, 3.2).
+
+**Contrastes.** Cada variante frente a `base`, en ambas métricas: 4 pruebas exactas de Fisher
+bilaterales con corrección de Holm.
+- H1: `sin_canal_secreto` cambia P(acuerdo). La historiografía considera decisivo el pacto secreto.
+- H2: `mando_debil` cambia P(escalada).
+
+**Referencia del motor** (agentes scripted, 2.000 partidas por celda desde el mismo estado):
+
+| Emparejamiento | base: acuerdo / escalada | sin canal secreto | mando débil |
+|---|---|---|---|
+| pragmática × defensiva | 56 % / 43 % | +0,1 / −0,1 pp | −3,1 / +3,3 pp |
+| pragmática × pragmática | 57 % / 43 % | +0,2 / −0,2 pp | −3,1 / +3,1 pp |
+| halcón × paloma | 26 % / 73 % | 0 / 0 pp | −1,6 / +1,6 pp |
+
+Por tanto, el motor no produce por sí mismo un efecto del canal secreto: **cualquier efecto en H1
+vendrá del razonamiento de los agentes LLM**. El efecto mecánico de `mando_debil` es de unos 3 puntos,
+indetectable con n = 30. Si H2 sale significativa, el efecto viene de cómo reaccionan los agentes a
+los incidentes.
+
+**Potencia.** Con n = 30 por celda solo se detectan diferencias de ~35 puntos (80 % de potencia,
+α = 0,05). Un resultado nulo **no** demuestra ausencia de efecto y se reporta con su IC.
+
+**Reglas de lectura:**
+- Las partidas con decisiones de respaldo se reportan aparte. Si hay más del 10 % en una celda, se marca.
+- Las conclusiones se formulan como "agentes LLM en este modelo", nunca como "qué habría pasado en 1962".
+- Si la ejecución se corta antes de n = 30, se reporta el n alcanzado (las celdas quedan equilibradas
+  porque las semillas se intercalan) y se marca como incompleto.
+
+---
+
 ## 3‑bis. Hallazgos de la fase 0 (histórico)
 
 Son resultados reales del esqueleto, con agentes scripted y la secuencia histórica forzada.
