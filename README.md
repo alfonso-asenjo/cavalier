@@ -29,6 +29,7 @@ cavalier montecarlo cuba1962 --variant sin_armas_tacticas -n 1000   # contrafact
 cavalier bench cuba1962 -k 5                                         # comparar modelos: JSON, coste, fuga
 cavalier probe cuba1962 --model qwen3.5:9b                          # sonda de fuga
 cavalier run cuba1962 --usa llm:historico --ussr llm:historico --model qwen3.5:9b --anon --log runs/llm.jsonl
+cavalier run cuba1962 ... --log runs/llm.jsonl --resume              # continuar una partida cortada (guarda cada turno)
 cavalier checkpoints cuba1962 --agent llm:historico --model qwen3.5:9b -k 30
 ```
 

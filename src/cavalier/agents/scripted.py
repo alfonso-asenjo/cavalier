@@ -48,6 +48,12 @@ class ScriptedAgent:
         self.name = f"scripted:{self.p.name}"
         self.rng = np.random.default_rng(seed)
 
+    def snapshot(self) -> dict:
+        return {"rng": self.rng.bit_generator.state}
+
+    def restore(self, data: dict) -> None:
+        self.rng.bit_generator.state = data["rng"]
+
     # ------------------------------------------------------------------ acuerdos
 
     def deal_utility(self, terms: list[DealTerm], side: str, tension: float = 50.0) -> float:

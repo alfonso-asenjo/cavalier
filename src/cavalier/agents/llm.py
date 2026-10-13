@@ -117,6 +117,12 @@ class LLMAgent:
         self.system_prompt = self._system_prompt()
         self.graph = self._build_graph()
 
+    def snapshot(self) -> dict:
+        return {"history": list(self.history)}
+
+    def restore(self, data: dict) -> None:
+        self.history = list(data["history"])
+
     # ---------------------------------------------------------------- prompts
 
     def _system_prompt(self) -> str:
@@ -179,6 +185,7 @@ class LLMAgent:
                   for k, label in obs.legal_actions.items()]
         lines += ["", "### Términos negociables"]
         lines += [f"- {self._term_to_code[k]}: {label.replace(f'obliga a {self.side}', 'te obliga a ti').replace(f'obliga a {obs.other_side}', 'obliga al rival')}"
+                  + (" (puede pactarse en secreto)" if self.bundle.scenario.deal_terms[k].secretable else "")
                   for k, label in obs.deal_terms.items()]
         channels = {c: d for c, d in self.bundle.rules.channels.items()}
         lines += ["", "### Canales: " + ", ".join(f"{c} (retraso extra {d} turnos)" for c, d in channels.items())]
@@ -272,7 +279,11 @@ class LLMAgent:
                        if t.code not in self.term_codes or self.term_codes[t.code] not in obs.deal_terms]
             if unknown:
                 raise ValueError(f"Términos no disponibles ahora: {unknown}")
-            terms = [DealTerm(term=self.term_codes[t.code], secret=t.secret) for t in a.terms]
+            catalog = self.bundle.scenario.deal_terms
+            # Corrección tolerante: un término que no admite secreto (p. ej. una inspección) se pacta en
+            # público; si no, el motor descartaría la propuesta entera por un detalle de forma.
+            terms = [DealTerm(term=(k := self.term_codes[t.code]), secret=t.secret and catalog[k].secretable)
+                     for t in a.terms]
         if kind in ("private_message", "propose_deal") and a.channel and a.channel not in obs.channels:
             raise ValueError(f"Canal desconocido: {a.channel}. Opciones: {obs.channels}")
         deal_id = a.deal_id

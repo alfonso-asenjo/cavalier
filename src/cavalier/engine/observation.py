@@ -71,7 +71,7 @@ def observe(
         inbox=[m for m in state.messages if m.recipient == side and m.deliver_turn == state.turn],
         events=[e for e in state.events if e.turn == state.turn - 1 and side in e.seen_by],
         open_deals=[
-            d for d in state.deals.values()
+            d.model_copy() for d in state.deals.values()
             if d.status == "open" and (d.proposer == side or d.deliver_turn <= state.turn)
         ],
         commitments=[_commitment_view(c, side) for c in state.commitments],

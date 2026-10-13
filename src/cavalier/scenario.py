@@ -49,6 +49,9 @@ class DealTermConfig(BaseModel):
     verifies_deal: bool = False  # si el acuerdo lo incluye, todos sus compromisos se verifican (inspección)
     verification_required: bool = True  # False: se pacta a confianza y no bloquea el cierre de la crisis
     sets: dict[str, float] = Field(default_factory=dict)  # variables que fija al cumplirse
+    # Un acuerdo cumplido solo cierra la crisis si incluye algún término que la resuelve (en Cuba, la
+    # retirada de los misiles). Si ningún término del escenario lo marca, cualquier acuerdo la cierra.
+    resolves_crisis: bool = False
 
 
 class IncidentConfig(BaseModel):

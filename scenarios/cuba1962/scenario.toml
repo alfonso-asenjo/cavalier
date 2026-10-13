@@ -121,6 +121,7 @@ obligor = "USSR"
 value = { USA = 4.0, USSR = -2.0 }
 credibility_cost = 15.0
 sets = { "vars.missiles_withdrawn" = 1.0, "vars.construction_active" = 0.0 }
+resolves_crisis = true  # la crisis terminó con la retirada (Allison & Zelikow 1999); otros pactos no la cierran
 
 [deal_terms.halt_construction]
 label = "Detener las obras de los emplazamientos"
