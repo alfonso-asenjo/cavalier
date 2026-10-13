@@ -150,13 +150,32 @@ def cmd_morris(args) -> None:
 def cmd_bench(args) -> None:
     from .eval.bench import bench_model
 
-    results = []
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    for model in args.models.split(","):
-        results.append(bench_model(model.strip(), args.scenario, k=args.k, seed=args.seed, base_url=args.base_url,
-                                   num_ctx=args.num_ctx))
-        out.write_text(json.dumps(results, ensure_ascii=False, indent=1), encoding="utf-8")  # guardado incremental
+    # Reanudable: si una ejecución anterior se cortó, se reutiliza lo ya medido.
+    saved = {r["model"]: r for r in json.loads(out.read_text(encoding="utf-8"))} if out.exists() else {}
+
+    def save() -> None:
+        out.write_text(json.dumps(list(saved.values()), ensure_ascii=False, indent=1), encoding="utf-8")
+
+    results = []
+    for model in (m.strip() for m in args.models.split(",")):
+        previous = saved.get(model, {})
+        if previous.get("complete"):
+            print(f"[{model}] ya completo en {out}, se reutiliza")
+            results.append(previous)
+            continue
+
+        def progress(decisions, model=model):
+            saved[model] = {"model": model, "complete": False, "decisions": list(decisions)}
+            save()
+
+        result = bench_model(model, args.scenario, k=args.k, seed=args.seed, base_url=args.base_url,
+                             num_ctx=args.num_ctx, done=previous.get("decisions"), on_progress=progress)
+        result["complete"] = True
+        saved[model] = result
+        save()
+        results.append(result)
     print(f"\n{'modelo':<14}{'JSON 1er':>9}{'respaldo':>9}{'s/dec':>7}{'p90':>6}{'tok sal':>8}{'tok/s':>7}"
           f"{'fuga anon':>10}{'trampa':>8}  sonda (real/anon)")
     for r in results:

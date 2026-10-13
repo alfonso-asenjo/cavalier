@@ -170,6 +170,57 @@ Lectura:
 
 ---
 
+## 3‑ter. Fase 2: comparación de modelos locales (13‑oct‑2026)
+
+`cavalier bench`: 4 puntos de control × 2 modos (real y anonimizado) × K = 5, más la trampa
+`sin_jupiter` (2 puntos × 2 modos × 5) y la sonda de reconocimiento. Todo con Ollama en la RTX 2070,
+contexto de 4.096 tokens y sin modo "thinking". Resultados en `runs/bench_v2.json`.
+
+| | qwen3.5:9b | qwen3.5:4b |
+|---|---|---|
+| JSON válido al primer intento | **98 %** ✅ | 82 % ❌ |
+| Decisiones de respaldo | **0 %** ✅ | **0 %** ✅ |
+| Segundos por decisión (media / p90) | 10,7 / 13,2 | 8,1 / 12,6 |
+| Velocidad de generación | 48,7 tok/s | 70,5 tok/s |
+| Tokens de salida por decisión | 340 | 314 |
+| Nombra el episodio real en modo anonimizado | 0 % | 0 % |
+| Trampa (menciona misiles inexistentes en Turquía) | 1 de 40 (en el texto de una acción, sin verificar) | 0 de 40 |
+| Sonda: reconoce el episodio con nombres reales | sí (ambos bandos) | sí (ambos bandos) |
+| Sonda: reconoce el episodio anonimizado | **sí, desde el briefing de EE. UU.** | no |
+
+**Qué cambió respecto a la primera medición** (55 % de JSON válido y 17,5 % de respaldo con el 9B):
+- un **esquema JSON cerrado por turno**, que solo admite acciones legales, términos disponibles, propuestas abiertas y canales;
+- **pistas de campos requeridos** en el prompt;
+- **correcciones de formato que no cambian la decisión** (confianza 0–100, `deal_id` único).
+
+También se corrigió la trampa: la variable de los Jupiter seguía visible con valor 0 y contaminaba la medición.
+
+**Lectura:**
+1. **Modelo principal: `qwen3.5:9b`.** Es el único que cumple el criterio de la fase 2 (JSON ≥ 98 %,
+   respaldo ≤ 1 %).
+2. **El plan de "dos modelos" pierde sentido.** El 4B solo es 1,3 veces más rápido: genera casi los
+   mismos tokens, y el coste está en generar. No compensa su peor formato. El Monte Carlo con LLM
+   se hará con el 9B: unos 9–10 minutos por partida completa, es decir, lotes nocturnos de 50–80
+   partidas, más bifurcación desde estados críticos. Queda descartado salvo que un 4B posterior iguale
+   el formato.
+3. **Señal de fuga (exploratoria, a confirmar en la fase 3).** En la respuesta inicial de EE. UU. (20 de
+   octubre), los modelos eligen la cuarentena histórica en **7 de 10 casos con nombres reales y 0 de 10
+   anonimizados** (Fisher, una cola, p = 0,0015; ambos modelos sumados). Con nombres reales, el modelo
+   tiende a repetir la historia. **La fidelidad medida con nombres reales no se puede interpretar sin el
+   control anonimizado**, que es justo lo que el plan preveía (sección 4.3).
+4. **El 9B reconoce la crisis anonimizada** a partir del briefing de EE. UU.: la estructura delata el
+   episodio. Refuerza la necesidad de variantes perturbadas y de potencias inventadas (fase 5).
+5. **Memoria.** En Windows, `llama-server` reserva ~12 GB de memoria del sistema aunque el modelo vaya
+   al 100 % en la GPU. Por eso la comparación es reanudable y guarda tras cada decisión. Gemma 4 e4b no
+   cabe en la GPU (deja casi todo en RAM): descartada.
+
+**Criterios de salida de la fase 2:** JSON ✅ (9B) · respaldo ✅ · coste medido ✅ · fuga reportada en
+modo real, anonimizado y trampa ✅ · visor mínimo ✅ (adelantado, con estética DEFCON).
+Pendiente para cerrar la fase: la primera partida completa entre dos LLM, y que las partidas largas se
+puedan reanudar, porque una partida entera con el 9B dura unos 10 minutos.
+
+---
+
 ## 3‑bis. Hallazgos de la fase 0 (histórico)
 
 Son resultados reales del esqueleto, con agentes scripted y la secuencia histórica forzada.
