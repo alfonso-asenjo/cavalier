@@ -1,0 +1,5 @@
+# Contrafactual: cadena de mando más indisciplinada (derribos, submarinos acosados, alertas sin cifrar).
+# Doble de probabilidad de incidente: el extremo superior del rango de `ranges.toml`.
+# Pregunta: ¿cuánto depende el desenlace de que los mandos locales no actuaran por su cuenta?
+[rules]
+incident_prob_multiplier = 2.0

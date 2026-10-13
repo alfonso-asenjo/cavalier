@@ -14,7 +14,7 @@ import tomllib
 from datetime import datetime
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from .models import SideState, Visibility
 
@@ -141,6 +141,20 @@ class Rules(BaseModel):
     incidents: list[IncidentConfig] = Field(default_factory=list)
     false_reports: list[FalseReportConfig] = Field(default_factory=list)
     interactions: list[InteractionRule] = Field(default_factory=list)
+    # Las variantes no pueden borrar claves con la fusión; un canal se elimina nombrándolo aquí.
+    disabled_channels: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _drop_disabled_channels(cls, data):
+        if not isinstance(data, dict) or not data.get("disabled_channels"):
+            return data
+        channels, disabled = dict(data.get("channels", {})), set(data["disabled_channels"])
+        if disabled - set(channels):
+            raise ValueError(f"Canales desconocidos en disabled_channels: {sorted(disabled - set(channels))}")
+        if not set(channels) - disabled:
+            raise ValueError("Debe quedar al menos un canal")
+        return {**data, "channels": {c: d for c, d in channels.items() if c not in disabled}}
 
 
 class Aliases(BaseModel):

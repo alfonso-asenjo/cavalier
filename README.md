@@ -32,6 +32,7 @@ cavalier run cuba1962 --usa llm:historico --ussr llm:historico --model qwen3.5:9
 cavalier run cuba1962 ... --log runs/llm.jsonl --resume              # continuar una partida cortada (guarda cada turno)
 cavalier checkpoints cuba1962 --agent llm:historico --model qwen3.5:9b -k 30
 cavalier fidelity cuba1962 -k 30                                     # fase 3: fidelidad con referencias (reanudable)
+cavalier experiment cuba1962 --usa llm:historico --ussr llm:historico --anon -n 30   # fase 5: bifurcación desde el Sábado Negro
 ```
 
 Agentes: `scripted:{halcon,paloma,defensiva,pragmatica,impredecible}` y

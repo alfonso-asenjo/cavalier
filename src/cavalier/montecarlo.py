@@ -94,14 +94,16 @@ def _restore_checkpoint(path: Path, game: Game, log_path: Path) -> float:
 
 
 def play(bundle: ScenarioBundle, agents: dict[str, Agent], seed: int, anonymized: bool = False,
-         log_path: str | Path | None = None, resume: bool = False, log=None) -> GameSummary:
+         log_path: str | Path | None = None, resume: bool = False, log=None,
+         state: WorldState | None = None) -> GameSummary:
     """Con `log_path`, guarda tras cada turno un punto de control (`.ckpt.json`) con el estado real,
     el generador aleatorio y la memoria de los agentes; con `resume=True` continúa desde él. Con
-    agentes deterministas el resultado es idéntico al de una partida sin interrupción."""
+    agentes deterministas el resultado es idéntico al de una partida sin interrupción.
+    `state`: estado inicial (bifurcación desde un punto crítico); por defecto, el inicio del escenario."""
     ckpt = checkpoint_path(log_path) if log_path else None
     resuming = bool(resume and ckpt and ckpt.exists() and Path(log_path).exists())
     header = {"scenario": bundle.scenario.id, "seed": seed, "agents": {s: a.name for s, a in agents.items()}}
-    game = Game(bundle, agents, seed=seed, anonymized=anonymized)
+    game = Game(bundle, agents, seed=seed, anonymized=anonymized, state=state)
     max_tension = game.state.tension
     if resuming:
         max_tension = _restore_checkpoint(ckpt, game, Path(log_path))
