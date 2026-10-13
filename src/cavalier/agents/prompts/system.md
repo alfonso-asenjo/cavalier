@@ -22,5 +22,5 @@ tienes en cada momento. No conoces el futuro ni el desenlace de la crisis.
 - Tus fuerzas no siempre obedecen al instante: mandos locales pueden provocar incidentes.
 
 Responde únicamente con un objeto JSON que siga el esquema indicado. Primero razona
-(`reasoning`), después decide (`actions`). Cita en `cited_docs` los identificadores de los
+(`reasoning`, máximo tres frases), después decide (`actions`). Cita en `cited_docs` los identificadores de los
 documentos en los que te apoyas, si alguno.

@@ -12,6 +12,7 @@ términos, de modo que el modo real y el anonimizado solo difieren en los nombre
 
 from __future__ import annotations
 
+import copy
 import json
 from datetime import timedelta
 from pathlib import Path
@@ -38,6 +39,15 @@ PERSONAS = {
     "impredecible": "Desconfías de la información que recibes y tiendes a interpretar las señales del rival como amenazas.",
 }
 
+
+_FIELD_HINTS = {
+    "private_message": " (requiere `text` con el mensaje y `channel`)",
+    "public_statement": " (requiere `text` con la declaración)",
+    "propose_deal": " (requiere `terms`: lista de códigos de término; `secret` opcional)",
+    "accept_deal": " (requiere `deal_id`)",
+    "reject_deal": " (requiere `deal_id`)",
+    "renege_deal": " (requiere `deal_id` del acuerdo que rompes)",
+}
 
 # ---------------------------------------------------------------- esquema de salida del LLM
 
@@ -92,6 +102,7 @@ class LLMAgent:
         self.max_attempts = max_attempts
         self.history_turns = history_turns
         self.history: list[str] = []
+        self.errors: list[str] = []  # motivos de reintento de la última decisión (diagnóstico)
         self.name = f"llm:{client.model_id}:{persona}{':anon' if anonymized else ''}"
 
         actions = list(bundle.rules.actions)
@@ -101,6 +112,8 @@ class LLMAgent:
         self._action_to_code = {k: c for c, k in self.action_codes.items()}
         self._term_to_code = {k: c for c, k in self.term_codes.items()}
         self.schema = LLMDecision.model_json_schema()
+        # Razonamiento corto: en una GPU de 8 GB el coste está en los tokens generados (plan, 4.4).
+        self.schema["properties"]["reasoning"]["maxLength"] = 600
         self.system_prompt = self._system_prompt()
         self.graph = self._build_graph()
 
@@ -162,7 +175,8 @@ class LLMAgent:
             lines += ["", "### Documentos disponibles"]
             lines += [f"[{d.id}] {d.title} ({d.date:%Y-%m-%d}): {d.text[:700]}" for d in docs]
         lines += ["", f"### Acciones disponibles (máximo {obs.max_actions})"]
-        lines += [f"- {self._action_to_code[k]}: {label}" for k, label in obs.legal_actions.items()]
+        lines += [f"- {self._action_to_code[k]}: {label}{_FIELD_HINTS.get(k, '')}"
+                  for k, label in obs.legal_actions.items()]
         lines += ["", "### Términos negociables"]
         lines += [f"- {self._term_to_code[k]}: {label.replace(f'obliga a {self.side}', 'te obliga a ti').replace(f'obliga a {obs.other_side}', 'obliga al rival')}"
                   for k, label in obs.deal_terms.items()]
@@ -196,15 +210,20 @@ class LLMAgent:
         prompt = self.render(st["obs"], st.get("docs", []))
         if st.get("error"):
             prompt += f"\n\n### Tu respuesta anterior no era válida\n{st['error']}\nCorrígela."
-        raw = self.client.complete_json(self.system_prompt, prompt, self.schema)
+        raw = self.client.complete_json(self.system_prompt, prompt, self.schema_for(st["obs"]))
         return {"prompt": prompt, "raw": raw, "attempts": st.get("attempts", 0) + 1}
 
     def _validate(self, st: _GraphState) -> _GraphState:
         obs = st["obs"]
         try:
-            out = LLMDecision.model_validate(json.loads(st["raw"]))
+            data = json.loads(st["raw"])
+            # Corrección tolerante de formato que no cambia la decisión: confianza expresada en 0-100.
+            if isinstance(data, dict) and isinstance(data.get("confidence"), (int, float)) and 1 < data["confidence"] <= 100:
+                data["confidence"] = data["confidence"] / 100
+            out = LLMDecision.model_validate(data)
             actions = [self._to_action(a, obs) for a in out.actions[: obs.max_actions]]
         except (json.JSONDecodeError, ValidationError, ValueError) as exc:
+            self.errors.append(str(exc)[:300])
             if st["attempts"] < self.max_attempts:
                 return {"error": str(exc)[:500]}
             return {"error": None, "decision": Decision(
@@ -217,6 +236,28 @@ class LLMAgent:
             cited_docs=[d for d in out.cited_docs if d in valid_docs],
         )
         return {"error": None, "decision": decision}
+
+    def schema_for(self, obs: Observation) -> dict:
+        """Esquema con listas cerradas para este turno: con decodificación restringida, el modelo
+        no puede inventar códigos de acción, términos, propuestas ni canales."""
+        schema = copy.deepcopy(self.schema)
+        action = schema["$defs"]["LLMAction"]["properties"]
+        action["code"]["enum"] = [self._action_to_code[k] for k in obs.legal_actions]
+        action["channel"]["anyOf"][0]["enum"] = list(obs.channels)
+        deal_ids = sorted({d.id for d in obs.open_deals if d.proposer != self.side}
+                          | {c.deal_id for c in obs.commitments if c.obligor == self.side and c.status == "pending"})
+        if deal_ids:
+            action["deal_id"]["anyOf"][0]["enum"] = deal_ids
+        else:
+            action["deal_id"] = {"type": "null", "default": None}
+        terms = [self._term_to_code[k] for k in obs.deal_terms]
+        if terms:
+            schema["$defs"]["LLMTerm"]["properties"]["code"]["enum"] = terms
+        else:
+            action["terms"] = {"type": "null", "default": None}
+        schema["properties"]["actions"]["minItems"] = 1
+        schema["properties"]["actions"]["maxItems"] = obs.max_actions
+        return schema
 
     def _route(self, st: _GraphState) -> str:
         return "done" if "decision" in st and st.get("error") is None else "retry"
@@ -234,20 +275,32 @@ class LLMAgent:
             terms = [DealTerm(term=self.term_codes[t.code], secret=t.secret) for t in a.terms]
         if kind in ("private_message", "propose_deal") and a.channel and a.channel not in obs.channels:
             raise ValueError(f"Canal desconocido: {a.channel}. Opciones: {obs.channels}")
-        if kind in ("accept_deal", "reject_deal") and a.deal_id not in {d.id for d in obs.open_deals}:
-            raise ValueError(f"Propuesta desconocida: {a.deal_id}")
-        if kind == "renege_deal" and a.deal_id not in {
-                c.deal_id for c in obs.commitments if c.obligor == self.side and c.status == "pending"}:
-            raise ValueError(f"No tienes compromisos pendientes en el acuerdo {a.deal_id}")
+        deal_id = a.deal_id
+        if kind in ("accept_deal", "reject_deal"):
+            rival = [d.id for d in obs.open_deals if d.proposer != self.side]
+            if deal_id is None and len(rival) == 1:
+                deal_id = rival[0]  # única propuesta posible: no hay ambigüedad
+            if deal_id not in rival:
+                raise ValueError(f"Propuesta desconocida: {deal_id}. Abiertas del rival: {rival}")
+        if kind == "renege_deal":
+            mine = sorted({c.deal_id for c in obs.commitments if c.obligor == self.side and c.status == "pending"})
+            if deal_id is None and len(mine) == 1:
+                deal_id = mine[0]
+            if deal_id not in mine:
+                raise ValueError(f"No tienes compromisos pendientes en el acuerdo {deal_id}")
         if kind == "propose_deal" and not terms:
             raise ValueError("Una propuesta de acuerdo necesita términos")
-        if kind == "private_message" and not a.channel:
-            raise ValueError("Un mensaje privado necesita canal")
-        return Action(kind=kind, text=a.text, channel=a.channel, terms=terms, deal_id=a.deal_id)
+        channel = a.channel
+        if kind in ("private_message", "propose_deal") and not channel:
+            channel = obs.channels[0]  # dato rellenable: canal oficial por defecto, no se rechaza la decisión
+        if kind == "private_message" and not a.text:
+            raise ValueError("Un mensaje privado necesita texto")
+        return Action(kind=kind, text=a.text, channel=channel, terms=terms, deal_id=deal_id)
 
     # ---------------------------------------------------------------- interfaz Agent
 
     def decide(self, obs: Observation) -> Decision:
+        self.errors = []
         result = self.graph.invoke({"obs": obs, "attempts": 0, "error": None})
         decision: Decision = result["decision"]
         summary = ", ".join(self._action_to_code[a.kind] for a in decision.actions)

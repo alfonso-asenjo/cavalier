@@ -26,9 +26,10 @@ cavalier morris cuba1962 --historical -n 300 -r 10 --workers 16     # sensibilid
 cavalier montecarlo cuba1962 --variant sin_armas_tacticas -n 1000   # contrafactual
 
 # Con un modelo local (Ollama, llama.cpp, LM Studio o vLLM con API compatible OpenAI)
-cavalier probe cuba1962 --model qwen3:8b                            # sonda de fuga
-cavalier run cuba1962 --usa llm:historico --ussr llm:historico --model qwen3:8b --anon --log runs/llm.jsonl
-cavalier checkpoints cuba1962 --agent llm:historico --model qwen3:8b -k 30
+cavalier bench cuba1962 -k 5                                         # comparar modelos: JSON, coste, fuga
+cavalier probe cuba1962 --model qwen3.5:9b                          # sonda de fuga
+cavalier run cuba1962 --usa llm:historico --ussr llm:historico --model qwen3.5:9b --anon --log runs/llm.jsonl
+cavalier checkpoints cuba1962 --agent llm:historico --model qwen3.5:9b -k 30
 ```
 
 Agentes: `scripted:{halcon,paloma,defensiva,pragmatica,impredecible}` y

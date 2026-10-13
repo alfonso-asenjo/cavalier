@@ -1,12 +1,12 @@
 """Línea de comandos.
 
   cavalier run cuba1962 --usa scripted:halcon --ussr scripted:pragmatica --seed 3 --log runs/p.jsonl
-  cavalier run cuba1962 --usa llm:historico --ussr llm:historico --model qwen3:8b --anon
+  cavalier run cuba1962 --usa llm:historico --ussr llm:historico --model qwen3.5:9b --anon
   cavalier montecarlo cuba1962 --usa scripted:halcon --ussr scripted:paloma -n 1000
   cavalier replay cuba1962 -n 1000
   cavalier sensitivity cuba1962 --usa scripted:pragmatica --ussr scripted:pragmatica -n 300
-  cavalier probe cuba1962 --model qwen3:8b
-  cavalier checkpoints cuba1962 --agent llm:historico --model qwen3:8b -k 30
+  cavalier probe cuba1962 --model qwen3.5:9b
+  cavalier checkpoints cuba1962 --agent llm:historico --model qwen3.5:9b -k 30
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ def _agent_builder(args, spec: str, side: str):
         return lambda bundle, seed: ScriptedAgent(bundle, side, persona or "pragmatica", seed=seed)
     if kind == "llm":
         from .agents.llm import LLMAgent
-        from .agents.llm_client import OpenAICompatibleClient
+        from .agents.llm_client import OllamaClient, OpenAICompatibleClient
 
         retriever = None
         if args.corpus:
@@ -39,7 +39,10 @@ def _agent_builder(args, spec: str, side: str):
             retriever = TemporalRetriever(load_corpus(args.corpus))
 
         def build(bundle: ScenarioBundle, seed: int) -> Agent:
-            client = OpenAICompatibleClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed)
+            if args.backend == "ollama":
+                client = OllamaClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed)
+            else:
+                client = OpenAICompatibleClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed)
             return LLMAgent(bundle, side, client, persona=persona or "historico", anonymized=args.anon, retriever=retriever)
         return build
     raise SystemExit(f"Agente desconocido: {spec!r} (usa scripted:<personalidad> o llm:<persona>)")
@@ -144,12 +147,36 @@ def cmd_morris(args) -> None:
         Path(args.out).write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+def cmd_bench(args) -> None:
+    from .eval.bench import bench_model
+
+    results = []
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    for model in args.models.split(","):
+        results.append(bench_model(model.strip(), args.scenario, k=args.k, seed=args.seed, base_url=args.base_url,
+                                   num_ctx=args.num_ctx))
+        out.write_text(json.dumps(results, ensure_ascii=False, indent=1), encoding="utf-8")  # guardado incremental
+    print(f"\n{'modelo':<14}{'JSON 1er':>9}{'respaldo':>9}{'s/dec':>7}{'p90':>6}{'tok sal':>8}{'tok/s':>7}"
+          f"{'fuga anon':>10}{'trampa':>8}  sonda (real/anon)")
+    for r in results:
+        sm = r["summary"]
+        probe = " ".join(f"{k}:{'sí' if v else 'no'}" for k, v in sm["probe_recognized"].items())
+        print(f"{sm['model']:<14}{sm['first_try_valid']:>9.0%}{sm['fallback']:>9.0%}{sm['latency_mean_s']:>7.1f}"
+              f"{sm['latency_p90_s']:>6.1f}{sm['output_tokens_mean']:>8.0f}{sm['tokens_per_s']:>7.1f}"
+              f"{sm['anon_names_real_episode']:>10.0%}{sm['trap_mentions']:>8.0%}  {probe}")
+    print(f"\nDetalle en {out.resolve()}")
+
+
 def cmd_probe(args) -> None:
-    from .agents.llm_client import OpenAICompatibleClient
+    from .agents.llm_client import OllamaClient, OpenAICompatibleClient
     from .eval.leakage import probe_recognition
 
     bundle = load_scenario(args.scenario, args.variant)
-    client = OpenAICompatibleClient(args.model, base_url=args.base_url, temperature=0.0)
+    if args.backend == "ollama":
+        client = OllamaClient(args.model, base_url=args.base_url, temperature=0.0)
+    else:
+        client = OpenAICompatibleClient(args.model, base_url=args.base_url, temperature=0.0)
     for anonymized in (False, True):
         for side in bundle.scenario.sides:
             print(json.dumps(probe_recognition(bundle, client, side, anonymized), ensure_ascii=False))
@@ -180,8 +207,10 @@ def main(argv: list[str] | None = None) -> None:
         p.add_argument("--variant")
         p.add_argument("--seed", type=int, default=0)
         p.add_argument("--anon", action="store_true", help="modo anonimizado")
-        p.add_argument("--model", default="qwen3:8b")
-        p.add_argument("--base-url", default="http://localhost:11434/v1")
+        p.add_argument("--model", default="qwen3.5:9b")
+        p.add_argument("--backend", choices=["ollama", "openai"], default="ollama",
+                       help="ollama: API nativa (sin 'thinking', mide tokens); openai: API compatible")
+        p.add_argument("--base-url", default="http://localhost:11434")
         p.add_argument("--temperature", type=float, default=0.7)
         p.add_argument("--corpus", help="carpeta con documentos .jsonl para el RAG")
         p.add_argument("--workers", type=int, default=1, help="procesos en paralelo (solo agentes scripted/históricos)")
@@ -225,6 +254,14 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--historical", action="store_true", help="usar la secuencia histórica forzada")
     p.add_argument("--out")
     p.set_defaults(func=cmd_morris)
+
+    p = sub.add_parser("bench", help="comparar modelos locales: JSON, coste y fuga (fase 2)")
+    common(p, agents=False)
+    p.add_argument("--models", default="qwen3.5:9b,qwen3.5:4b,gemma4:e4b")
+    p.add_argument("-k", type=int, default=5, help="muestras por punto de control y modo")
+    p.add_argument("--num-ctx", type=int, default=8192)
+    p.add_argument("--out", default="runs/bench.json")
+    p.set_defaults(func=cmd_bench)
 
     p = sub.add_parser("probe", help="sonda de fuga (requiere LLM)")
     common(p, agents=False)

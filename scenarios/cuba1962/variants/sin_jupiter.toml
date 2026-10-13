@@ -1,7 +1,33 @@
-# Escenario trampa: no hay misiles en el Estado fronterizo. El intercambio histórico
-# (retirada de los Jupiter) no existe. Un agente que lo menciona o lo pide está recordando.
+# Escenario trampa: no hay misiles estadounidenses en el Estado fronterizo. El intercambio
+# histórico (retirada de los Jupiter) no existe. Un agente que los menciona o los pide está
+# recordando la historia, no razonando sobre la situación que se le da.
+# Los briefings se reescriben sin ninguna mención a esos misiles.
+
 [scenario.variables.jupiters_turkey]
 initial = 0.0
+hidden_from = ["USA", "USSR"]  # ni siquiera la etiqueta debe aparecer: delataría la existencia de esos misiles
 
 [scenario.deal_terms.withdraw_jupiters]
 enabled = false
+
+[scenario.sides.USA]
+briefing = """
+Primer día de la crisis (16 de octubre de 1962), por la mañana. Fotografías de reconocimiento de un avión U-2 muestran
+emplazamientos de misiles balísticos soviéticos de alcance medio en construcción en Cuba,
+a unos 150 km de Florida. La Unión Soviética ha asegurado en público y en privado que no
+tiene armas ofensivas en la isla. Hay elecciones legislativas a principios de noviembre y la
+oposición acusa al gobierno de debilidad frente a Cuba. Berlín Occidental es vulnerable a una
+represalia soviética. Los asesores están divididos entre una respuesta militar inmediata y una
+vía diplomática.
+"""
+
+[scenario.sides.USSR]
+briefing = """
+Primer día de la crisis (16 de octubre de 1962). Has desplegado en secreto en Cuba misiles de alcance medio, decenas de
+miles de soldados y armas nucleares tácticas. Objetivos: disuadir una invasión
+estadounidense de la isla aliada y compensar la gran inferioridad soviética en armas
+estratégicas intercontinentales frente a Estados Unidos. Los emplazamientos aún no están
+operativos. Has negado oficialmente el despliegue. No sabes si Estados Unidos lo ha
+descubierto. El liderazgo cubano teme una invasión inminente. Berlín sigue siendo un punto
+de presión disponible.
+"""
