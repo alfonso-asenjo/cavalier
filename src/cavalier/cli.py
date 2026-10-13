@@ -252,8 +252,7 @@ def cmd_fidelity(args) -> None:
 
 def _print_fidelity(rep: dict) -> None:
     for cp_id, r in rep.items():
-        print(f"
-{cp_id} ({r['side']}) — histórica: {r['historical']} · azar {r['uniform']:.0%}")
+        print(f"\n{cp_id} ({r['side']}) — histórica: {r['historical']} · azar {r['uniform']:.0%}")
         for cond, row in r["conditions"].items():
             lo, hi = row["ci95"]
             top = ", ".join(f"{k} {v}" for k, v in list(row["choices"].items())[:3])

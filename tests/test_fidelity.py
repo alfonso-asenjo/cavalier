@@ -45,3 +45,15 @@ def test_report_includes_references_and_leakage_contrast(bundle):
     assert {"llm:historico:real", "llm:ninguna:anon", "scripted:halcon"} <= set(cp["conditions"])
     assert cp["conditions"]["scripted:halcon"]["n"] == 3
     assert cp["real_vs_anon"]["historico"]["fisher_p"] == pytest.approx(1.0)
+
+
+def test_cli_prints_fidelity_report(bundle, capsys):
+    from cavalier import cli
+
+    records = fidelity.run_fidelity(_client(bundle), k=1, log=lambda *_: None)
+    cli._print_fidelity(fidelity.report(records + fidelity.scripted_choices("cuba1962", k=1)))
+    out = capsys.readouterr().out
+    assert "usa_respuesta_inicial (USA)" in out and "Fisher p" in out
+    with pytest.raises(SystemExit) as exc:
+        cli.main(["fidelity", "--help"])
+    assert exc.value.code == 0
