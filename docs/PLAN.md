@@ -284,6 +284,56 @@ en una sola cifra.
 - Las decisiones de respaldo cuentan como "otra" y se reportan aparte. Si superan el 2 % en una
   celda, la celda se marca.
 
+### Resultados (13‑oct‑2026, `runs/fidelity_v1.json`)
+
+480 decisiones LLM: 0 respaldos, 97,9 % de JSON válido al primer intento, 10,5 s por decisión.
+Ninguna celda marcada. Columnas: P(opción histórica) [IC 95 %], n = 30 por celda.
+
+| Punto (opción histórica, azar) | histórico real | histórico anon | sin persona real | sin persona anon | scripted (rango) |
+|---|---|---|---|---|---|
+| EE. UU. respuesta inicial (cuarentena, 17 %) | 50 % [33, 67] | 7 % [2, 21] | 53 % [36, 70] | 10 % [3, 26] | 0–17 % |
+| URSS línea de cuarentena (dar la vuelta, 20 %) | 0 % [0, 11] | 0 % [0, 11] | 0 % [0, 11] | 3 % [1, 17] | 0–10 % |
+| EE. UU. Sábado Negro (proponer acuerdo, 20 %) | 20 % [10, 37] | 10 % [3, 26] | 17 % [7, 34] | 17 % [7, 34] | 0 % |
+| URSS aceptación (aceptar, 33 %) | 43 % [27, 61] | 3 % [1, 17] | 37 % [22, 54] | 17 % [7, 34] | 100 % |
+
+**Contraste 1, fuga (Holm, 8 pruebas).** Es significativa en la respuesta inicial con ambas personas
+(+43 puntos; p ajustado 0,003 y 0,004) y en la aceptación con persona histórica (+40 puntos;
+p ajustado 0,003). **La hipótesis confirmatoria se cumple**: la señal 7/10 frente a 0/10 de la fase 2
+se replica con n = 30. En el resto de puntos no hay diferencia (p ajustado ≥ 0,7).
+
+**Contraste 2, aporte de la persona (modo anonimizado, Holm, 4 pruebas).** No hay ninguna diferencia
+significativa (la menor es la aceptación, 1/30 frente a 5/30, p ajustado 0,78).
+
+**Lectura según las reglas fijadas:**
+1. **Ningún punto se reproduce en una condición interpretable.** En modo anonimizado, todos los
+   límites inferiores quedan por debajo del azar. En modo real, los dos únicos puntos que se acercan
+   (respuesta inicial y aceptación) tienen fuga significativa, así que son **no interpretables**.
+2. **La persona histórica se mantiene en la fase 5**: no queda por debajo de `ninguna` en ningún
+   punto. Tampoco aporta nada medible.
+3. Con nombres reales, el modelo "acierta" justo donde el desenlace es famoso (la cuarentena y la
+   aceptación de Jruschov) y no en los puntos menos conocidos (los buques, el Sábado Negro).
+   **Recuerda, no razona como los dirigentes de 1962.**
+
+**Exploratorio** (no prerregistrado; sirve para diseñar la siguiente evaluación, no como resultado):
+- **"Otra" domina** (63–87 % de muchas celdas). El agente toma hasta 3 acciones por turno y suele
+  combinar acciones "blandas" (declaración, inteligencia, contención) sin ninguna de las opciones
+  consideradas. En la línea de cuarentena, la URSS envía mensajes y contiene a sus fuerzas, pero
+  nunca da la vuelta a los buques (0/120). Todas las opciones consideradas son legales en los cuatro puntos.
+- **El Sábado Negro está mal codificado**: el modelo acepta a menudo la propuesta soviética abierta
+  (la primera carta: retirada a cambio de no invasión). Es lo más parecido a lo que hizo Kennedy, pero
+  `accept_deal` no está entre las opciones y cuenta como "otra". Contando proponer o aceptar sin
+  acción militar, la vía diplomática sube al 43–60 % en las cuatro condiciones.
+- **El modelo es muy poco escalador**: solo 1 de 480 decisiones incluye ataque o invasión. Contrasta
+  con la literatura (Rivera 2024) y con la partida libre de la semilla 0, donde EE. UU. bombardeó tras
+  varios días sin respuesta. En los puntos de control falta esa frustración acumulada.
+- Para una `prereg-v3`: pedir una "decisión principal" explícita en los puntos de control, en vez de
+  inferirla de hasta 3 acciones, y añadir `accept_deal` a las opciones del Sábado Negro.
+
+**Consecuencia para la fase 5.** Los contrafactuales no pueden presentarse como "qué habrían hecho
+Kennedy y Jruschov". Son experimentos sobre agentes LLM dentro de un modelo de crisis con la
+estructura de 1962, siempre en modo anonimizado y condicionados a `rules.toml`. Era el objetivo
+primario (sección 0); ahora está justificado con datos y no solo como precaución.
+
 ---
 
 ## 3‑bis. Hallazgos de la fase 0 (histórico)
@@ -427,7 +477,7 @@ legítimo. Por eso no se usa sola.
 | **0** ✅ | Esqueleto, agentes scripted, CLI, tests | Partida reproducible con semilla; 26 tests en verde |
 | **1** ✅ | Motor v2: tensión sin saturación, cumplimiento y verificación de acuerdos, resolución de choques simultáneos (bloqueo frente a buques), coste de ceder pronto. Cribado de Morris. Tabla de rangos. Verificar y **congelar** `historical.toml` y `checkpoints.toml` | Invariantes en verde · secuencia histórica con P(acuerdo) ∈ [50 %, 95 %] y duración media ≥ 8 turnos · parámetros dominantes (Morris) identificados, con rango justificado, y resultados que dependan de ellos presentados como curva sobre su rango · etiqueta de prerregistro `prereg-v1` creada |
 | **2** ✅ | Agente LLM sin RAG con modelo local **fijado** (nombre, cuantización y hash). Visor mínimo de partidas (JSONL → HTML). Sonda de fuga niveles 1 y 3 | JSON válido al primer intento ≥ 98 % · decisiones de respaldo ≤ 1 % · coste medido (s/decisión, tokens/partida) · fuga reportada en real, anonimizado y trampa |
-| **3** | Fidelidad en los puntos de control (K = 30) frente a las referencias | Informe por punto con IC. Decisión justificada sobre si la persona histórica aporta algo frente a un LLM sin persona |
+| **3** ✅ | Fidelidad en los puntos de control (K = 30) frente a las referencias | Informe por punto con IC. Decisión justificada sobre si la persona histórica aporta algo frente a un LLM sin persona |
 | **4** | Corpus mínimo: ~30 documentos **ligados a los puntos de control**, pre‑anotados por LLM y validados por una persona. RAG temporal | Acuerdo entre la anotación del LLM y la humana ≥ 90 % en `available_to` y `known_from` · el RAG no aumenta la fuga · cambio en fidelidad reportado con IC |
 | **5** | **Experimentos contrafactuales** (objetivo primario): perfiles × variantes × disciplina de mando; potencias inventadas; bifurcación desde estados críticos | Resultados con IC y análisis de sensibilidad con agentes LLM, condicionados a `rules.toml` versionado |
 | **6** | Interfaz espectador estilo DEFCON (FastAPI + MapLibre) y "cambiar la historia" en la interfaz | Reproducir una partida registrada y bifurcarla desde la interfaz |
