@@ -252,6 +252,40 @@ Comportamiento a vigilar en la fase 3, sin sacar conclusiones con n = 2:
 
 ---
 
+## 3‑quater. Fase 3: plan de análisis prerregistrado (13‑oct‑2026, etiqueta `prereg-v2`)
+
+Se fija **antes** de ejecutar ningún LLM en la fase 3. Los puntos de control y su codificación
+siguen congelados desde `prereg-v1`.
+
+**Configuración.** Modelo `qwen3.5:9b` (Ollama, id `56671c2ab938`), temperatura 0,7, `num_ctx` 4096,
+sin "thinking". K = 30 por celda, semillas 0–29. Comando:
+`cavalier fidelity cuba1962 -k 30 --out runs/fidelity_v1.json`.
+
+**Condiciones** (en los 4 puntos de control):
+- `llm:historico` y `llm:ninguna` (mismo briefing y nombre del dirigente, sin la instrucción de
+  imitarlo), cada una en modo real y anonimizado: 4 × 4 × 30 = 480 decisiones;
+- referencias: las cinco personalidades scripted (K = 30) y el azar uniforme sobre las opciones consideradas.
+
+**Métrica.** P(opción histórica) por punto y condición, con IC 95 % de Wilson. **Nunca se agrega**
+en una sola cifra.
+
+**Contrastes** (Fisher exacta bilateral, corrección de Holm dentro de cada familia):
+1. *Fuga*: real frente a anonimizado, por punto y persona (8 pruebas). Confirmatoria para
+   `usa_respuesta_inicial` con `historico`, donde la fase 2 dio 7/10 frente a 0/10. El resto es descriptivo.
+2. *Aporte de la persona*: `historico` frente a `ninguna` **en modo anonimizado**, por punto (4
+   pruebas). Se usa el modo anonimizado porque en modo real el efecto se mezcla con la fuga.
+
+**Reglas de lectura fijadas de antemano:**
+- Un punto "se reproduce" en una condición si el límite inferior del IC supera al azar uniforme.
+- Si la fuga es significativa (Holm) en un punto, la fidelidad en modo real de ese punto se
+  reporta como **no interpretable**.
+- La persona histórica se mantiene en la fase 5 si en modo anonimizado no queda por debajo de
+  `ninguna` en ningún punto con diferencia significativa. Si queda por debajo, la fase 5 usa `ninguna`.
+- Las decisiones de respaldo cuentan como "otra" y se reportan aparte. Si superan el 2 % en una
+  celda, la celda se marca.
+
+---
+
 ## 3‑bis. Hallazgos de la fase 0 (histórico)
 
 Son resultados reales del esqueleto, con agentes scripted y la secuencia histórica forzada.
@@ -392,7 +426,7 @@ legítimo. Por eso no se usa sola.
 |---|---|---|
 | **0** ✅ | Esqueleto, agentes scripted, CLI, tests | Partida reproducible con semilla; 26 tests en verde |
 | **1** ✅ | Motor v2: tensión sin saturación, cumplimiento y verificación de acuerdos, resolución de choques simultáneos (bloqueo frente a buques), coste de ceder pronto. Cribado de Morris. Tabla de rangos. Verificar y **congelar** `historical.toml` y `checkpoints.toml` | Invariantes en verde · secuencia histórica con P(acuerdo) ∈ [50 %, 95 %] y duración media ≥ 8 turnos · parámetros dominantes (Morris) identificados, con rango justificado, y resultados que dependan de ellos presentados como curva sobre su rango · etiqueta de prerregistro `prereg-v1` creada |
-| **2** | Agente LLM sin RAG con modelo local **fijado** (nombre, cuantización y hash). Visor mínimo de partidas (JSONL → HTML). Sonda de fuga niveles 1 y 3 | JSON válido al primer intento ≥ 98 % · decisiones de respaldo ≤ 1 % · coste medido (s/decisión, tokens/partida) · fuga reportada en real, anonimizado y trampa |
+| **2** ✅ | Agente LLM sin RAG con modelo local **fijado** (nombre, cuantización y hash). Visor mínimo de partidas (JSONL → HTML). Sonda de fuga niveles 1 y 3 | JSON válido al primer intento ≥ 98 % · decisiones de respaldo ≤ 1 % · coste medido (s/decisión, tokens/partida) · fuga reportada en real, anonimizado y trampa |
 | **3** | Fidelidad en los puntos de control (K = 30) frente a las referencias | Informe por punto con IC. Decisión justificada sobre si la persona histórica aporta algo frente a un LLM sin persona |
 | **4** | Corpus mínimo: ~30 documentos **ligados a los puntos de control**, pre‑anotados por LLM y validados por una persona. RAG temporal | Acuerdo entre la anotación del LLM y la humana ≥ 90 % en `available_to` y `known_from` · el RAG no aumenta la fuga · cambio en fidelidad reportado con IC |
 | **5** | **Experimentos contrafactuales** (objetivo primario): perfiles × variantes × disciplina de mando; potencias inventadas; bifurcación desde estados críticos | Resultados con IC y análisis de sensibilidad con agentes LLM, condicionados a `rules.toml` versionado |
