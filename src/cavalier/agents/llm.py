@@ -148,6 +148,14 @@ class LLMAgent:
                 who = "tuya" if d.proposer == self.side else f"de {self._side_name(d.proposer)}"
                 terms = ", ".join(f"{self._term_to_code[t.term]}{' (secreto)' if t.secret else ''}" for t in d.terms)
                 lines.append(f"- {d.id} ({who}): {terms}")
+        if obs.commitments:
+            lines += ["", "### Compromisos de acuerdos aceptados"]
+            status = {"pending": "pendiente / sin verificar", "fulfilled": "cumplido", "broken": "roto"}
+            for c in obs.commitments:
+                who = "tú" if c.obligor == self.side else self._side_name(c.obligor)
+                extra = (" (secreto)" if c.secret else "") + (" (filtrado)" if c.leaked else "")
+                lines.append(f"- {c.deal_id} · {self._term_to_code[c.term]}{extra}: obligado {who}, "
+                             f"plazo turno {c.due_turn}, {status.get(c.status, c.status)}")
         if self.history:
             lines += ["", "### Tus decisiones anteriores"] + self.history[-self.history_turns:]
         if docs:
@@ -227,6 +235,9 @@ class LLMAgent:
             raise ValueError(f"Canal desconocido: {a.channel}. Opciones: {obs.channels}")
         if kind in ("accept_deal", "reject_deal") and a.deal_id not in {d.id for d in obs.open_deals}:
             raise ValueError(f"Propuesta desconocida: {a.deal_id}")
+        if kind == "renege_deal" and a.deal_id not in {
+                c.deal_id for c in obs.commitments if c.obligor == self.side and c.status == "pending"}:
+            raise ValueError(f"No tienes compromisos pendientes en el acuerdo {a.deal_id}")
         if kind == "propose_deal" and not terms:
             raise ValueError("Una propuesta de acuerdo necesita términos")
         if kind == "private_message" and not a.channel:

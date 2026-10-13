@@ -9,7 +9,7 @@ id = "cuba1962"
 title = "Crisis de los misiles de Cuba"
 start = 1962-10-16T08:00:00  # Kennedy recibe las fotografías del U-2
 hours_per_turn = 12
-max_turns = 30
+max_turns = 36  # 18 días: deja margen para cumplir y verificar un acuerdo
 initial_tension = 55.0
 
 # --------------------------------------------------------------------------- bandos
@@ -134,12 +134,14 @@ label = "Inspección de la ONU en Cuba"
 obligor = "USSR"
 value = { USA = 1.0, USSR = -1.0 }
 credibility_cost = 5.0
+verifies_deal = true  # con inspección, todos los compromisos del acuerdo se verifican
 
 [deal_terms.no_invasion_pledge]
 label = "Compromiso público de no invadir Cuba"
 obligor = "USA"
 value = { USA = -1.0, USSR = 3.0 }
 credibility_cost = 5.0
+verification = 1.0  # un compromiso público es observable
 sets = { "vars.invasion_pledge" = 1.0 }
 
 [deal_terms.withdraw_jupiters]
@@ -148,6 +150,7 @@ obligor = "USA"
 value = { USA = -1.5, USSR = 2.0 }
 credibility_cost = 20.0
 secretable = true
+verification_required = false  # pactado a confianza: la retirada real terminó en abril de 1963
 sets = { "vars.jupiters_turkey" = 0.0 }
 
 [deal_terms.lift_quarantine]
@@ -155,21 +158,30 @@ label = "Levantar la cuarentena naval"
 obligor = "USA"
 value = { USA = -0.5, USSR = 1.5 }
 credibility_cost = 2.0
+requires = { "vars.quarantine" = 1.0 }
+verification = 1.0  # visible
 sets = { "vars.quarantine" = 0.0 }
 
 # --------------------------------------------------------------------------- referencia
 # El motor no usa estos datos. Cifras aproximadas: VERIFICAR contra la fuente antes de citarlas.
 
 [historical_data.arsenal_1962]
-fuente = "Norris & Kristensen, Nuclear Notebook, Bulletin of the Atomic Scientists"
-verificado = false
-usa_ojivas_total_aprox = 25500
-urss_ojivas_total_aprox = 3300
+fuente = "DOE/NNSA (EE. UU., fin del año fiscal 1962); Norris & Kristensen, Bulletin of the Atomic Scientists (2010)"
+url = "https://thebulletin.org/2010/07/global-nuclear-weapons-inventories-1945-2010/"
+verificado = true
+usa_ojivas_total = 25540
+urss_ojivas_total_aprox = 3322
+ratio_ojivas_estrategicas = "~17:1 (McNamara, 1989: ~5.000 frente a ~300)"
+icbm_usa_aprox = "180-200"
+icbm_urss_aprox = "20-44"
 nota = "Asimetría estratégica muy fuerte a favor de EE. UU.; motivo central del despliegue soviético"
 
 [historical_data.cuba]
-fuente = "Fursenko & Naftali, One Hell of a Gamble; National Security Archive"
-verificado = false
-tropas_sovieticas_reales_aprox = 42000
-estimacion_eeuu_durante_crisis_aprox = 10000
+fuente = "National Security Archive; registros soviéticos (Deseret News, 1992)"
+url = "https://nsarchive2.gwu.edu/NSAEBB/NSAEBB449/"
+verificado = true
+tropas_sovieticas_reales = 41902
+estimacion_cia = "8.000 antes del 22 oct, 10.000 durante la crisis, ~22.000 hacia el 24 oct"
+ojivas_tacticas_en_cuba = "~98 (80 FKR, 12 Luna, 6 bombas Il-28)"
 armas_tacticas_conocidas_por_eeuu = false
+nota_tacticas = "EE. UU. fotografió lanzadores Luna ~25 oct sin saber que tenían ojivas; McNamara lo supo en 1992"

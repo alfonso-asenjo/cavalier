@@ -44,6 +44,10 @@ class DealTermConfig(BaseModel):
     credibility_cost: float = 0.0  # coste para el obligado si el término es público
     secretable: bool = False  # puede pactarse en secreto (p. ej. los Jupiter de Turquía)
     enabled: bool = True  # las variantes pueden desactivar términos
+    requires: dict[str, float] = Field(default_factory=dict)  # condiciones para poder pactarlo
+    verification: float = 0.0  # prob. mínima de verificar ESTE compromiso (1.0 = observable, p. ej. un compromiso público)
+    verifies_deal: bool = False  # si el acuerdo lo incluye, todos sus compromisos se verifican (inspección)
+    verification_required: bool = True  # False: se pacta a confianza y no bloquea el cierre de la crisis
     sets: dict[str, float] = Field(default_factory=dict)  # variables que fija al cumplirse
 
 
@@ -90,6 +94,19 @@ class ActionRule(BaseModel):
     nuclear_escalation: dict[str, float] = Field(default_factory=dict)  # base + contribución de variables
 
 
+class InteractionRule(BaseModel):
+    """Efecto de acciones que coinciden en el mismo turno (p. ej. buques que fuerzan la cuarentena).
+    Se evalúa después de aplicar las acciones de postura y antes de las terminales."""
+
+    id: str
+    label: str
+    actions: dict[str, str]  # bando -> acción; todas deben ocurrir en el turno
+    requires: dict[str, float] = Field(default_factory=dict)
+    prob: float = 1.0
+    effects: dict[str, float] = Field(default_factory=dict)  # rutas explícitas: tension, USA.x, vars.x
+    nuclear_risk: float = 0.0
+
+
 class DriftRule(BaseModel):
     target: str
     delta: float
@@ -103,8 +120,15 @@ class Rules(BaseModel):
     actions: dict[str, ActionRule]
     drifts: list[DriftRule] = Field(default_factory=list)
     tension_decay: float = 1.0
-    deal_tension_relief: float = 30.0
+    deal_tension_relief: float = 15.0  # al aceptar
+    fulfillment_tension_relief: float = 15.0  # al cumplirse y verificarse
     deal_expiry_turns: int = 4
+    implementation_turns: int = 4  # turnos para cumplir los compromisos de un acuerdo
+    verification_rate: float = 0.5  # prob. por turno de verificar = calidad de inteligencia * tasa
+    secret_leak_prob: float = 0.03  # prob. por turno de que se filtre un término secreto
+    # Ceder con poca tensión parece debilidad: coste de credibilidad *= 1 + penal * (1 - tensión/100)
+    concession_low_tension_penalty: float = 1.0
+    concession_pressure_factor: float = 0.5  # presión interna añadida por punto de credibilidad perdido
     deescalation_threshold: float = 20.0
     deescalation_turns: int = 3
     incident_tension_scale: float = 50.0  # p *= exp((tension-50)/scale)
@@ -113,6 +137,7 @@ class Rules(BaseModel):
     observation_noise: float = 12.0  # ruido base sobre variables 0..100 del rival
     incidents: list[IncidentConfig] = Field(default_factory=list)
     false_reports: list[FalseReportConfig] = Field(default_factory=list)
+    interactions: list[InteractionRule] = Field(default_factory=list)
 
 
 class Aliases(BaseModel):

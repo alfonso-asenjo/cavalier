@@ -75,3 +75,20 @@ def test_anonymized_prompts_do_not_leak_names(bundle):
             assert anon.leaks(text) == []
             assert not side_ids.search(text), side_ids.search(text)
             assert not forbidden.search(text), forbidden.search(text)
+
+
+def test_commitments_are_rendered_and_renege_is_validated(bundle):
+    from cavalier.models import Action, DealTerm
+
+    usa = ReplayAgent({0: [Action(kind="propose_deal", channel="backchannel", terms=[DealTerm(term="withdraw_missiles")])]})
+    ussr = ReplayAgent({1: [Action(kind="accept_deal")]})
+    game = Game(bundle, {"USA": usa, "USSR": ussr}, stochastic_events=False)
+    game.step(); game.step()
+    client = FakeLLMClient([])
+    agent = LLMAgent(bundle, "USSR", client)
+    obs = game.observe("USSR")
+    assert "Compromisos de acuerdos aceptados" in agent.render(obs, [])
+    client._responder = [_answer(agent, "renege_deal", deal_id="P1")]
+    assert agent.decide(obs).actions[0].kind == "renege_deal"
+    usa_agent = LLMAgent(bundle, "USA", FakeLLMClient([_answer(agent, "renege_deal", deal_id="P1")]))
+    assert usa_agent.decide(game.observe("USA")).fallback  # EE. UU. no tiene compromisos pendientes en P1

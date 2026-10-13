@@ -41,3 +41,33 @@ def test_historical_replay_is_neither_doomed_nor_trivial(bundle):
     negotiated = res.proportion(Outcome.NEGOTIATED)
     assert 0.5 < negotiated < 0.99, negotiated
     assert sum(s.invalid_actions for s in res.summaries) == 0
+
+
+def test_parallel_batch_matches_sequential(bundle):
+    from concurrent.futures import ProcessPoolExecutor
+
+    factory = scripted_factory({"USA": "impredecible", "USSR": "pragmatica"})
+    sequential = run_batch(bundle, factory, 40, seed=7)
+    with ProcessPoolExecutor(max_workers=4) as ex:
+        parallel = run_batch(bundle, factory, 40, seed=7, executor=ex, chunks=4)
+    assert parallel.summaries == sequential.summaries
+
+
+def test_morris_runs_and_ranks_parameters():
+    from cavalier.sensitivity import load_ranges, morris
+
+    ranges = load_ranges("cuba1962")
+    subset = {k: ranges[k] for k in ("rules.incidents.1.nuclear_risk", "rules.observation_noise")}
+    res = morris("cuba1962", replay_factory("cuba1962"), n=60, trajectories=2, ranges=subset)
+    nuclear = {row["param"]: row for row in res["metrics"]["nuclear"]}
+    # con acciones fijas, el ruido de observación no puede influir; el riesgo del submarino sí
+    assert nuclear["rules.observation_noise"]["mu_star"] == 0.0
+    assert nuclear["rules.incidents.1.nuclear_risk"]["mu_star"] > 0.0
+
+
+def test_ranges_cover_base_values(bundle):
+    from cavalier.sensitivity import _get, load_ranges
+
+    raw = {"rules": bundle.rules.model_dump()}
+    for path, rg in load_ranges("cuba1962").items():
+        assert rg.low <= _get(raw, path.split(".")) <= rg.high, path

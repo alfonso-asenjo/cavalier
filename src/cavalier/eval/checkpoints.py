@@ -33,11 +33,10 @@ def reconstruct_state(bundle: ScenarioBundle, scenario: str, checkpoint: Checkpo
 
 
 def classify(decision: Decision, considered: list[str]) -> str:
-    """Opción principal de una decisión: la primera acción que está entre las consideradas."""
-    for action in decision.actions:
-        if action.kind in considered:
-            return action.kind
-    return "otra"
+    """Opción principal de una decisión. `considered` está ordenada por prioridad: si el agente
+    toma varias de esas acciones, cuenta la que aparece antes en la lista (terminales primero)."""
+    kinds = {a.kind for a in decision.actions}
+    return next((option for option in considered if option in kinds), "otra")
 
 
 def evaluate_checkpoint(

@@ -18,9 +18,10 @@ pip install -e ".[llm,dev]"
 pytest
 
 cavalier replay cuba1962 -n 1000                                    # secuencia histórica forzada
-cavalier montecarlo cuba1962 --usa scripted:halcon --ussr scripted:paloma -n 1000
+cavalier montecarlo cuba1962 --usa scripted:halcon --ussr scripted:paloma -n 1000 --workers 16
 cavalier run cuba1962 --usa scripted:pragmatica --ussr scripted:impredecible --log runs/p.jsonl
 cavalier sensitivity cuba1962 -n 300                                # supuestos ±20 %
+cavalier morris cuba1962 --historical -n 300 -r 10 --workers 16     # sensibilidad global (ranges.toml)
 cavalier montecarlo cuba1962 --variant sin_armas_tacticas -n 1000   # contrafactual
 
 # Con un modelo local (Ollama, llama.cpp, LM Studio o vLLM con API compatible OpenAI)
@@ -41,4 +42,5 @@ Agentes: `scripted:{halcon,paloma,defensiva,pragmatica,impredecible}` y
 | `aliases.toml` | Renombrado para el modo anonimizado |
 | `historical.toml` | Secuencia histórica traducida a acciones (validación del motor) |
 | `checkpoints.toml` | Puntos de control para medir fidelidad (prerregistro) |
+| `ranges.toml` | Rango plausible y justificación de cada supuesto (Morris) |
 | `variants/*.toml` | Contrafactuales y escenarios trampa |

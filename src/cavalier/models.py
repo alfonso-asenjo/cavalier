@@ -55,7 +55,22 @@ class Deal(BaseModel):
     proposed_turn: int
     deliver_turn: int  # las propuestas viajan por un canal y llegan con retraso
     channel: str
-    status: str = "open"  # open | accepted | rejected | expired
+    status: str = "open"  # open | accepted | rejected | expired | broken | fulfilled
+    accepted_turn: int | None = None
+
+
+class Commitment(BaseModel):
+    """Obligación nacida de un acuerdo aceptado. Se cumple al llegar `due_turn` salvo que el
+    obligado rompa el acuerdo; el otro bando tiene que verificarla."""
+
+    deal_id: str
+    term: str
+    obligor: str
+    secret: bool = False
+    due_turn: int
+    status: str = "pending"  # pending | fulfilled | broken
+    verified: bool = False  # el otro bando ha comprobado el cumplimiento
+    leaked: bool = False  # término secreto que se ha hecho público
 
 
 class Action(BaseModel):
@@ -94,6 +109,7 @@ class WorldState(BaseModel):
     vars: dict[str, float] = Field(default_factory=dict)
     messages: list[Message] = Field(default_factory=list)
     deals: dict[str, Deal] = Field(default_factory=dict)
+    commitments: list[Commitment] = Field(default_factory=list)
     events: list[Event] = Field(default_factory=list)
     low_tension_streak: int = 0
     fired_incidents: list[str] = Field(default_factory=list)
@@ -117,6 +133,7 @@ class Observation(BaseModel):
     inbox: list[Message]
     events: list[Event]  # eventos vistos desde el turno anterior (incluye inteligencia falsa)
     open_deals: list[Deal]
+    commitments: list[Commitment]  # de acuerdos aceptados; `verified` desde el punto de vista del observador
     legal_actions: dict[str, str]  # kind -> descripción
     deal_terms: dict[str, str]  # term -> descripción
     channels: list[str]

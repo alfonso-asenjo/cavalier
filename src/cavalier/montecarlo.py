@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from collections.abc import Callable
+from concurrent.futures import Executor
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -86,26 +87,51 @@ def play(bundle: ScenarioBundle, agents: dict[str, Agent], seed: int, anonymized
     )
 
 
+def _play_seeds(bundle: ScenarioBundle, factory: AgentFactory, seeds: list[int], anonymized: bool) -> list[GameSummary]:
+    return [play(bundle, factory(bundle, s), s, anonymized) for s in seeds]
+
+
 def run_batch(bundle: ScenarioBundle, factory: AgentFactory, n: int, seed: int = 0,
-              anonymized: bool = False, log_dir: str | Path | None = None) -> BatchResult:
+              anonymized: bool = False, log_dir: str | Path | None = None,
+              executor: Executor | None = None, chunks: int = 16) -> BatchResult:
+    """Juega `n` partidas con semillas seed..seed+n-1. Con `executor` (p. ej. ProcessPoolExecutor)
+    reparte las semillas en `chunks` bloques; el resultado es idéntico al secuencial.
+    La fábrica debe ser serializable (ScriptedFactory, ReplayFactory) para usar procesos."""
+    seeds = list(range(seed, seed + n))
     result = BatchResult()
-    for i in range(n):
-        game_seed = seed + i
+    if executor is not None and log_dir is None and n > 1:
+        size = max(1, -(-n // chunks))
+        blocks = [seeds[i:i + size] for i in range(0, n, size)]
+        for summaries in executor.map(_play_seeds, *zip(*[(bundle, factory, b, anonymized) for b in blocks])):
+            result.summaries.extend(summaries)
+        return result
+    for game_seed in seeds:
         log_path = Path(log_dir) / f"game_{game_seed:05d}.jsonl" if log_dir else None
         result.summaries.append(play(bundle, factory(bundle, game_seed), game_seed, anonymized, log_path))
     return result
 
 
-def scripted_factory(personalities: dict[str, str]) -> AgentFactory:
-    def factory(bundle: ScenarioBundle, seed: int) -> dict[str, Agent]:
+@dataclass
+class ScriptedFactory:
+    personalities: dict[str, str]
+
+    def __call__(self, bundle: ScenarioBundle, seed: int) -> dict[str, Agent]:
         return {side: ScriptedAgent(bundle, side, p, seed=seed * 7919 + i)
-                for i, (side, p) in enumerate(personalities.items())}
-    return factory
+                for i, (side, p) in enumerate(self.personalities.items())}
+
+
+@dataclass
+class ReplayFactory:
+    script: dict[str, dict[int, list]]
+
+    def __call__(self, bundle: ScenarioBundle, seed: int) -> dict[str, Agent]:
+        return {side: ReplayAgent(self.script.get(side, {}), name=f"historical:{side}")
+                for side in bundle.scenario.sides}
+
+
+def scripted_factory(personalities: dict[str, str]) -> AgentFactory:
+    return ScriptedFactory(dict(personalities))
 
 
 def replay_factory(scenario: str | Path) -> AgentFactory:
-    script = load_historical_script(scenario)
-
-    def factory(bundle: ScenarioBundle, seed: int) -> dict[str, Agent]:
-        return {side: ReplayAgent(script.get(side, {}), name=f"historical:{side}") for side in bundle.scenario.sides}
-    return factory
+    return ReplayFactory(load_historical_script(scenario))

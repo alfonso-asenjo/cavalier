@@ -1,0 +1,5 @@
+# Contrafactual: comunicaciones oficiales más lentas (cifrado, traducción, mensajeros).
+# Pregunta: ¿la latencia aumenta los incidentes y reduce los acuerdos a tiempo?
+[rules.channels]
+official = 2
+backchannel = 1

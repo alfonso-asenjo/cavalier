@@ -8,8 +8,14 @@
 
 max_actions_per_turn = 3
 tension_decay = 1.5            # la tensión baja sola si nadie hace nada
-deal_tension_relief = 30.0
+deal_tension_relief = 15.0       # al aceptar un acuerdo
+fulfillment_tension_relief = 15.0  # al cumplirse y verificarse
 deal_expiry_turns = 4
+implementation_turns = 4         # 2 días para cumplir lo pactado
+verification_rate = 0.5          # p(verificar por turno) = calidad de inteligencia del otro * tasa
+secret_leak_prob = 0.03          # por turno y término secreto
+concession_low_tension_penalty = 1.0  # ceder sin crisis aparente cuesta hasta el doble
+concession_pressure_factor = 0.5
 deescalation_threshold = 20.0
 deescalation_turns = 3
 incident_tension_scale = 25.0
@@ -18,9 +24,13 @@ incident_prob_multiplier = 1.0
 observation_noise = 12.0
 
 # Retraso adicional en turnos de 12 h. Un mensaje enviado en el turno t llega en t+1+retraso.
+# Verificado: la primera carta de Jrushchov tardó ~10 h (Moscú 09:40 -> Estado 18:00-21:00), es decir,
+# un turno. A esta resolución el canal oficial y el extraoficial (Dobrynin - R. Kennedy, horas) colapsan.
+# La latencia como mecánica se estudia con la variante `comunicaciones_lentas` (sin "teléfono rojo",
+# que se creó en 1963 precisamente por esta crisis).
 [channels]
-official = 1      # embajadas, cifrado y traducción: las cartas tardaban horas
-backchannel = 0   # canal extraoficial (p. ej. Dobrynin – R. Kennedy)
+official = 0
+backchannel = 0
 
 # --------------------------------------------------------------------------- acciones genéricas
 
@@ -85,6 +95,11 @@ label = "Aceptar un acuerdo propuesto"
 [actions.reject_deal]
 label = "Rechazar un acuerdo propuesto"
 effects = { tension = 3.0 }
+
+[actions.renege_deal]
+label = "Romper un acuerdo aceptado antes de cumplir lo pactado"
+stance = "escalate"
+effects = { tension = 12.0, "self.credibility" = -15.0 }
 
 # --------------------------------------------------------------------------- acciones de escenario
 
@@ -237,3 +252,22 @@ prob = 0.03
 target = "USSR"
 label = "Informes del aliado insular aseguran que la invasión es inminente en 24-72 horas"
 prob = 0.06
+
+# --------------------------------------------------------------------------- interacciones
+# Acciones que coinciden en el mismo turno. Se evalúan tras las acciones de postura: si EE. UU.
+# levanta la cuarentena en el mismo turno en que los buques intentan cruzarla, no hay choque.
+
+[[interactions]]
+id = "enfrentamiento_naval"
+label = "Buques que intentan cruzar la cuarentena se enfrentan a la flota que la impone"
+actions = { USSR = "run_quarantine" }
+requires = { "vars.quarantine" = 1.0 }
+prob = 0.5
+effects = { tension = 12.0 }
+nuclear_risk = 0.03
+
+[[interactions]]
+id = "espiral_movilizacion"
+label = "Movilizaciones simultáneas: cada bando interpreta la del otro como preparación ofensiva"
+actions = { USA = "mobilize", USSR = "mobilize" }
+effects = { tension = 5.0 }
