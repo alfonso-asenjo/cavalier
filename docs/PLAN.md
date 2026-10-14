@@ -390,6 +390,116 @@ los incidentes.
 
 ---
 
+## 3‑sexies. Fase 5, experimento 2 (propuesta, sin prerregistrar): asesores históricos
+
+Propuesto el 14‑oct‑2026 y revisado el mismo día con el informe
+[`reports/Asesores en la crisis de Cuba.md`](../reports/Asesores%20en%20la%20crisis%20de%20Cuba.md)
+(notas de investigación en `research_notes/`). **No es un prerregistro.** Antes de ejecutar nada hay
+que fijar en un `prereg-v4` las métricas, las celdas, n y el criterio de corte de la fase 0.
+
+**Motivación.** Hoy cada bando es un solo agente que decide a solas. La hipótesis es que dar voz a
+asesores con posturas documentadas **aumenta la variedad de las partidas**: trayectorias distintas,
+no solo desenlaces distintos.
+
+**Lo que dice la historia.**
+- El ExComm fue un debate abierto y dividido. La línea divisoria se movió tres veces: el 16 de octubre casi
+  todos querían atacar; entre el 17 y el 20 se formaron un bando del bloqueo y otro del ataque; el 27 se
+  discutía si canjear los Jupiter o no.
+- Jrushchov ideó y cerró la crisis prácticamente solo, y el Presídium lo ratificaba por unanimidad.
+  La exigencia de Turquía del 27 fue iniciativa suya.
+- La asimetría es en sí una predicción comprobable: con la misma estructura, los asesores deberían
+  dar más variedad al bando estadounidense. Si no lo hacen, el modelo está aplanando la asimetría histórica.
+
+**Lo que dice la literatura sobre LLM.** La predicción nula es fuerte:
+- En equipos simulados por LLM se observa una «armonía farsesca», incluso con rasgos extremos
+  (Lamparth et al., 2024).
+- Los rasgos de persona explican menos del 10 % de la varianza (Hu y Collier, 2024).
+- Las personas derivan en menos de 8 rondas (Li et al., 2024).
+- El debate entre agentes colapsa en consenso.
+
+Lo que sí ha bajado la concentración de opiniones en consejos de modelos de 7–9B es la **estructura**:
+información distinta por asesor y, sobre todo, **un modelo distinto por perspectiva** (Sela, 2026, preprint).
+
+**Asesores** (fichas completas con su nivel de evidencia en el informe; posturas corregidas respecto
+a la primera versión de esta propuesta):
+
+| Bando | Asesor | Acción ancla | Línea roja | Notas |
+|---|---|---|---|---|
+| EE. UU. | McNamara | Cuarentena, presión gradual | Ataque sin aviso | Aceptaba el canje de los Jupiter; el 27 también preparaba lo militar |
+| EE. UU. | Taylor (LeMay como variante dura) | Ataque aéreo, represalia contra el SAM | Ataque limitado | LeMay no estaba en el ExComm |
+| EE. UU. | Thompson | Responder a la oferta más blanda | Canje **público** con la OTAN | Lee a Jrushchov; se opuso al canje de Turquía el 27 |
+| EE. UU. | Stevenson (opcional) | Negociar, retirar los Jupiter | Ataque por sorpresa | Aporta la opción de acomodo que los modelos no generan solos |
+| URSS | Mikoyán | Desmantelar a cambio de garantías, la ONU | Dar pretextos para un ataque | El único escéptico documentado del despliegue |
+| URSS | Malinovski | Alerta sin uso nuclear | Uso sin orden de Moscú | Leal, subestimaba a EE. UU.; **no** es «el halcón» |
+| URSS | Dobrynin (opcional) | Canal secreto | Ultimátum público | Lee Washington; no habla en el Presídium |
+
+**Qué no inventar.**
+- Cada rasgo va etiquetado como cinta o documento, memoria o interpretación de historiador. El modelo puede responder «no consta».
+- No atribuir a RFK el pacifismo de *Thirteen Days*, ni el «Trollope ploy» a nadie en concreto.
+- No dar a Kózlov ni a Biriuzov posturas de octubre.
+- No tratar como hecho la regla de los tres oficiales del B‑59.
+- **En el modo anonimizado, los asesores llevan nombre de cargo** («Secretario de Defensa») y argumentos
+  sin referencias históricas concretas («Pearl Harbor» rompería el anonimato).
+
+**Mecánica (contra el eco).**
+- El asesor habla solo en los turnos clave: incidente, propuesta recibida, cambio de DEFCON y primer turno.
+- Cada asesor recibe un **informe privado distinto** derivado del estado del juego:
+  - Taylor: la disponibilidad militar;
+  - McNamara: la cuarentena y la postura de fuerzas;
+  - Thompson y Stevenson: la última propuesta y la reacción de la ONU;
+  - Mikoyán: el coste de escalar;
+  - Malinovski: los informes de alerta;
+  - Dobrynin: las señales del canal secreto.
+- Los consejos se generan **de forma independiente y en una sola ronda**. Ningún asesor ve a los demás ni la intención del líder.
+- La salida es estructurada: acción del enum, confianza, un riesgo y qué le haría cambiar de opinión.
+- **El prompt se reconstruye en cada turno clave**, sin historial: evita la deriva y cabe en 4096 tokens.
+- Si todos coinciden, el último asesor (Stevenson o Mikoyán) defiende la mejor alternativa.
+- Los consejos se registran y el visor los muestra en «Qué pasó por dentro».
+
+**Fase 0: validar antes de jugar** (pocas horas de GPU).
+- Se congelan 10–20 estados reales (el Sábado Negro y otros turnos clave) y se ejecuta cada asesor K = 10 veces por estado.
+- Medidas:
+  - la distribución de acciones recomendadas por asesor (divergencia de Jensen–Shannon entre pares y concentración en la primera opción);
+  - la distancia semántica entre asesores frente a la distancia dentro de un mismo asesor;
+  - una **atribución ciega**: un juez debe acertar quién escribió cada consejo por encima del azar;
+  - una **prueba de complacencia**: se inyecta la intención del líder y se mide cuánto se desplazan los consejos;
+  - la deriva: adherencia a la acción ancla en los primeros y en los últimos turnos clave.
+- Criterio de corte (a fijar en `prereg-v4`): si McNamara y Taylor no recomiendan acciones distintas
+  en la mayoría de los estados, no se lanza el experimento.
+
+**Diseño tentativo de las partidas.** Bifurcación desde `usa_sabado_negro`, con el mismo modelo
+fijado para los líderes y en modo anonimizado. Celdas:
+- **líder solo**: la `base` del experimento 1, si el código no cambia en nada más;
+- **asesores solo con etiqueta**: separa el efecto del nombre;
+- **asesores con informe privado y acción ancla**;
+- opcionalmente, **asesores con otro modelo** (4B u otro de 7–9B, cargados uno tras otro en Ollama).
+
+**Cómo medir la "variedad".**
+- La entropía de los desenlaces.
+- La distancia de edición entre las secuencias de acciones.
+- La dispersión de la duración y de la tensión máxima.
+- P(acuerdo) y P(escalada) como control.
+- La **influencia**: la tasa a la que el líder sigue a la mayoría de los consejos y la tasa a la que adopta la recomendación minoritaria.
+- El porcentaje de acciones rechazadas por el nodo `validate`, para no confundir variedad con incoherencia.
+
+**Coste** (simulacro del 14‑oct, calibrado con el ritmo real del experimento 1, ~43 s por turno
+con 2 decisiones):
+
+| Configuración | Llamadas al LLM por turno | Por partida | 30 partidas |
+|---|---|---|---|
+| Sin asesores (hoy) | 2 | ~6 min | ~3 h |
+| 5 asesores en todos los turnos (9B) | 7 | ~15 min | ~7,5 h |
+| 5 asesores solo en los turnos clave (9B) | ~3,7 de media | ~9 min | ~4,5 h |
+| Ídem con los asesores en el modelo 4B | ~3,7 | ~8 min | ~4 h |
+
+**Riesgos.**
+- El eco: los asesores repiten al líder o entre sí. Es lo que mide la fase 0.
+- El sesgo de escalada de los LLM: todos los estudios lo encuentran. El prompt de cada asesor actúa
+  como una intervención sobre la escalada, así que la mecánica del motor no debe cambiar entre celdas.
+- Que la «variedad» venga de ruido y no de deliberación. Hay que leer una muestra de partidas a mano.
+
+---
+
 ## 3‑bis. Hallazgos de la fase 0 (histórico)
 
 Son resultados reales del esqueleto, con agentes scripted y la secuencia histórica forzada.
@@ -534,7 +644,7 @@ legítimo. Por eso no se usa sola.
 | **3** ✅ | Fidelidad en los puntos de control (K = 30) frente a las referencias | Informe por punto con IC. Decisión justificada sobre si la persona histórica aporta algo frente a un LLM sin persona |
 | **4** | Corpus mínimo: ~30 documentos **ligados a los puntos de control**, pre‑anotados por LLM y validados por una persona. RAG temporal | Acuerdo entre la anotación del LLM y la humana ≥ 90 % en `available_to` y `known_from` · el RAG no aumenta la fuga · cambio en fidelidad reportado con IC |
 | **5** | **Experimentos contrafactuales** (objetivo primario): perfiles × variantes × disciplina de mando; potencias inventadas; bifurcación desde estados críticos | Resultados con IC y análisis de sensibilidad con agentes LLM, condicionados a `rules.toml` versionado |
-| **6** | Interfaz espectador estilo DEFCON (FastAPI + MapLibre) y "cambiar la historia" en la interfaz | Reproducir una partida registrada y bifurcarla desde la interfaz |
+| **6** | Interfaz espectador estilo DEFCON (FastAPI + MapLibre) y "cambiar la historia" en la interfaz. Voces sintéticas de los líderes (adelantado como experimento: `cavalier voices`, ver 8.4) | Reproducir una partida registrada y bifurcarla desde la interfaz |
 | **7** | (Condicional) Destilación o LoRA si F5 está limitado por coste | El modelo pequeño reproduce la distribución de decisiones del grande en los puntos de control (divergencia por debajo de un umbral fijado antes) |
 
 ---
@@ -572,3 +682,15 @@ legítimo. Por eso no se usa sola.
    Carlo si supera la comparación en los puntos de control (ver 4.4).
 3. **Versionado**: repositorio git creado. El prerregistro será una etiqueta (`prereg-v1`) cuando
    `historical.toml` y `checkpoints.toml` estén verificados contra las fuentes (F1).
+4. **Voces sintéticas** (14‑oct‑2026, experimental, adelanto de F6). No existe un TTS listo con
+   las voces de Kennedy y Jrushchov (el proyecto «JFK Unsilenced», de CereProc en 2018, fue un
+   encargo cerrado, y los servicios comerciales bloquean la clonación de políticos). Se clonan en
+   local con **XTTS‑v2** (Coqui) a partir de clips de archivo: Kennedy, de la JFK Library (dominio
+   público); Jrushchov, de noticiarios en ruso, ya que XTTS clona el timbre en otro idioma. Los
+   agentes escriben en español y las voces hablan español.
+   - Es solo presentación: no toca el motor, los agentes ni los experimentos.
+   - Va en un entorno aparte (`.venv-tts`, PyTorch con CUDA) y solo entre tandas, porque XTTS
+     (2–3 GB) no cabe en la GPU junto al modelo de 9B.
+   - Siempre se marca como **sintético** (manifiesto y visor). No se publican clips sueltos. La
+     licencia de XTTS‑v2 (CPML) es solo para uso no comercial.
+   - Instrucciones: `data/voices/README.md`.
