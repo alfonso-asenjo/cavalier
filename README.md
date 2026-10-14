@@ -21,6 +21,7 @@ cavalier replay cuba1962 -n 1000                                    # secuencia 
 cavalier montecarlo cuba1962 --usa scripted:halcon --ussr scripted:paloma -n 1000 --workers 16
 cavalier run cuba1962 --usa scripted:pragmatica --ussr scripted:impredecible --seed 112 --view   # + visor HTML
 cavalier view runs/p.jsonl                                           # visor de una partida registrada
+cavalier view runs/p.jsonl --story                                   # relato por capítulos con fotos históricas (data/photos)
 cavalier sensitivity cuba1962 -n 300                                # supuestos ±20 %
 cavalier morris cuba1962 --historical -n 300 -r 10 --workers 16     # sensibilidad global (ranges.toml)
 cavalier montecarlo cuba1962 --variant sin_armas_tacticas -n 1000   # contrafactual
@@ -33,6 +34,9 @@ cavalier run cuba1962 ... --log runs/llm.jsonl --resume              # continuar
 cavalier checkpoints cuba1962 --agent llm:historico --model qwen3.5:9b -k 30
 cavalier fidelity cuba1962 -k 30                                     # fase 3: fidelidad con referencias (reanudable)
 cavalier experiment cuba1962 --usa llm:historico --ussr llm:historico --anon -n 30   # fase 5: bifurcación desde el Sábado Negro
+
+# Voces sintéticas de los líderes (experimental; entorno aparte, ver data/voices/README.md)
+.venv-tts/Scripts/cavalier voices runs/exp1/base/s001.jsonl          # audio por mensaje + botones en el visor
 ```
 
 Agentes: `scripted:{halcon,paloma,defensiva,pragmatica,impredecible}` y

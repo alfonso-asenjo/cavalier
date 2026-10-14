@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cavalier · relato de una partida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&display=swap">
+<style>
+:root {
+  --board: #d9dedb;      /* panel de las fotos de reconocimiento */
+  --paper: #f6f7f5;
+  --ink: #1e2427;
+  --ink-soft: #4d575b;
+  --rule: #b7bfbc;
+  --usa: #2c5a85;
+  --ussr: #9e2f28;
+  --heat: #d08a12;
+  --calm: #5c8a6e;
+  --display: "Archivo", "Arial Narrow", sans-serif;
+  --text: "Source Serif 4", Georgia, serif;
+  --gutter: 112px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --board: #1b2124; --paper: #242b2e; --ink: #e6eae8; --ink-soft: #a9b3b0; --rule: #3b4549;
+    --usa: #79a6d2; --ussr: #e0786e; --heat: #e6a43a; --calm: #8cbf9f;
+  }
+}
+:root[data-theme="dark"] {
+  --board: #1b2124; --paper: #242b2e; --ink: #e6eae8; --ink-soft: #a9b3b0; --rule: #3b4549;
+  --usa: #79a6d2; --ussr: #e0786e; --heat: #e6a43a; --calm: #8cbf9f;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--board); color: var(--ink); font: 400 18px/1.6 var(--text); }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--heat); outline-offset: 2px; }
+.usa { color: var(--usa); }
+.ussr { color: var(--ussr); }
+
+/* ── Portada ── */
+.hero { position: relative; min-height: min(88vh, 760px); display: grid; align-items: end; color: #fff; background: #20282b; overflow: hidden; }
+.hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1) brightness(.62); }
+.hero .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(14,18,20,.92) 0%, rgba(14,18,20,.35) 55%, rgba(14,18,20,.1) 100%); }
+.hero .inner { position: relative; padding: 0 clamp(16px, 5vw, 72px) clamp(28px, 6vh, 64px); max-width: 1100px; }
+.hero .kicker { font: 600 15px/1.3 var(--display); font-stretch: 85%; letter-spacing: .02em; opacity: .85; margin: 0 0 14px; }
+.hero h1 { font: 800 clamp(40px, 7.4vw, 96px)/.95 var(--display); font-stretch: 68%; margin: 0 0 18px; letter-spacing: -.01em; max-width: 14ch; }
+.hero .dek { font: 400 clamp(18px, 2.2vw, 23px)/1.45 var(--text); max-width: 46ch; margin: 0; opacity: .95; }
+.hero .credit { position: absolute; right: 12px; bottom: 8px; font: 400 12px/1.2 var(--display); opacity: .6; max-width: 50ch; text-align: right; }
+.hero .scrollhint { margin-top: 26px; font: 600 15px var(--display); font-stretch: 85%; }
+.hero .scrollhint a { text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.5); }
+
+/* ── Ficha de la partida ── */
+.facts { background: var(--paper); border-bottom: 1px solid var(--rule); }
+.facts dl { max-width: 1100px; margin: 0 auto; padding: 22px clamp(16px, 5vw, 72px); display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px 28px; }
+.facts dt { font: 500 14px/1.2 var(--display); font-stretch: 85%; color: var(--ink-soft); }
+.facts dd { margin: 4px 0 0; font: 700 26px/1.1 var(--display); font-stretch: 75%; }
+
+/* ── Cuerpo: sismógrafo + capítulos + panel ── */
+.story { display: grid; grid-template-columns: var(--gutter) minmax(0, 680px) 300px; gap: 0 40px; justify-content: center; padding: 48px 16px 24px; }
+.trace { position: relative; grid-column: 1; }
+.trace svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.chapters { grid-column: 2; }
+.rail { grid-column: 3; }
+.rail .sticky { position: sticky; top: 20px; background: var(--paper); border: 1px solid var(--rule); padding: 18px 18px 14px; }
+
+.chapter { position: relative; padding: 0 0 56px; scroll-margin-top: 16px; }
+.chapter .when { font: 600 15px/1.2 var(--display); font-stretch: 85%; color: var(--ink-soft); margin: 0 0 6px; }
+.chapter .when b { color: var(--ink); font-weight: 700; }
+.chapter h2 { font: 750 clamp(28px, 3.6vw, 40px)/1.05 var(--display); font-stretch: 72%; margin: 0 0 14px; text-wrap: balance; }
+.chapter.key h2 { font-size: clamp(32px, 4.4vw, 50px); }
+.chapter p { margin: 0 0 14px; max-width: 62ch; }
+.chapter .quiet h2 { font-size: 26px; }
+
+figure { margin: 18px 0 20px; }
+figure img { display: block; width: 100%; height: auto; max-height: 440px; object-fit: cover; filter: grayscale(1) contrast(1.05); background: var(--rule); }
+figcaption { font: 400 14px/1.4 var(--display); font-stretch: 90%; color: var(--ink-soft); margin-top: 6px; }
+
+blockquote { margin: 18px 0; padding: 2px 0 2px 18px; border-left: 4px solid currentColor; }
+blockquote .who { font: 650 15px/1.2 var(--display); font-stretch: 85%; margin: 0 0 6px; }
+blockquote .said { font: italic 400 19px/1.55 var(--text); color: var(--ink); margin: 0; max-width: 60ch; }
+blockquote audio { display: block; width: 100%; max-width: 340px; height: 32px; margin-top: 8px; }
+
+details.more > summary { cursor: pointer; font: 600 15px var(--display); font-stretch: 85%; color: var(--ink-soft); margin: -4px 0 12px; }
+details.inside { margin-top: 8px; border-top: 1px solid var(--rule); }
+details.inside > summary { cursor: pointer; padding: 10px 0; font: 650 16px var(--display); font-stretch: 85%; color: var(--ink-soft); list-style: none; }
+details.inside > summary::-webkit-details-marker { display: none; }
+details.inside > summary::before { content: "+"; display: inline-block; width: 1.2em; font-weight: 800; }
+details.inside[open] > summary::before { content: "−"; }
+.sides { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 15px; line-height: 1.5; }
+.side h3 { font: 700 18px var(--display); font-stretch: 80%; margin: 0 0 6px; }
+.side h4 { font: 600 14px var(--display); font-stretch: 85%; color: var(--ink-soft); margin: 14px 0 4px; }
+.side ul { margin: 0; padding-left: 18px; }
+.side li { margin: 0 0 4px; }
+.side .reason { font-style: italic; margin: 0; }
+.gap { font: 600 13px var(--display); }
+.gap.off { color: var(--heat); }
+.world { margin-top: 16px; font-size: 15px; }
+.world h4 { font: 600 14px var(--display); font-stretch: 85%; color: var(--ink-soft); margin: 0 0 4px; }
+.world ul { margin: 0; padding-left: 18px; }
+.false { font: 700 12px var(--display); color: var(--ussr); margin-left: 6px; }
+.fallback { font: 700 12px var(--display); color: var(--heat); }
+
+/* ── Panel fijo ── */
+.rail h3 { font: 700 15px/1.2 var(--display); font-stretch: 85%; margin: 0 0 2px; }
+.rail .now { font: 500 14px var(--display); font-stretch: 90%; color: var(--ink-soft); margin: 0 0 14px; }
+.meter { margin: 0 0 16px; }
+.meter .lbl { display: flex; justify-content: space-between; font: 600 14px var(--display); font-stretch: 85%; }
+.meter .bar { height: 8px; background: var(--rule); margin-top: 4px; }
+.meter .bar i { display: block; height: 100%; background: var(--heat); transition: width .35s; }
+.defcon { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; margin: 0 0 16px; font: 600 14px var(--display); font-stretch: 85%; }
+.ladder { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.ladder span { text-align: center; font: 700 12px/20px var(--display); border: 1px solid var(--rule); color: var(--ink-soft); }
+.ladder span.on { color: #fff; border-color: transparent; }
+.ladder.usa span.on { background: var(--usa); }
+.ladder.ussr span.on { background: var(--ussr); }
+.status { list-style: none; margin: 0; padding: 0; font: 500 14px/1.35 var(--display); font-stretch: 90%; }
+.status li { display: flex; gap: 8px; padding: 4px 0; border-top: 1px solid var(--rule); }
+.status li::before { content: ""; flex: 0 0 9px; height: 9px; margin-top: 5px; border-radius: 50%; background: var(--rule); }
+.status li.yes::before { background: var(--heat); }
+.status li.good::before { background: var(--calm); }
+.rail .deals { margin-top: 12px; font: 500 13px/1.35 var(--display); font-stretch: 90%; color: var(--ink-soft); }
+
+/* ── Cierre ── */
+.ending { background: var(--paper); border-top: 1px solid var(--rule); padding: 48px clamp(16px, 5vw, 72px); }
+.ending > div { max-width: 760px; margin: 0 auto; }
+.ending h2 { font: 800 clamp(30px, 4vw, 44px)/1.05 var(--display); font-stretch: 70%; margin: 0 0 14px; }
+.ending .notes { font: 400 14px/1.5 var(--display); font-stretch: 92%; color: var(--ink-soft); margin-top: 28px; }
+.ending .notes p { margin: 0 0 8px; }
+
+/* ── Móvil: el panel se convierte en una franja fija ── */
+@media (max-width: 1100px) {
+  .story { grid-template-columns: 56px minmax(0, 1fr); gap: 0 16px; padding-top: 0; }
+  .rail { grid-column: 1 / -1; grid-row: 1; position: sticky; top: 0; z-index: 5; margin: 0 -16px 28px; }
+  .rail .sticky { position: static; border-width: 0 0 1px; padding: 8px 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: center; }
+  .rail h3, .rail .status, .rail .deals { display: none; }
+  .rail .now { grid-column: 1 / -1; margin: 0; }
+  .meter, .defcon { margin: 0; }
+  .defcon { grid-column: span 2; }
+  .trace, .chapters { grid-row: 2; }
+}
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .sides { grid-template-columns: 1fr; }
+  .rail .sticky { grid-template-columns: 1fr; }
+  .defcon { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+<header class="hero" id="top"></header>
+<section class="facts" aria-label="Ficha de la partida"><dl id="facts"></dl></section>
+<main class="story">
+  <div class="trace" aria-hidden="true"><svg id="trace"></svg></div>
+  <div class="chapters" id="chapters"></div>
+  <aside class="rail" aria-label="Estado en el turno visible"><div class="sticky" id="rail"></div></aside>
+</main>
+<section class="ending" id="ending"></section>
+
+<script>
+const DATA = /*__DATA__*/null;
+const C = DATA.catalog, T = DATA.turns, V = DATA.voices, P = DATA.photos || {};
+const SIDES = ["USA", "USSR"];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const cls = s => s.toLowerCase();
+const leader = s => s ? ((C.sides[s] || {}).leader || s).split(" ").slice(-1)[0] : "";
+const country = s => ({USA: "EE. UU.", USSR: "la URSS"})[s] || s;
+const termLabel = k => C.terms[k] || k;
+const actLabel = k => (C.actions[k] || {}).label || k;
+const stance = k => (C.actions[k] || {}).stance || "neutral";
+const lowerFirst = s => s ? s[0].toLowerCase() + s.slice(1) : s;
+const OUTCOME = {
+  acuerdo_negociado: ["Hay acuerdo, y se cumple", "Los dos bandos firman, cumplen y verifican lo pactado."],
+  desescalada: ["La crisis se desactiva", "La tensión baja y se mantiene baja: nadie gana, nadie dispara."],
+  sin_resolver: ["Se acaba el tiempo sin acuerdo", "La partida termina con los misiles en su sitio y la tensión al límite."],
+  conflicto_convencional: ["Empieza la guerra", "Una acción militar abre un conflicto convencional."],
+  uso_nuclear: ["Se cruza el umbral nuclear", "Un arma nuclear se usa. La simulación termina aquí."],
+};
+
+/* ── Fotos por tipo de momento ── */
+const photoUse = {};
+function photo(cat) {
+  const list = P[cat];
+  if (!list || !list.length) return null;
+  const n = photoUse[cat] = (photoUse[cat] ?? -1) + 1;
+  return list[n % list.length];
+}
+function figure(ph) {
+  if (!ph) return "";
+  return `<figure><img src="${ph.src}" alt="${esc(ph.caption)}" loading="lazy"><figcaption>${esc(ph.caption)} Foto: ${esc(ph.credit)}.</figcaption></figure>`;
+}
+function incidentCategory(text) {
+  if (/submarino/i.test(text)) return "submarino";
+  if (/reconocimiento|avión|aviones|antiaére/i.test(text)) return "reconocimiento";
+  if (/buques|cuarentena/i.test(text)) return "bloqueo";
+  if (/radar|alerta|movilizaci/i.test(text)) return "alerta";
+  if (/invasión/i.test(text)) return "misiles";
+  return "alerta";
+}
+
+/* ── Qué pasó en cada turno, contado ── */
+function actionsOf(t, side) { return ((t.decisions || {})[side] || {}).actions || []; }
+function prevState(i) { return i > 0 ? T[i - 1].state : null; }
+
+function chapter(t, i) {
+  const ev = t.events || [];
+  const prev = prevState(i);
+  const outcome = ev.find(e => e.kind === "outcome");
+  const incidents = ev.filter(e => e.kind === "incident");
+  const intel = ev.filter(e => e.kind === "intel");
+  const deals = ev.filter(e => e.kind === "deal");
+  const accepted = deals.find(e => /aceptado/i.test(e.description));
+  const fulfilled = deals.filter(e => /^(Cumplido|Verificado)/.test(e.description));
+  const proposed = deals.find(e => /enviada/i.test(e.description));
+  const rejected = deals.find(e => /rechazada/i.test(e.description));
+  const defconMoves = SIDES.filter(s => prev && t.state.sides[s].defcon !== prev.sides[s].defcon);
+  const hard = SIDES.flatMap(s => actionsOf(t, s).filter(a => ["escalate", "terminal"].includes(stance(a.kind))).map(a => [s, a]));
+  const soft = SIDES.flatMap(s => actionsOf(t, s).filter(a => stance(a.kind) === "deescalate" && !["restrain_forces"].includes(a.kind)).map(a => [s, a]));
+
+  let title, cat = null, key = false;
+  if (outcome) { title = OUTCOME[t.state.outcome]?.[0] || outcome.description; key = true;
+    cat = t.state.outcome === "acuerdo_negociado" ? "retirada" : t.state.outcome === "sin_resolver" ? "misiles" : "alerta"; }
+  else if (incidents.length) { title = incidents[0].description; key = true; cat = incidentCategory(title); }
+  else if (accepted) { title = `${accepted.actor ? leader(accepted.actor) + " acepta" : "Se acepta"} la propuesta ${accepted.description.match(/P\d+/)?.[0] || ""}`; key = true; cat = "onu"; }
+  else if (fulfilled.length) { title = "Se cumple: " + lowerFirst(fulfilled[0].description.replace(/^(Cumplido|Verificado):\s*/, "")); cat = "retirada"; }
+  else if (proposed) { title = `${proposed.actor ? leader(proposed.actor) : "Un bando"} pone una oferta sobre la mesa`; cat = "onu"; }
+  else if (defconMoves.length) { const s = defconMoves[0]; title = `${country(s)[0].toUpperCase() + country(s).slice(1)} pasa a DEFCON ${t.state.sides[s].defcon}`; cat = "alerta"; }
+  else if (hard.length) { const [s, a] = hard[0]; title = `${leader(s)}: ${lowerFirst(actLabel(a.kind))}`; cat = /quarantine|ships/.test(a.kind) ? "bloqueo" : "alerta"; }
+  else if (rejected) { title = `La propuesta ${rejected.description.match(/P\d+/)?.[0] || ""} cae`; }
+  else if (soft.length) { const [s, a] = soft[0]; title = `${leader(s)}: ${lowerFirst(actLabel(a.kind))}`; }
+  else if (intel.length) { title = intel[0].description; cat = "reconocimiento"; }
+  else { title = "Mensajes cruzados, nadie mueve ficha"; }
+  if (i === 0 && !cat) cat = "consejo_usa";
+
+  // relato: lo que cada bando hizo de forma visible, en una frase por bando
+  const story = [];
+  for (const s of SIDES) {
+    const acts = actionsOf(t, s).filter(a => !["private_message", "public_statement", "wait"].includes(a.kind));
+    if (acts.length) story.push(`<span class="${cls(s)}">${esc(leader(s))}</span> decide ${esc(acts.map(a => lowerFirst(actLabel(a.kind))).join(", "))}.`);
+  }
+  if (proposed) {
+    const id = proposed.description.match(/P\d+/)?.[0];
+    const d = (t.state.deals || {})[id];
+    if (d) story.push(`La propuesta ${esc(id)} pide: ${esc(d.terms.map(x => lowerFirst(termLabel(x.term)) + (x.secret ? " (en secreto)" : "")).join("; "))}.`);
+  }
+  for (const e of incidents.slice(title === incidents[0]?.description ? 1 : 0)) story.push(esc(e.description) + ".");
+  for (const e of intel) if (e.description !== title) story.push(`Llega un informe: ${esc(lowerFirst(e.description))}${e.is_false ? " (es falso)" : ""}.`);
+  if (prev) {
+    const dt = t.state.tension - prev.tension;
+    if (Math.abs(dt) >= 4) story.push(`La tensión ${dt > 0 ? "sube" : "baja"} ${Math.abs(dt).toFixed(0)} puntos, hasta ${t.state.tension.toFixed(0)} sobre 100.`);
+  }
+  if (outcome) story.push(esc(OUTCOME[t.state.outcome]?.[1] || ""), esc(t.state.outcome_reason || ""));
+
+  // citas: lo que dicen los líderes (con voz si existe). Una por líder a la vista; el resto, plegadas.
+  // los agentes a veces narran el envío («Mensaje privado al líder de…: '…'»); se queda solo lo dicho
+  const clean = txt => txt.trim()
+    .replace(/^(?:hacer una |enviar (?:un )?)?(?:declaración pública|mensajes? (?:privado|oficial|backchannel|enviados?)|mensaje)[^:]{0,90}:\s*/i, "")
+    .replace(/^['"«“](.*)['"»”]\.?$/s, "$1");
+  const rank = a => a.kind === "private_message" ? (a.channel === "backchannel" ? 0 : 1) : 2;
+  const quote = (s, a, k) => {
+    const how = a.kind === "public_statement" ? "en público" : (a.channel === "backchannel" ? "por el canal secreto" : "por la vía oficial");
+    const src = V && V.files[`${t.turn}:${s}:${k}`];
+    return `<blockquote class="${cls(s)}"><p class="who">${esc(leader(s))}, ${how}</p><p class="said">«${esc(clean(a.text))}»</p>${src ? `<audio controls preload="none" src="${esc(src)}" aria-label="Escuchar a ${esc(leader(s))} (voz sintética)"></audio>` : ""}</blockquote>`;
+  };
+  const shown = [], extra = [];
+  for (const s of SIDES) {
+    const said = actionsOf(t, s).map((a, k) => [a, k]).filter(([a]) => ["private_message", "public_statement"].includes(a.kind) && a.text)
+      .sort((x, y) => rank(x[0]) - rank(y[0]));
+    said.forEach(([a, k], n) => (n ? extra : shown).push(quote(s, a, k)));
+  }
+  const quotes = shown.concat(extra.length ? [`<details class="more"><summary>${extra.length === 1 ? "Un mensaje más" : extra.length + " mensajes más"} en este turno</summary>${extra.join("")}</details>`] : []);
+
+  const quiet = !key && !cat && !proposed && !quotes.length;
+  const ph = cat && (key || i === 0 || cat !== chapter.lastCat) ? photo(cat) : null;
+  if (ph) chapter.lastCat = cat;
+  return `<article class="chapter${key ? " key" : ""}${quiet ? " quiet" : ""}" id="t${t.turn}" data-i="${i}">
+    <p class="when"><b>Turno ${t.turn}</b> ${esc(t.date)}</p>
+    <h2>${esc(title)}</h2>
+    ${story.length ? `<p>${story.join(" ")}</p>` : ""}
+    ${figure(ph)}
+    ${quotes.join("")}
+    ${inside(t, i)}
+  </article>`;
+}
+
+/* ── El detalle: qué veía y pensaba cada bando ── */
+function inside(t, i) {
+  const col = s => {
+    const obs = (t.observations || {})[s], dec = (t.decisions || {})[s] || {};
+    const other = s === "USA" ? "USSR" : "USA";
+    let h = `<div class="side"><h3 class="${cls(s)}">${esc(leader(s))}</h3>`;
+    if (obs) {
+      const real = (prevState(i) || t.state).tension;
+      const off = Math.abs(obs.tension_estimate - real) >= 10;
+      h += `<h4>Lo que creía</h4><ul>
+        <li>Tensión: ${obs.tension_estimate.toFixed(0)} <span class="gap${off ? " off" : ""}">(real ${real.toFixed(0)})</span></li>
+        <li>DEFCON de ${esc(leader(other))}: ${(obs.other_estimate?.defcon ?? 0).toFixed(0)} <span class="gap">(real ${((prevState(i) || t.state).sides[other].defcon)})</span></li>
+        <li>Presión interna propia: ${obs.own.domestic_pressure.toFixed(0)}; credibilidad: ${obs.own.credibility.toFixed(0)}</li></ul>`;
+      if (obs.inbox?.length) h += `<h4>Mensajes que recibió</h4><ul>${obs.inbox.map(m => `<li>${esc(m.text)}</li>`).join("")}</ul>`;
+    }
+    if (dec.reasoning) h += `<h4>Por qué decidió así${dec.fallback ? ' <span class="fallback">decisión de respaldo</span>' : ""}</h4><p class="reason">${esc(dec.reasoning)}</p>`;
+    const acts = dec.actions || [];
+    if (acts.length) h += `<h4>Todo lo que ordenó</h4><ul>${acts.map(a => `<li>${esc(actLabel(a.kind))}${a.terms ? ": " + esc(a.terms.map(x => termLabel(x.term)).join("; ")) : ""}${a.deal_id ? ` (${esc(a.deal_id)})` : ""}</li>`).join("")}</ul>`;
+    return h + "</div>";
+  };
+  const world = (t.events || []).filter(e => e.kind !== "message");
+  return `<details class="inside"><summary>Qué pasó por dentro</summary>
+    <div class="sides">${SIDES.map(col).join("")}</div>
+    ${world.length ? `<div class="world"><h4>Todo lo que ocurrió (la verdad, vea quien lo vea)</h4><ul>${world.map(e => `<li>${esc(e.description)}${e.is_false ? '<span class="false">información falsa</span>' : ""}${e.seen_by.length < 2 ? ` <span class="gap">(solo lo vio ${esc(leader(e.seen_by[0] || ""))})</span>` : ""}</li>`).join("")}</ul></div>` : ""}
+  </details>`;
+}
+
+/* ── Panel con el estado del turno visible ── */
+function rail(i) {
+  const t = T[i], st = t.state, v = st.vars || {};
+  const ladder = s => `<span class="${cls(s)}">${esc(leader(s))}</span><div class="ladder ${cls(s)}" role="img" aria-label="DEFCON ${st.sides[s].defcon}">${[5, 4, 3, 2, 1].map(n => `<span class="${n === st.sides[s].defcon ? "on" : ""}">${n}</span>`).join("")}</div>`;
+  const open = Object.values(st.deals || {}).filter(d => ["open", "accepted"].includes(d.status));
+  const item = (on, txt, good) => `<li class="${on ? (good ? "good" : "yes") : ""}">${txt}</li>`;
+  document.getElementById("rail").innerHTML = `
+    <h3>Estado al final del turno</h3>
+    <p class="now">Turno ${t.turn}, ${esc(t.date)}</p>
+    <div class="meter"><div class="lbl"><span>Tensión</span><span>${st.tension.toFixed(0)}</span></div><div class="bar"><i style="width:${st.tension.toFixed(0)}%"></i></div></div>
+    <div class="defcon">${SIDES.map(ladder).join("")}</div>
+    <ul class="status">
+      ${item(v.quarantine >= 0.5, "Cuarentena naval en vigor")}
+      ${item(v.construction_active >= 0.5, "Obras de los emplazamientos en marcha")}
+      ${item(v.missiles_withdrawn >= 0.5, "Misiles de Cuba retirados", true)}
+      ${item(v.invasion_pledge >= 0.5, "Compromiso de no invadir", true)}
+      ${item(v.jupiters_turkey < 0.5, "Jupiter retirados de Turquía", true)}
+    </ul>
+    <div class="deals">${open.length ? open.map(d => `${esc(d.id)} (${d.status === "accepted" ? "aceptada" : "abierta"}): ${esc(d.terms.map(x => lowerFirst(termLabel(x.term))).join("; "))}`).join("<br>") : "Ninguna propuesta abierta"}</div>`;
+}
+
+/* ── Sismógrafo: la tensión de cada capítulo, alineada con él ── */
+function drawTrace() {
+  const svg = document.getElementById("trace"), box = svg.getBoundingClientRect();
+  const w = box.width, top = box.top + window.scrollY;
+  // escala ajustada al rango de la partida (la tensión suele moverse en una franja estrecha)
+  const lo = Math.max(0, Math.floor((Math.min(...T.map(t => t.state.tension)) - 5) / 10) * 10);
+  const X = v => 6 + (w - 12) * (v - lo) / (100 - lo);
+  const pts = [...document.querySelectorAll(".chapter")].map(el => {
+    const t = T[+el.dataset.i];
+    return [X(t.state.tension), el.getBoundingClientRect().top + window.scrollY - top + 12, t];
+  });
+  if (!pts.length) return;
+  const css = getComputedStyle(document.documentElement);
+  const step = (100 - lo) / 4;
+  const grid = [1, 2, 3, 4].map(k => lo + k * step).map(p => { const x = X(p); return `<line x1="${x}" x2="${x}" y1="0" y2="${box.height}" stroke="${css.getPropertyValue("--rule")}" stroke-dasharray="${p === 100 ? "none" : "2 5"}"/>`; }).join("");
+  const path = pts.map(([x, y], k) => (k ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1)).join(" ");
+  const dots = pts.map(([x, y, t]) => {
+    const r = (t.events || []).some(e => ["incident", "outcome"].includes(e.kind)) ? 6 : 3.5;
+    return `<circle cx="${x}" cy="${y}" r="${r}" fill="${css.getPropertyValue("--heat")}"/><text x="${x - 10}" y="${y + 4}" text-anchor="end" font-family="Archivo, sans-serif" font-size="12" fill="${css.getPropertyValue("--ink-soft")}">${t.state.tension.toFixed(0)}</text>`;
+  }).join("");
+  svg.innerHTML = `${grid}<text x="6" y="-8" font-family="Archivo, sans-serif" font-size="12" fill="${css.getPropertyValue("--ink-soft")}">tensión ${lo}</text><text x="${w - 6}" y="-8" text-anchor="end" font-family="Archivo, sans-serif" font-size="12" fill="${css.getPropertyValue("--ink-soft")}">100</text><path d="${path}" fill="none" stroke="${css.getPropertyValue("--heat")}" stroke-width="2.5" stroke-linejoin="round"/>${dots}`;
+}
+
+/* ── Portada, ficha y cierre ── */
+function init() {
+  const h = DATA.header || {}, first = T[0], last = T[T.length - 1].state;
+  const oc = OUTCOME[last.outcome] || ["Partida en curso", "La partida aún no ha terminado."];
+  const heroPh = photo("reconocimiento") || photo("misiles") || photo("consejo_usa");
+  document.title = `${oc[0]} · Cavalier`;
+  const forked = first.turn > 1 ? `desde el turno ${first.turn} (${first.date})` : "desde el principio";
+  document.getElementById("top").innerHTML = `
+    ${heroPh ? `<img src="${heroPh.src}" alt=""><p class="credit">${esc(heroPh.caption)} Foto: ${esc(heroPh.credit)}.</p>` : ""}
+    <div class="veil"></div>
+    <div class="inner">
+      <p class="kicker">${esc(C.title)}. Partida simulada ${esc(forked)}${h.seed !== undefined ? ", semilla " + esc(h.seed) : ""}.</p>
+      <h1>${esc(oc[0])}</h1>
+      <p class="dek">${esc(oc[1])} ${esc(last.outcome_reason || "")}</p>
+      <p class="scrollhint"><a href="#t${first.turn}">Leer cómo se llegó aquí</a></p>
+    </div>`;
+
+  const allEv = T.flatMap(t => t.events || []);
+  const proposals = allEv.filter(e => e.kind === "deal" && /enviada/i.test(e.description)).length;
+  const maxT = Math.max(...T.map(t => t.state.tension));
+  const minDef = Math.min(...T.flatMap(t => SIDES.map(s => t.state.sides[s].defcon)));
+  const msgs = T.reduce((n, t) => n + SIDES.reduce((m, s) => m + actionsOf(t, s).filter(a => a.text && ["private_message", "public_statement"].includes(a.kind)).length, 0), 0);
+  const fact = (k, v) => `<div><dt>${k}</dt><dd>${v}</dd></div>`;
+  document.getElementById("facts").innerHTML =
+    fact("Turnos jugados", T.length) + fact(`Horas por turno`, C.hours_per_turn) + fact("Tensión máxima", maxT.toFixed(0)) +
+    fact("DEFCON más bajo", minDef) + fact("Incidentes", allEv.filter(e => e.kind === "incident").length) +
+    fact("Propuestas nuevas", proposals) + fact("Mensajes entre líderes", msgs);
+
+  chapter.lastCat = null;
+  document.getElementById("chapters").innerHTML = T.map(chapter).join("");
+
+  const agents = h.agents ? Object.entries(h.agents).map(([s, a]) => `${leader(s)}: ${a}`).join("; ") : "";
+  const credits = DATA.photo_credits || [];
+  document.getElementById("ending").innerHTML = `<div>
+    <h2>${esc(oc[0])}</h2>
+    <p>${esc(oc[1])} ${esc(last.outcome_reason || "")}</p>
+    <div class="notes">
+      <p>Esto es una simulación. Las decisiones y los mensajes los generan agentes de IA dentro de un motor con supuestos explícitos; no describen lo que ocurrió en 1962 ni lo que habría ocurrido.${V ? " " + esc(V.notice) : ""}</p>
+      ${agents ? `<p>Agentes: ${esc(agents)}.</p>` : ""}
+      ${credits.length ? `<p>Fotografías históricas: ${credits.map(c => `${esc(c.caption)} ${esc(c.credit)}, ${esc(c.license)}${c.source ? ` (<a href="${esc(c.source)}">fuente</a>)` : ""}`).join(" ")}</p>` : ""}
+    </div></div>`;
+
+  rail(0);
+  const io = new IntersectionObserver(entries => {
+    const vis = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+    if (vis) rail(+vis.target.dataset.i);
+  }, {rootMargin: "-30% 0px -60% 0px"});
+  document.querySelectorAll(".chapter").forEach(el => io.observe(el));
+
+  document.addEventListener("play", e => document.querySelectorAll("audio").forEach(a => { if (a !== e.target) a.pause(); }), true);
+  const redraw = () => requestAnimationFrame(drawTrace);
+  window.addEventListener("resize", redraw);
+  document.addEventListener("toggle", redraw, true);
+  document.querySelectorAll("img").forEach(img => img.addEventListener("load", redraw));
+  if (document.fonts) document.fonts.ready.then(redraw);
+  redraw();
+}
+init();
+</script>
+</body>
+</html>
