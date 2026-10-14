@@ -34,6 +34,7 @@ cavalier run cuba1962 ... --log runs/llm.jsonl --resume              # continuar
 cavalier checkpoints cuba1962 --agent llm:historico --model qwen3.5:9b -k 30
 cavalier fidelity cuba1962 -k 30                                     # fase 3: fidelidad con referencias (reanudable)
 cavalier experiment cuba1962 --usa llm:historico --ussr llm:historico --anon -n 30   # fase 5: bifurcación desde el Sábado Negro
+cavalier advisors-probe cuba1962 --anon                             # experimento 2, fase 0: ¿difieren los consejos de los asesores?
 
 # Voces sintéticas de los líderes (experimental; entorno aparte, ver data/voices/README.md)
 .venv-tts/Scripts/cavalier voices runs/exp1/base/s001.jsonl          # audio por mensaje + botones en el visor

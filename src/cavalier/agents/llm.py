@@ -140,9 +140,14 @@ class LLMAgent:
         return self.bundle.scenario.sides[side].name
 
     def render(self, obs: Observation, docs: list[Document]) -> str:
+        return self.anon("\n".join(line for sec in self.sections(obs, docs).values() for line in sec))
+
+    def sections(self, obs: Observation, docs: list[Document]) -> dict[str, list[str]]:
+        """El prompt de situación por bloques con nombre (sin anonimizar). `render` los une todos;
+        los asesores reciben solo los suyos (informe privado, ver agents/advisors.py)."""
         sc, own = self.bundle.scenario, obs.own
-        lines = [f"## Situación — {obs.date} (turno {obs.turn})"]
-        lines += ["", "### Tu estado",
+        out: dict[str, list[str]] = {"cabecera": [f"## Situación — {obs.date} (turno {obs.turn})"]}
+        out["estado"] = lines = ["", "### Tu estado",
                   f"- Nivel de alerta (DEFCON, 5 = paz, 1 = máxima): {own.defcon}",
                   f"- Movilización: {own.mobilization:.0f}/100",
                   f"- Disciplina de tu cadena de mando: {own.control:.2f}",
@@ -150,25 +155,29 @@ class LLMAgent:
                   f"- Credibilidad internacional: {own.credibility:.0f}/100",
                   f"- Calidad de tu inteligencia: {own.intel_quality:.2f}"]
         est = obs.other_estimate
-        lines += ["", f"### Estimación sobre {self._side_name(obs.other_side)} (incierta)",
+        out["rival"] = lines = ["", f"### Estimación sobre {self._side_name(obs.other_side)} (incierta)",
                   f"- DEFCON estimado: {est.get('defcon', 5):.0f}",
                   f"- Movilización estimada: {est.get('mobilization', 0):.0f}/100",
-                  f"- Presión interna estimada: {est.get('domestic_pressure', 0):.0f}/100",
-                  "", f"### Tensión internacional estimada: {obs.tension_estimate:.0f}/100"]
+                  f"- Presión interna estimada: {est.get('domestic_pressure', 0):.0f}/100"]
+        out["tension"] = ["", f"### Tensión internacional estimada: {obs.tension_estimate:.0f}/100"]
+        out["situacion"] = lines = []
         if obs.vars:
             lines += ["", "### Lo que sabes de la situación (0 = no, 1 = sí / completo; puede ser una estimación)"]
             lines += [f"- {sc.variables[k].label}: {v:.2f}" for k, v in obs.vars.items()]
-        lines += ["", "### Desde el último turno"]
-        lines += [f"- [{e.kind}] {e.description}" for e in obs.events] or ["- Nada relevante."]
+        out["eventos"] = ["", "### Desde el último turno"] + (
+            [f"- [{e.kind}] {e.description}" for e in obs.events] or ["- Nada relevante."])
+        out["mensajes"] = lines = []
         if obs.inbox:
             lines += ["", "### Mensajes recibidos"]
             lines += [f"- ({m.channel}) {m.text}" for m in obs.inbox]
+        out["propuestas"] = lines = []
         if obs.open_deals:
             lines += ["", "### Propuestas de acuerdo abiertas"]
             for d in obs.open_deals:
                 who = "tuya" if d.proposer == self.side else f"de {self._side_name(d.proposer)}"
                 terms = ", ".join(f"{self._term_to_code[t.term]}{' (secreto)' if t.secret else ''}" for t in d.terms)
                 lines.append(f"- {d.id} ({who}): {terms}")
+        out["compromisos"] = lines = []
         if obs.commitments:
             lines += ["", "### Compromisos de acuerdos aceptados"]
             status = {"pending": "pendiente / sin verificar", "fulfilled": "cumplido", "broken": "roto"}
@@ -177,21 +186,22 @@ class LLMAgent:
                 extra = (" (secreto)" if c.secret else "") + (" (filtrado)" if c.leaked else "")
                 lines.append(f"- {c.deal_id} · {self._term_to_code[c.term]}{extra}: obligado {who}, "
                              f"plazo turno {c.due_turn}, {status.get(c.status, c.status)}")
-        if self.history:
-            lines += ["", "### Tus decisiones anteriores"] + self.history[-self.history_turns:]
+        out["historial"] = (["", "### Tus decisiones anteriores"] + self.history[-self.history_turns:]
+                            if self.history else [])
+        out["documentos"] = lines = []
         if docs:
             lines += ["", "### Documentos disponibles"]
             lines += [f"[{d.id}] {d.title} ({d.date:%Y-%m-%d}): {d.text[:700]}" for d in docs]
-        lines += ["", f"### Acciones disponibles (máximo {obs.max_actions})"]
+        out["acciones"] = lines = ["", f"### Acciones disponibles (máximo {obs.max_actions})"]
         lines += [f"- {self._action_to_code[k]}: {label}{_FIELD_HINTS.get(k, '')}"
                   for k, label in obs.legal_actions.items()]
-        lines += ["", "### Términos negociables"]
+        out["terminos"] = lines = ["", "### Términos negociables"]
         lines += [f"- {self._term_to_code[k]}: {label.replace(f'obliga a {self.side}', 'te obliga a ti').replace(f'obliga a {obs.other_side}', 'obliga al rival')}"
                   + (" (puede pactarse en secreto)" if self.bundle.scenario.deal_terms[k].secretable else "")
                   for k, label in obs.deal_terms.items()]
         channels = {c: d for c, d in self.bundle.rules.channels.items()}
-        lines += ["", "### Canales: " + ", ".join(f"{c} (retraso extra {d} turnos)" for c, d in channels.items())]
-        return self.anon("\n".join(lines))
+        out["canales"] = ["", "### Canales: " + ", ".join(f"{c} (retraso extra {d} turnos)" for c, d in channels.items())]
+        return out
 
     # ---------------------------------------------------------------- grafo
 

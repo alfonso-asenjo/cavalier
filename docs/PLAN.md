@@ -505,6 +505,32 @@ a la primera versión de esta propuesta):
 - Criterio de corte (a fijar en `prereg-v4`): si McNamara y Taylor no recomiendan acciones distintas
   en la mayoría de los estados, no se lanza el experimento.
 
+**Fase 0: prerregistro (`prereg-v4`, parte 1), fijado el 14‑oct‑2026 antes de ejecutarla.**
+Implementación: `cavalier advisors-probe` (`src/cavalier/agents/advisors.py`,
+`src/cavalier/eval/advisor_probe.py`, fichas en `scenarios/cuba1962/advisors.toml`). Antes de fijar
+esto solo se hizo una prueba de humo para medir tiempos: 1 estado, K = 2,
+`runs/advisors_smoke.jsonl`, 7,7 s por consejo. Queda fuera del análisis.
+
+- **Estados:** 12 observaciones reales de la celda `base` del experimento 1, elegidas de forma
+  determinista por orden de semilla. Son 4 turnos de bifurcación (el Sábado Negro) y 8 turnos clave
+  posteriores (incidente, informe, propuesta recibida o cambio de DEFCON), cada uno de una partida distinta.
+- **Asesores:** los 7 de las fichas (4 de EE. UU. y 3 de la URSS), con el mismo modelo que los líderes
+  (`qwen3.5:9b`, temperatura 0,7, `num_ctx` 4096), en modo anonimizado.
+- **Modos:** `etiqueta` y `completo` con K = 10 repeticiones; `complacencia` con K = 5. En
+  `complacencia`, la intención del líder es la primera acción no verbal que tomó de verdad el
+  líder en ese estado.
+- **Criterio de corte principal:** en el modo `completo`, la acción modal de McNamara y la de Taylor
+  son distintas en **más de la mitad** de los estados válidos. Si no se cumple, no se lanzan las partidas.
+- **Comprobaciones secundarias** (se reportan, no deciden):
+  - concentración media y divergencia de Jensen–Shannon media entre pares, `completo` frente a `etiqueta`,
+    en cada bando (se espera menor concentración y mayor divergencia en `completo`);
+  - distancia léxica de los argumentos dentro de un mismo asesor frente a entre asesores;
+  - desplazamiento hacia la intención del líder en `complacencia`;
+  - porcentaje de consejos inválidos por asesor.
+- **Coste:** 2.100 consejos, unas 4,5 h. Es reanudable.
+- **Comando:**
+  `cavalier advisors-probe cuba1962 --anon` (salida en `runs/advisors_probe.jsonl` y `.report.json`).
+
 **Diseño tentativo de las partidas.** Bifurcación desde `usa_sabado_negro`, con el mismo modelo
 fijado para los líderes y en modo anonimizado. Celdas:
 - **líder solo**: la `base` del experimento 1, si el código no cambia en nada más;

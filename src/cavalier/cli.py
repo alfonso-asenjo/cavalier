@@ -299,6 +299,39 @@ def cmd_voices(args) -> None:
     print(f"Visor: {render(args.log).resolve()}")
 
 
+def cmd_advisors_probe(args) -> None:
+    from .agents.advisors import load_advisors
+    from .agents.llm_client import OllamaClient
+    from .eval.advisor_probe import load_records, report, run_probe, select_states
+
+    personas = load_advisors(args.scenario)
+    if args.advisors:
+        personas = {k: personas[k] for k in args.advisors.split(",")}
+    if not args.report_only:
+        states = select_states(args.states_from, n_fork=args.n_fork, n_key=args.n_key)
+        print(f"{len(states)} estados congelados: " + ", ".join(s["id"] for s in states), flush=True)
+        client = OllamaClient(args.model, base_url=args.base_url, temperature=args.temperature, num_ctx=args.num_ctx)
+        run_probe(load_scenario(args.scenario), client, personas, states, args.out, k=args.k,
+                  k_sycophancy=args.k_sycophancy, anonymized=args.anon, log=lambda m: print(m, flush=True))
+    rep = report(load_records(args.out))
+    Path(args.out).with_suffix(".report.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
+    for mode, row in rep["modes"].items():
+        print(f"\n== {mode}")
+        for a, r in row["advisors"].items():
+            top = ", ".join(f"{k} {v}" for k, v in list(r["actions"].items())[:3])
+            print(f"  {a:<11} ({r['side']}) válidos {r['valid']:<8} {top}")
+        for side, r in row["sides"].items():
+            print(f"  {side}: concentración {r['concentracion_media']:.0%}  distancia léxica dentro "
+                  f"{r['dist_lexica_dentro']:.2f} / entre {r['dist_lexica_entre']:.2f}")
+        for pair, r in row["pairs"].items():
+            print(f"  {pair:<22} JS {r['js_media']:.2f}  acción modal distinta {r['modal_distinta']}")
+    c = rep["criterio"]
+    print(f"\nCriterio ({c['par']}, modo completo): acción modal distinta en {c['modal_distinta']} estados -> "
+          f"{'CUMPLE' if c['cumple'] else 'NO CUMPLE'}")
+    for a, r in rep["complacencia"].items():
+        print(f"  complacencia {a:<11} {r['completo']:.0%} -> {r['complacencia']:.0%} ({r['desplazamiento']:+.0%})")
+
+
 def main(argv: list[str] | None = None) -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -392,6 +425,18 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--limit", type=int, help="solo las primeras N líneas (pruebas)")
     p.add_argument("--dry-run", action="store_true", help="listar las líneas sin sintetizar")
     p.set_defaults(func=cmd_voices)
+
+    p = sub.add_parser("advisors-probe", help="fase 0 del experimento 2: ¿difieren los consejos de los asesores?")
+    common(p, agents=False)
+    p.add_argument("--states-from", default="runs/exp1/base", help="partidas de las que se toman los estados")
+    p.add_argument("--n-fork", type=int, default=4, help="estados del turno de bifurcación")
+    p.add_argument("--n-key", type=int, default=8, help="estados de turnos clave posteriores")
+    p.add_argument("-k", type=int, default=10, help="repeticiones por asesor, estado y modo")
+    p.add_argument("--k-sycophancy", type=int, default=5, help="repeticiones del modo complacencia")
+    p.add_argument("--advisors", help="lista separada por comas (por defecto, todos)")
+    p.add_argument("--out", default="runs/advisors_probe.jsonl")
+    p.add_argument("--report-only", action="store_true")
+    p.set_defaults(func=cmd_advisors_probe)
 
     p = sub.add_parser("probe", help="sonda de fuga (requiere LLM)")
     common(p, agents=False)
