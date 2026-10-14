@@ -115,6 +115,8 @@
   .kv .v { color: #fff; text-align: right; }
   .meter { height: 4px; background: var(--line); margin: 2px 0 6px; position: relative; }
   .meter > div { position: absolute; inset: 0 auto 0 0; background: var(--glow); box-shadow: 0 0 6px var(--glow); }
+  .voice { display: block; width: 100%; max-width: 360px; height: 32px; margin-top: 4px; }
+  .voice-note { color: var(--dim); font-size: 12px; margin-top: 4px; }
   .hidden-note { color: var(--dim); font-size: 13px; padding: 24px 0; text-align: center; }
 
   /* cronología */
@@ -202,13 +204,20 @@ const OUTCOMES = {
   conflicto_convencional: "Conflicto convencional", uso_nuclear: "Uso nuclear",
 };
 
-function actionHtml(a) {
+const V = DATA.voices;  // audio de `cavalier voices` (sintético), o null
+
+function voiceHtml(key) {
+  const src = V && V.files[key];
+  return src ? `<audio class="voice" controls preload="none" src="${esc(src)}" title="Voz sintética"></audio>` : "";
+}
+
+function actionHtml(a, key) {
   const rule = C.actions[a.kind] || {label: a.kind, stance: "neutral"};
   let extra = "";
   if (a.terms) extra += " — " + a.terms.map(t => esc(C.terms[t.term] || t.term) + (t.secret ? " <span class='tag'>(secreto)</span>" : "")).join("; ");
   if (a.deal_id) extra += ` <span class="tag">[${esc(a.deal_id)}]</span>`;
   if (a.channel) extra += ` <span class="tag">vía ${esc(a.channel)}</span>`;
-  if (a.text) extra += `<div class="tag">«${esc(a.text)}»</div>`;
+  if (a.text) extra += `<div class="tag">«${esc(a.text)}»${voiceHtml(key)}</div>`;
   return `<li><span class="act ${rule.stance}">${esc(rule.label)}</span>${extra}</li>`;
 }
 
@@ -254,7 +263,7 @@ function sideColumn(side, t) {
     }
   }
   if (dec) {
-    html += `<div class="sec"><h3>DECISIÓN ${dec.fallback ? "<span class='bad'>RESPALDO</span>" : ""}</h3><ul class="items">${(dec.actions || []).map(actionHtml).join("")}</ul>`;
+    html += `<div class="sec"><h3>DECISIÓN ${dec.fallback ? "<span class='bad'>RESPALDO</span>" : ""}</h3><ul class="items">${(dec.actions || []).map((a, i) => actionHtml(a, `${t.turn}:${side}:${i}`)).join("")}</ul>`;
     if (dec.reasoning) html += `<div class="reason">${esc(dec.reasoning)}</div>`;
     html += `<div class="tag" style="margin-top:4px">confianza ${pct(dec.confidence ?? 0)}${dec.cited_docs && dec.cited_docs.length ? " · documentos: " + dec.cited_docs.map(esc).join(", ") : ""}</div></div>`;
   }
@@ -356,6 +365,16 @@ function init() {
     oc.className = "outcome glow o-" + last.outcome;
     oc.title = last.outcome_reason || "";
   } else { oc.textContent = "En curso"; oc.className = "outcome o-sin_resolver"; }
+  if (V) {
+    const note = document.createElement("div");
+    note.className = "meta voice-note";
+    note.textContent = "⚠ " + V.notice;
+    document.getElementById("meta").after(note);
+    // un solo mensaje sonando a la vez
+    document.addEventListener("play", e => {
+      document.querySelectorAll("audio.voice").forEach(a => { if (a !== e.target) a.pause(); });
+    }, true);
+  }
   drawChart(); drawLog(); go(0);
 
   document.getElementById("first").onclick = () => go(0);

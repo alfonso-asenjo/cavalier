@@ -1,0 +1,13 @@
+# Voces sintéticas para `cavalier voices` (experimental, fase 6). Ver README.md.
+#
+# Cada bando usa los clips de audio que haya en data/voices/<speaker>/ (.wav, .flac o .mp3)
+# como referencia para clonar el timbre. Los clips NO se versionan (.gitignore).
+
+model = "tts_models/multilingual/multi-dataset/xtts_v2"
+language = "es"   # los agentes escriben en español; XTTS mantiene el timbre al cambiar de idioma
+
+[sides.USA]
+speaker = "kennedy"
+
+[sides.USSR]
+speaker = "jrushchov"

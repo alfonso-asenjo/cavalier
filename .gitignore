@@ -3,3 +3,6 @@ __pycache__/
 .pytest_cache/
 runs/
 .venv/
+.venv-tts/
+# Audio de referencia de las voces (se descarga de los archivos; ver data/voices/README.md)
+data/voices/*/

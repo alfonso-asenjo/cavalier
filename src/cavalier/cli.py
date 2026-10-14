@@ -95,7 +95,7 @@ def cmd_run(args) -> None:
 def cmd_view(args) -> None:
     from .viewer import render
 
-    print(f"Visor: {render(args.log, args.out).resolve()}")
+    print(f"Visor: {render(args.log, args.out, embed_audio=args.embed_audio, story=args.story).resolve()}")
 
 
 def cmd_montecarlo(args) -> None:
@@ -282,6 +282,23 @@ def cmd_experiment(args) -> None:
         print(f"  {key:<34} {c['diff']:+5.0%}  Fisher p = {c['fisher_p']:.3g}  Holm p = {c['holm_p']:.3g}")
 
 
+def cmd_voices(args) -> None:
+    from .viewer import render
+    from .voices import conversation_mp3, extract_lines, load_config, synthesize
+
+    if args.dry_run:
+        lines = extract_lines(args.log)[:args.limit]
+        for ln in lines:
+            print(f"T{ln.turn} {ln.side} {ln.kind}{' (' + ln.channel + ')' if ln.channel else ''}: {ln.text}")
+        print(f"{len(lines)} líneas, {sum(len(ln.text) for ln in lines)} caracteres")
+        return
+    manifest = synthesize(args.log, load_config(args.config), limit=args.limit,
+                          log=lambda m: print(m, flush=True))
+    print(f"Audio: {manifest.parent.resolve()}")
+    print(f"Conversación completa: {conversation_mp3(manifest).resolve()}")
+    print(f"Visor: {render(args.log).resolve()}")
+
+
 def main(argv: list[str] | None = None) -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -316,6 +333,9 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("view", help="visor HTML de una partida registrada")
     p.add_argument("log", help="fichero JSONL de la partida")
     p.add_argument("-o", "--out", help="HTML de salida (por defecto, junto al JSONL)")
+    p.add_argument("--story", action="store_true", help="relato por capítulos con fotos históricas")
+    p.add_argument("--embed-audio", action="store_true",
+                   help="incrustar el audio de `cavalier voices` en el HTML (fichero autónomo, para compartirlo)")
     p.set_defaults(func=cmd_view)
 
     p = sub.add_parser("montecarlo", help="lote de partidas")
@@ -365,6 +385,13 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--out", default="runs/exp1")
     p.add_argument("--report-only", action="store_true", help="solo recalcular el informe")
     p.set_defaults(func=cmd_experiment)
+
+    p = sub.add_parser("voices", help="voces sintéticas de los mensajes de una partida (XTTS-v2, experimental)")
+    p.add_argument("log", help="fichero JSONL de la partida")
+    p.add_argument("--config", help="voices.toml (por defecto, data/voices/voices.toml)")
+    p.add_argument("--limit", type=int, help="solo las primeras N líneas (pruebas)")
+    p.add_argument("--dry-run", action="store_true", help="listar las líneas sin sintetizar")
+    p.set_defaults(func=cmd_voices)
 
     p = sub.add_parser("probe", help="sonda de fuga (requiere LLM)")
     common(p, agents=False)
