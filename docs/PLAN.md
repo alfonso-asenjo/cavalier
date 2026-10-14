@@ -388,6 +388,44 @@ los incidentes.
 - Si la ejecución se corta antes de n = 30, se reporta el n alcanzado (las celdas quedan equilibradas
   porque las semillas se intercalan) y se marca como incompleto.
 
+### Resultados (14‑oct‑2026, `runs/exp1/report.json`)
+
+Ejecución completa: n = 30 por celda, semillas 0–29, el mismo modelo fijado (`56671c2ab938`). La
+ejecución se cortó tres veces (dos por falta de memoria en el equipo) y se reanudó desde los
+puntos de control. Las semillas intercaladas mantuvieron las celdas equilibradas, y ninguna
+partida se repitió ni se perdió.
+
+| Celda | P(acuerdo) [IC 95 %] | P(escalada militar) [IC 95 %] | Desenlaces | Partidas con respaldo |
+|---|---|---|---|---|
+| `base` | 70 % [52, 83] | 10 % [3, 26] | 21 acuerdos, 6 sin resolver, 2 conflictos convencionales, 1 uso nuclear | 1 |
+| `sin_canal_secreto` | 63 % [46, 78] | 20 % [10, 37] | 19 / 5 / 4 / 2 | 1 |
+| `mando_debil` | 57 % [39, 73] | 10 % [3, 26] | 17 / 10 / 1 / 2 | 3 (10 %, en el límite de la regla) |
+
+| Contraste frente a `base` | Diferencia | Fisher p | Holm p |
+|---|---|---|---|
+| H1: `sin_canal_secreto`, P(acuerdo) | −7 pp | 0,78 | 1 |
+| `sin_canal_secreto`, P(escalada) | +10 pp | 0,47 | 1 |
+| `mando_debil`, P(acuerdo) | −13 pp | 0,42 | 1 |
+| H2: `mando_debil`, P(escalada) | 0 pp | 1 | 1 |
+
+**Lectura (según las reglas fijadas):**
+- **H1 y H2: sin efecto detectable.** Ningún contraste se acerca a la significación, ni antes ni
+  después de la corrección de Holm. Con n = 30, la potencia solo alcanza diferencias de unos
+  35 puntos, así que **esto no demuestra que no haya efecto**: los IC son anchos y compatibles con
+  efectos moderados en cualquier dirección.
+- **Partidas con decisiones de respaldo, aparte.** Son 5 en total. Si se excluyen, `mando_debil`
+  pasa del −13 al −6 pp en P(acuerdo), porque sus tres partidas con respaldo acabaron sin resolver.
+  Parte de la caída aparente de `mando_debil` viene, por tanto, de fallos del agente y no de su
+  razonamiento. Los demás contrastes apenas cambian: −7 y +10 pp en `sin_canal_secreto`, +1 pp en
+  la escalada de `mando_debil`. Todos los p ≥ 0,47.
+- **Patrón descriptivo, no concluyente:** sin el canal secreto se duplican las escaladas militares
+  (6 frente a 3). La dirección coincide con la historiografía, pero el experimento no tiene potencia
+  para afirmarlo. Si se quiere estudiar, hace falta un experimento con más n solo para esa celda.
+- **El uso nuclear se da solo como descripción** (depende sobre todo del parámetro del submarino):
+  1, 2 y 2 partidas.
+- Las conclusiones se refieren a agentes LLM (`qwen3.5:9b`, anonimizados) dentro de este motor, no
+  a lo que habría pasado en 1962.
+
 ---
 
 ## 3‑sexies. Fase 5, experimento 2 (propuesta, sin prerregistrar): asesores históricos
