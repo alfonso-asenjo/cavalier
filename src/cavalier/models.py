@@ -89,6 +89,8 @@ class Decision(BaseModel):
     # True si el agente no produjo una decisión válida y se usó una de respaldo.
     # Esas partidas se reportan aparte: tratar fallos como "esperar" sesga hacia la desescalada.
     fallback: bool = False
+    # Consejos que recibió el líder antes de decidir (asesores, experimento 2); vacío sin asesores.
+    advice: list[dict] = Field(default_factory=list)
 
 
 class Event(BaseModel):

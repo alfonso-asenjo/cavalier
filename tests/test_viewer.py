@@ -23,6 +23,6 @@ def test_story_view_embeds_game_and_photos(bundle, tmp_path):
     assert out.name == "partida_relato.html"
     html = out.read_text(encoding="utf-8")
     assert "Qué pasó por dentro" in html and "/*__DATA__*/" not in html
-    payload = html.split("const DATA = ", 1)[1].split(";\nconst C = DATA.catalog", 1)[0]
+    payload = html.split("let DATA = ", 1)[1].split(";\nlet C, T, V, P;", 1)[0]
     data = json.loads(payload.replace("<\/", "</"))
     assert "photos" in data and "photo_credits" in data

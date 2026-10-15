@@ -79,7 +79,11 @@ def run_probe(bundle: ScenarioBundle, client, personas: dict[str, Persona], stat
               log: Callable[[str], None] = lambda m: None) -> list[dict]:
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    done = {(r["state"], r["advisor"], r["mode"], r["rep"]) for r in load_records(out_path)}
+    if out_path.exists():  # un corte a mitad de escritura deja una última línea incompleta: se descarta
+        raw = out_path.read_bytes()
+        if raw and not raw.endswith(b"\n"):
+            out_path.write_bytes(raw[:raw.rfind(b"\n") + 1])
+    done ={(r["state"], r["advisor"], r["mode"], r["rep"]) for r in load_records(out_path)}
     agents = {(pid, mode): AdvisorAgent(bundle, p, client, anonymized=anonymized, mode=mode)
               for pid, p in personas.items() for mode in ("etiqueta", "completo", "complacencia")}
     plan = [(rep, st, pid, mode) for rep in range(k) for st in states for pid in personas
@@ -108,7 +112,17 @@ def load_records(path: str | Path) -> list[dict]:
     path = Path(path)
     if not path.exists():
         return []
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    # Si dos procesos escriben a la vez el mismo archivo, un consejo puede repetirse: vale el primero.
+    seen, out = set(), []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        key = (r["state"], r["advisor"], r["mode"], r["rep"])
+        if key not in seen:
+            seen.add(key)
+            out.append(r)
+    return out
 
 
 # ---------------------------------------------------------------- métricas

@@ -159,6 +159,7 @@ class Rules(BaseModel):
 
 class Aliases(BaseModel):
     replacements: dict[str, str] = Field(default_factory=dict)
+    display: dict[str, str] = Field(default_factory=dict)  # alias → nombre real, solo para el espectador
     date_mode: str = "relative"  # relative: "Día 3, 12:00" en lugar de fechas reales
 
 
@@ -192,18 +193,20 @@ def deep_merge(base: dict, override: dict) -> dict:
 
 def load_scenario(
     name_or_path: str | Path,
-    variant: str | None = None,
+    variant: str | list[str] | None = None,
     overrides: dict | None = None,
 ) -> ScenarioBundle:
     """Carga un escenario. `variant` aplica `variants/<variant>.toml` (secciones [scenario] y [rules])
-    sobre la base: así se definen escenarios perturbados para el control de fuga.
+    sobre la base: así se definen escenarios perturbados para el control de fuga. Se pueden combinar
+    varias, en orden: una lista o "a+b".
     `overrides` tiene la misma forma y se aplica después (análisis de sensibilidad)."""
     path = Path(name_or_path)
     if not path.is_dir():
         path = SCENARIOS_DIR / str(name_or_path)
     scenario_data = _read(path / "scenario.toml")
     rules_data = _read(path / "rules.toml")
-    overlays = [_read(path / "variants" / f"{variant}.toml")] if variant else []
+    variants = variant.split("+") if isinstance(variant, str) else list(variant or [])
+    overlays = [_read(path / "variants" / f"{v}.toml") for v in variants if v]
     overlays += [overrides] if overrides else []
     for overlay in overlays:
         scenario_data = deep_merge(scenario_data, overlay.get("scenario", {}))

@@ -129,3 +129,134 @@ caption = "Equipo de misiles soviéticos cargado en un puerto cubano para su ret
 credit = "Departamento de Defensa de EE. UU."
 license = "Dominio público (obra del gobierno de EE. UU.)"
 source = "https://commons.wikimedia.org/wiki/File:Soviet_missile_equipment_beeing_loaded_at_port_in_Cuba_1962.PNG"
+
+# --- Retratos para la introducción histórica (data/intro/cuba1962.toml), category = "persona".
+# Licencias comprobadas en la página de cada fichero en Wikimedia Commons (oct. 2026). Reducidas a 600 px de ancho.
+
+[[photo]]
+file = "persona_rfk.jpg"
+category = "persona"
+caption = "Robert F. Kennedy, fiscal general de EE. UU. y hermano del presidente, agosto de 1963."
+credit = "Warren K. Leffler, U.S. News & World Report / Biblioteca del Congreso"
+license = "Dominio público (colección U.S. News & World Report de la Biblioteca del Congreso, sin restricciones conocidas)"
+source = "https://commons.wikimedia.org/wiki/File:Robert_Kennedy_1963_(cropped,_5x6).jpg"
+
+[[photo]]
+file = "persona_mcnamara.jpg"
+category = "persona"
+caption = "Retrato oficial de Robert McNamara, secretario de Defensa, enero de 1961."
+credit = "Oscar Porter, U.S. Army / Departamento de Defensa de EE. UU."
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:Robert_McNamara_official_portrait.jpg"
+
+[[photo]]
+file = "persona_taylor.jpg"
+category = "persona"
+caption = "Retrato oficial del general Maxwell D. Taylor (h. 1956-1959); en 1962 era presidente del Estado Mayor Conjunto."
+credit = "U.S. Army / Defense Technical Information Center"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:Maxwell_D_Taylor_official_portrait.jpg"
+
+[[photo]]
+file = "persona_lemay.jpg"
+category = "persona"
+caption = "Retrato oficial del general Curtis LeMay, jefe de Estado Mayor de la Fuerza Aérea de EE. UU. (posterior a 1951)."
+credit = "U.S. Air Force"
+license = "Dominio público (obra del gobierno de EE. UU.; PD-USGov-Military-Air Force)"
+source = "https://commons.wikimedia.org/wiki/File:Curtis_LeMay_(USAF).jpg"
+
+[[photo]]
+file = "persona_rusk.jpg"
+category = "persona"
+caption = "Dean Rusk, secretario de Estado de EE. UU. (1961-1969)."
+credit = "Departamento de Estado de EE. UU. / John F. Kennedy Presidential Library"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:Dean_Rusk.jpg"
+
+[[photo]]
+file = "persona_stevenson.jpg"
+category = "persona"
+caption = "Adlai Stevenson, embajador de EE. UU. ante la ONU, en la Casa Blanca, 23 de junio de 1961."
+credit = "Warren K. Leffler, U.S. News & World Report / Biblioteca del Congreso"
+license = "Dominio público (colección U.S. News & World Report de la Biblioteca del Congreso, sin restricciones conocidas)"
+source = "https://commons.wikimedia.org/wiki/File:Adlai_Stevenson_close-up_(cropped).jpg"
+
+[[photo]]
+file = "persona_thompson.jpg"
+category = "persona"
+caption = "Kennedy (izq.) recibe en el Despacho Oval al embajador en Moscú Llewellyn Thompson (centro), con Dean Rusk (der.), 22 de febrero de 1961."
+credit = "Abbie Rowe, Casa Blanca / John F. Kennedy Presidential Library"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:President_John_F._Kennedy_Meets_with_Ambassador_to_the_Soviet_Union_Llewellyn_Thompson.jpg"
+
+[[photo]]
+file = "persona_castro.jpg"
+category = "persona"
+caption = "Fidel Castro llega a Washington, 15 de abril de 1959, pocos meses después del triunfo de la revolución."
+credit = "Warren K. Leffler, U.S. News & World Report / Biblioteca del Congreso"
+license = "Dominio público (colección U.S. News & World Report de la Biblioteca del Congreso, sin restricciones conocidas)"
+source = "https://commons.wikimedia.org/wiki/File:Fidel_Castro_-_MATS_Terminal_Washington_1959_(cropped).jpg"
+
+[[photo]]
+file = "persona_dobrynin.jpg"
+category = "persona"
+caption = "El embajador soviético Anatoli Dobrynin llega a la Casa Blanca para reunirse con Kennedy, 17 de julio de 1962."
+credit = "Abbie Rowe, Casa Blanca / John F. Kennedy Presidential Library"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:Anatoly_Dobrynin_(1962).jpg"
+
+[[photo]]
+file = "persona_bundy.jpg"
+category = "persona"
+caption = "McGeorge Bundy, que había sido asesor de Seguridad Nacional de Kennedy, en el Despacho Oval (1967)."
+credit = "Yoichi Okamoto, Casa Blanca / LBJ Presidential Library"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:McGeorge_Bundy.jpg"
+
+[[photo]]
+file = "persona_mikoyan.jpg"
+category = "persona"
+caption = "Anastás Mikoyán (centro) con Kennedy en el Despacho Oval, 29 de noviembre de 1962, al final de su misión en Cuba; a la derecha, la intérprete del Departamento de Estado Natalie Kushnir."
+credit = "Casa Blanca / John F. Kennedy Presidential Library"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:John_F._Kennedy,_Anastas_Mikoyan.jpg"
+
+[[photo]]
+file = "persona_gromyko.jpg"
+category = "persona"
+caption = "El ministro soviético de Exteriores Andréi Gromyko (centro), entre Llewellyn Thompson (izq.) y Dean Rusk (der.), 23 de junio de 1967."
+credit = "Yoichi Okamoto, Casa Blanca / LBJ Presidential Library"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:Gromyko_and_Rusk.jpg"
+
+[[photo]]
+file = "persona_anderson.jpg"
+category = "persona"
+caption = "El mayor Rudolf Anderson, piloto de U-2 de la Fuerza Aérea de EE. UU., derribado sobre Cuba el 27 de octubre de 1962."
+credit = "U.S. Air Force / National Museum of the U.S. Air Force"
+license = "Dominio público (obra del gobierno de EE. UU.)"
+source = "https://commons.wikimedia.org/wiki/File:Rudolf_Anderson.jpg"
+
+[[photo]]
+file = "persona_malinovsky.jpg"
+category = "persona"
+caption = "El mariscal Rodión Malinovski, ministro de Defensa de la URSS, en un retrato oficial de posguerra."
+credit = "Fotógrafo oficial soviético / Ministerio de Defensa de Rusia (mil.ru)"
+license = "CC BY 4.0 (recortada y reducida)"
+source = "https://commons.wikimedia.org/wiki/File:Rodion_Malinovsky_postwar.jpg"
+
+[[photo]]
+file = "persona_feklisov.jpg"
+category = "persona"
+caption = "Aleksandr Feklisov, jefe de la estación del KGB en Washington en 1962, en un sello de Correos de Rusia de 2020."
+credit = "V. Beltiukov / Correos de Rusia"
+license = "Dominio público (sello postal de Rusia)"
+source = "https://commons.wikimedia.org/wiki/File:Aleksandr_Feklisov_2020_stamp_of_Russia.jpg"
+
+[[photo]]
+file = "persona_arjipov.jpg"
+category = "persona"
+caption = "Vasili Arjípov, oficial de la Marina soviética a bordo del submarino B-59 en octubre de 1962."
+credit = "Cortesía de Olga Arjípova"
+license = "CC BY-SA 4.0 (recortada y reducida)"
+source = "https://commons.wikimedia.org/wiki/File:Vasili_Arkhipov_(cropped).jpg"

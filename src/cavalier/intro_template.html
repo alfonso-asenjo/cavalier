@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cavalier · Trece días de octubre</title>
+<meta name="description" content="La crisis de los misiles de Cuba contada para quien no sabe nada de ella, y simulada con agentes de IA: ¿qué habría pasado si…?">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root {
+  --board: #d9dedb; --paper: #f6f7f5; --ink: #1e2427; --ink-soft: #4d575b; --rule: #b7bfbc;
+  --usa: #2c5a85; --ussr: #9e2f28; --cuba: #6a5a1c; --heat: #d08a12; --calm: #5c8a6e;
+  --display: "Archivo", "Arial Narrow", sans-serif; --text: "Source Serif 4", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --board: #1b2124; --paper: #242b2e; --ink: #e6eae8; --ink-soft: #a9b3b0; --rule: #3b4549;
+    --usa: #79a6d2; --ussr: #e0786e; --cuba: #cdb75f; --heat: #e6a43a; --calm: #8cbf9f;
+  }
+}
+:root[data-theme="dark"] {
+  --board: #1b2124; --paper: #242b2e; --ink: #e6eae8; --ink-soft: #a9b3b0; --rule: #3b4549;
+  --usa: #79a6d2; --ussr: #e0786e; --cuba: #cdb75f; --heat: #e6a43a; --calm: #8cbf9f;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--board); color: var(--ink); font: 400 clamp(17px, 0.45vw + 12px, 21px)/1.6 var(--text); }
+[hidden] { display: none !important; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--heat); outline-offset: 2px; }
+.usa { color: var(--usa); } .ussr { color: var(--ussr); } .cuba { color: var(--cuba); }
+h2, h3 { text-wrap: balance; }
+code { font: 500 .9em/1.4 ui-monospace, Consolas, monospace; background: var(--board); padding: 1px 5px; }
+pre { font: 500 14px/1.5 ui-monospace, Consolas, monospace; background: var(--board); padding: 12px 14px; overflow-x: auto; margin: 10px 0 16px; }
+
+/* barra */
+.topnav { position: sticky; top: 0; z-index: 10; display: flex; gap: 18px; align-items: center; padding: 10px clamp(16px, 5vw, 72px); background: #141a1c; color: #e6eae8; font: 600 15px/1.2 var(--display); font-stretch: 85%; overflow-x: auto; white-space: nowrap; }
+.topnav a { text-decoration: none; opacity: .85; }
+.topnav a:hover { opacity: 1; text-decoration: underline; }
+.topnav a[data-nav] { padding: 5px 9px; margin: -5px -9px; border-radius: 3px; }
+.topnav a.active { opacity: 1; background: var(--heat); color: #141a1c; text-decoration: none; }
+.topnav .brand { font-weight: 800; letter-spacing: .04em; margin-right: auto; opacity: 1; }
+
+/* portada */
+.hero { position: relative; min-height: min(92vh, 820px); display: grid; align-items: end; color: #fff; background: #20282b; overflow: hidden; }
+.hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1) brightness(.58); }
+.hero .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(14,18,20,.94) 0%, rgba(14,18,20,.4) 55%, rgba(14,18,20,.12) 100%); }
+.hero .inner { position: relative; padding: 0 clamp(16px, 5vw, 72px) clamp(32px, 7vh, 72px); max-width: 1100px; }
+.hero .kicker { font: 600 15px/1.3 var(--display); font-stretch: 85%; letter-spacing: .06em; text-transform: uppercase; opacity: .85; margin: 0 0 14px; }
+.hero h1 { font: 800 clamp(44px, 8.5vw, 112px)/.92 var(--display); font-stretch: 66%; margin: 0 0 18px; max-width: 12ch; }
+.hero .dek { font: 400 clamp(18px, 2.3vw, 24px)/1.45 var(--text); max-width: 48ch; margin: 0 0 26px; opacity: .95; }
+.hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { display: inline-block; font: 700 16px/1 var(--display); font-stretch: 85%; padding: 13px 18px; text-decoration: none; border: 2px solid currentColor; background: transparent; color: inherit; cursor: pointer; }
+.btn.solid { background: var(--heat); border-color: var(--heat); color: #141a1c; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.hero .credit { position: absolute; right: 12px; bottom: 8px; font: 400 12px/1.2 var(--display); opacity: .6; max-width: 50ch; text-align: right; }
+
+/* lectura */
+.wrap { max-width: min(1440px, 100%); margin: 0 auto; padding: 0 clamp(16px, 5vw, 72px); }
+.read { max-width: clamp(620px, 56vw, 920px); }
+section.block { padding: 64px 0 40px; border-bottom: 1px solid var(--rule); }
+section.block.paper { background: var(--paper); }
+.eyebrow { font: 700 14px/1.2 var(--display); font-stretch: 85%; letter-spacing: .08em; text-transform: uppercase; color: var(--heat); margin: 0 0 8px; }
+section.block h2, .rewrite h2 { font: 800 clamp(32px, 4.6vw, 54px)/1.02 var(--display); font-stretch: 70%; margin: 0 0 12px; }
+.kick { font: italic 400 21px/1.45 var(--text); color: var(--ink-soft); margin: 0 0 22px; max-width: 46ch; }
+.prose p { margin: 0 0 16px; }
+.prose strong { font-weight: 650; }
+sup a { text-decoration: none; font: 700 11px var(--display); color: var(--ink-soft); padding: 0 1px; }
+figure { margin: 24px 0; }
+figure img { display: block; width: 100%; max-height: 480px; object-fit: cover; filter: grayscale(1) contrast(1.05); background: var(--rule); }
+figcaption { font: 400 14px/1.4 var(--display); font-stretch: 90%; color: var(--ink-soft); margin-top: 6px; }
+
+/* personajes */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+.chip { font: 650 15px/1 var(--display); font-stretch: 85%; padding: 9px 13px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.people { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.person { background: var(--paper); border: 1px solid var(--rule); border-top: 5px solid var(--side); display: flex; flex-direction: column; }
+.person[data-side="USA"] { --side: var(--usa); } .person[data-side="USSR"] { --side: var(--ussr); } .person[data-side="CUBA"] { --side: var(--cuba); }
+.person .pic { height: 300px; background: var(--board); display: grid; place-items: center; overflow: hidden; }
+.person .pic img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1) contrast(1.05); }
+.person .links { display: flex; gap: 14px; flex-wrap: wrap; font: 600 14px var(--display); font-stretch: 88%; margin-top: auto; padding-top: 8px; }
+.person .links a { color: var(--side); }
+.person .pic .ini { font: 800 54px var(--display); font-stretch: 70%; color: var(--side); opacity: .7; }
+.person .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.person h3 { font: 750 22px/1.05 var(--display); font-stretch: 78%; margin: 0; }
+.person .role { font: 500 14px/1.3 var(--display); font-stretch: 90%; color: var(--ink-soft); margin: 0; }
+.person .summary { font-size: 16px; line-height: 1.5; margin: 4px 0 0; }
+.badge { align-self: flex-start; font: 700 12px/1 var(--display); letter-spacing: .03em; padding: 4px 7px; background: var(--heat); color: #141a1c; }
+.person details summary { cursor: pointer; font: 650 15px var(--display); font-stretch: 85%; color: var(--ink-soft); padding-top: 6px; }
+.person details p { font-size: 15.5px; line-height: 1.5; margin: 8px 0 0; }
+.person .evidence { font: 500 12.5px var(--display); color: var(--ink-soft); }
+
+/* mapa de relaciones */
+.mapgrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr); gap: 24px; align-items: start; margin-top: 40px; }
+.map { background: var(--paper); border: 1px solid var(--rule); }
+.map svg { display: block; width: 100%; height: auto; }
+.map .node { cursor: pointer; }
+.map .node circle { stroke: var(--paper); stroke-width: 3; }
+.map .node text { font: 650 15px var(--display); font-stretch: 85%; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; }
+.map .edge { fill: none; stroke-width: 2.2; opacity: .55; transition: opacity .2s; }
+.map.focus .edge { opacity: .08; } .map.focus .edge.on { opacity: 1; stroke-width: 3.4; }
+.map.focus .node { opacity: .35; } .map.focus .node.on { opacity: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 14px; border-top: 1px solid var(--rule); font: 500 13.5px var(--display); font-stretch: 90%; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 22px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
+.relpanel { background: var(--paper); border: 1px solid var(--rule); padding: 16px 18px; }
+.relpanel h3 { font: 750 22px/1.1 var(--display); font-stretch: 78%; margin: 0 0 4px; }
+.relpanel ul { list-style: none; margin: 10px 0 0; padding: 0; }
+.relpanel li { padding: 9px 0; border-top: 1px solid var(--rule); font-size: 15.5px; line-height: 1.45; }
+.relpanel .kind { font: 700 12.5px var(--display); letter-spacing: .03em; text-transform: uppercase; display: block; }
+
+/* fuerzas */
+.fgroup { margin: 8px 0 34px; }
+.fgroup > h3 { font: 750 22px var(--display); font-stretch: 80%; margin: 0 0 10px; }
+.fcols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.fcol { background: var(--paper); border: 1px solid var(--rule); border-top: 5px solid var(--side); }
+.fcol[data-side="USA"] { --side: var(--usa); } .fcol[data-side="USSR"] { --side: var(--ussr); } .fcol[data-side="CUBA"] { --side: var(--cuba); }
+.fcol h4 { font: 700 15px var(--display); font-stretch: 85%; letter-spacing: .04em; text-transform: uppercase; color: var(--side); margin: 0; padding: 10px 14px 4px; }
+.fcol dl { margin: 0; }
+.fcol .row { padding: 10px 14px; border-top: 1px solid var(--rule); }
+.fcol .row:first-child { border-top: 0; }
+.fcol dt { font: 600 14.5px/1.3 var(--display); font-stretch: 88%; }
+.fcol dd { margin: 2px 0 0; }
+.fcol .v { font: 800 26px/1.05 var(--display); font-stretch: 72%; color: var(--side); display: block; }
+.fcol .n { font: 500 13.5px/1.4 var(--display); font-stretch: 92%; color: var(--ink-soft); display: block; margin-top: 2px; }
+
+/* cronología */
+.timeline { list-style: none; margin: 8px 0 0; padding: 0; position: relative; }
+.timeline::before { content: ""; position: absolute; left: 118px; top: 6px; bottom: 6px; width: 2px; background: var(--rule); }
+.timeline li { display: grid; grid-template-columns: 104px 28px minmax(0, 1fr); gap: 0 6px; padding: 0 0 22px; }
+.timeline .d { font: 700 15px/1.25 var(--display); font-stretch: 85%; text-align: right; color: var(--ink-soft); }
+.timeline .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 3px solid var(--rule); margin: 4px 0 0 5px; position: relative; z-index: 1; }
+.timeline li.t1 .dot { border-color: var(--ink-soft); }
+.timeline li.t2 .dot { border-color: var(--heat); background: var(--heat); width: 18px; height: 18px; margin: 2px 0 0 3px; }
+.timeline h3 { font: 700 19px/1.2 var(--display); font-stretch: 85%; margin: 0 0 4px; }
+.timeline p { margin: 0; font-size: 16.5px; line-height: 1.5; max-width: 62ch; }
+
+/* al borde */
+.misses { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 8px; }
+.miss { background: var(--paper); border: 1px solid var(--rule); border-left: 5px solid var(--heat); padding: 14px 16px; }
+.miss .d { font: 650 14px var(--display); font-stretch: 85%; color: var(--ink-soft); margin: 0; }
+.miss h3 { font: 750 22px/1.1 var(--display); font-stretch: 78%; margin: 4px 0 8px; }
+.miss p { font-size: 16px; line-height: 1.5; margin: 0 0 10px; }
+.ev { font: 700 12px/1 var(--display); letter-spacing: .03em; padding: 4px 7px; border: 1px solid currentColor; display: inline-block; }
+.ev.disputado { color: var(--ussr); } .ev.testimonios { color: var(--heat); } .ev.documentado { color: var(--calm); }
+
+/* glosario */
+.term { all: unset; cursor: help; border-bottom: 1.5px dotted var(--heat); }
+.term:focus-visible { outline: 2px solid var(--heat); outline-offset: 1px; }
+.gpop { position: absolute; z-index: 30; max-width: min(360px, calc(100vw - 32px)); background: var(--ink); color: var(--paper); padding: 10px 13px; font: 500 15px/1.45 var(--display); font-stretch: 92%; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+.gpop b { display: block; font-weight: 800; margin-bottom: 2px; color: var(--heat); }
+.gpop sup a { color: inherit; }
+.glossary { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0 32px; margin: 8px 0 0; }
+.glossary div { padding: 10px 0; border-top: 1px solid var(--rule); break-inside: avoid; }
+.glossary dt { font: 750 19px var(--display); font-stretch: 80%; }
+.glossary dd { margin: 2px 0 0; font-size: 16px; line-height: 1.5; }
+
+/* el misil que se desmonta (fuerzas) */
+.forcegrid { display: grid; grid-template-columns: 240px minmax(0, 1fr) 250px; gap: 0 36px; align-items: start; }
+.icbm, .icbm-parts { position: sticky; top: 64px; }
+.icbm svg { width: 100%; height: auto; max-height: calc(100vh - 90px); display: block; }
+.icbm .part { transition: transform .12s linear; }
+.icbm .badge2 { transition: opacity .25s; }
+.icbm figcaption, .icbm-note { font: 400 12.5px/1.4 var(--display); color: var(--ink-soft); margin-top: 6px; }
+.icbm-parts ol { list-style: none; margin: 0; padding: 0; counter-reset: p; }
+.icbm-parts li { counter-increment: p; padding: 8px 0 8px 34px; border-top: 1px solid var(--rule); position: relative; font: 500 14px/1.4 var(--display); font-stretch: 92%; color: var(--ink-soft); opacity: .35; transition: opacity .3s, color .3s; }
+.icbm-parts li::before { content: counter(p); position: absolute; left: 0; top: 8px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid currentColor; font: 800 12px/18px var(--display); text-align: center; }
+.icbm-parts li.on { opacity: 1; color: var(--ink); }
+.icbm-parts li.on::before { background: var(--heat); border-color: var(--heat); color: #141a1c; }
+.icbm-parts li b { display: block; font-weight: 750; }
+.icbm-parts h3 { font: 750 18px var(--display); font-stretch: 80%; margin: 0 0 8px; }
+@media (max-width: 1300px) {
+  .forcegrid { grid-template-columns: 200px minmax(0, 1fr); }
+  .icbm-parts { position: static; grid-column: 1 / -1; grid-row: 2; margin-bottom: 28px; }
+  .icbm-parts ol { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 24px; }
+}
+@media (max-width: 760px) {
+  .forcegrid { grid-template-columns: 1fr; }
+  .icbm { position: static; max-width: 220px; margin: 0 auto 8px; }
+  .icbm-parts { grid-row: auto; }
+}
+
+/* mapa */
+.cmap { background: var(--paper); border: 1px solid var(--rule); margin: 8px 0 0; }
+.cmap svg { display: block; width: 100%; height: auto; }
+.cmap .sea { fill: color-mix(in srgb, var(--usa) 7%, var(--paper)); }
+.cmap .land { fill: var(--board); stroke: var(--rule); stroke-width: .8; }
+.cmap .land.cuba { fill: color-mix(in srgb, var(--cuba) 22%, var(--board)); stroke: var(--cuba); }
+.cmap .q { fill: none; stroke: var(--usa); stroke-width: 2.2; stroke-dasharray: 9 6; }
+.cmap .pt circle { stroke: var(--paper); stroke-width: 2; }
+.cmap .pt text { font: 650 13px var(--display); font-stretch: 88%; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; }
+.cmap .pt.misiles circle { fill: var(--ussr); } .cmap .pt.incidente circle { fill: var(--heat); }
+.cmap .pt.base circle { fill: var(--usa); } .cmap .pt.ciudad circle, .cmap .pt.puerto circle { fill: var(--ink-soft); }
+.cmap .legend { border-top: 1px solid var(--rule); }
+
+/* cómo funciona */
+.how { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 20px 36px; margin-top: 12px; }
+.how article { border-top: 3px solid var(--ink); padding-top: 10px; }
+.how h3 { font: 750 24px/1.1 var(--display); font-stretch: 78%; margin: 0 0 10px; }
+.how p { font-size: .95em; margin: 0 0 12px; }
+
+/* reescribe la historia */
+.rewrite { background: #141a1c; color: #e6eae8; padding: 72px 0 56px; }
+.rewrite h2 { color: #fff; }
+.rewrite .kick { color: #b9c3c0; }
+.rewrite .prose p { color: #d4dbd8; }
+.points { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 22px 0 36px; }
+.point { border: 1px solid #3b4549; padding: 12px 14px; font: 500 15px/1.4 var(--display); font-stretch: 92%; }
+.point b { display: block; font: 800 20px/1.1 var(--display); font-stretch: 75%; color: var(--heat); margin-bottom: 4px; }
+.rewrite h3 { font: 750 26px/1.1 var(--display); font-stretch: 76%; margin: 28px 0 12px; color: #fff; }
+.games { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.game { display: flex; flex-direction: column; gap: 6px; background: #20282b; border: 1px solid #3b4549; border-top: 5px solid var(--oc); padding: 14px 16px; text-decoration: none; color: inherit; }
+.game:hover { border-color: #6b7578; border-top-color: var(--oc); }
+.game .oc { font: 800 13px var(--display); letter-spacing: .05em; text-transform: uppercase; color: var(--oc); }
+.game h4 { font: 750 21px/1.12 var(--display); font-stretch: 78%; margin: 0; color: #fff; }
+.game p { font-size: 15px; line-height: 1.45; margin: 0; color: #c9d1ce; }
+.game .meta { font: 500 13px/1.35 var(--display); font-stretch: 92%; color: #9aa5a2; margin-top: auto; padding-top: 6px; }
+.oc-acuerdo_negociado, .oc-desescalada { --oc: #8cbf9f; } .oc-sin_resolver { --oc: #e6a43a; }
+.oc-conflicto_convencional { --oc: #e0786e; } .oc-uso_nuclear { --oc: #ff5a4a; } .oc-null { --oc: #79a6d2; }
+/* ── Teletipo Model 28 (partida nueva) ── */
+.tty28 { --case: #a7ad9c; --case2: #8c9282; --case3: #6f7566; --paper: #f4eedb; --ink28: #1d1c18;
+  position: relative; max-width: 860px; margin: 64px auto 0; }
+/* el rollo de papel asoma por encima de la tapa */
+.tty28 .roll { position: relative; margin: 0 9%; background: var(--paper); color: var(--ink28); padding: 26px 30px 18px;
+  font: 700 15.5px/1.62 "Courier Prime", "Courier New", monospace; letter-spacing: .02em; text-transform: uppercase;
+  text-shadow: 0 0 .5px rgba(0,0,0,.55), .3px .2px 0 rgba(0,0,0,.18);
+  box-shadow: inset 0 -30px 30px -24px rgba(0,0,0,.25), 0 0 0 1px #d9cfae;
+  -webkit-mask: linear-gradient(#000, #000) bottom / 100% calc(100% - 10px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) top / 14px 10px repeat-x;
+          mask: linear-gradient(#000, #000) bottom / 100% calc(100% - 10px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) top / 14px 10px repeat-x; }
+.tty28 .roll::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(transparent 0 calc(1.62em - 1px), rgba(120,100,60,.06) calc(1.62em - 1px) 1.62em); }
+.tty28 .roll p { margin: 0; white-space: pre-wrap; }
+.tty28 .roll p.opt { cursor: default; }
+.tty28 .roll .gap { height: 1.62em; }
+.tty28 .roll .dim { opacity: .62; }
+.tty28 .roll .note { text-transform: none; font-weight: 400; font-size: 14px; line-height: 1.55; letter-spacing: 0; opacity: .85; }
+.tty28 .roll code { font: inherit; background: rgba(0,0,0,.06); padding: 0 3px; text-transform: none; }
+.tty28 .roll pre { font: 400 13.5px/1.5 "Courier Prime", "Courier New", monospace; text-transform: none; margin: 4px 0 8px; white-space: pre-wrap; background: rgba(90,70,30,.07); padding: 6px 10px; border-left: 3px solid rgba(90,70,30,.25); }
+.tty28 .roll a { color: inherit; }
+/* opciones mecanografiadas */
+.tty28 .opt { display: block; cursor: pointer; padding-left: 4ch; text-indent: -4ch; }
+.tty28 .opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.tty28 .opt .mk::before { content: attr(data-off); }
+.tty28 .opt input:checked + .mk::before { content: attr(data-on); }
+.tty28 .opt input:disabled + .mk::before { content: attr(data-dis); }
+.tty28 .opt:has(input:disabled) { opacity: .45; cursor: not-allowed; text-decoration: line-through; text-decoration-thickness: 1px; }
+.tty28 .opt:hover .mk, .tty28 .opt input:focus-visible + .mk { background: rgba(208,138,18,.28); }
+.tty28 .opt input:focus-visible + .mk { outline: 2px solid #b36b00; }
+.tty28 .field { font: inherit; text-transform: uppercase; color: inherit; background: transparent; border: 0; border-bottom: 1.5px dashed rgba(0,0,0,.45); padding: 0 2px; letter-spacing: inherit; }
+.tty28 select.field { appearance: none; cursor: pointer; max-width: 100%; }
+.tty28 select.field option { text-transform: none; font-family: system-ui, sans-serif; font-weight: 400; }
+.tty28 .field:focus-visible { outline: 2px solid #b36b00; background: rgba(208,138,18,.15); }
+.tty28 input.field { width: 5ch; }
+.tty28 .printing::after { content: "█"; animation: blink .7s steps(1) infinite; margin-left: 1px; }
+@keyframes blink { 50% { opacity: 0; } }
+/* la carcasa */
+.tty28 .case { position: relative; margin-top: -6px; padding: 16px 22px 22px; border-radius: 22px 22px 10px 10px;
+  background: linear-gradient(180deg, var(--case) 0%, var(--case2) 60%, var(--case3) 100%);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.35), inset 0 -3px 0 rgba(0,0,0,.25), 0 14px 30px rgba(0,0,0,.45); }
+.tty28 .case::before { content: ""; position: absolute; left: 7%; right: 7%; top: -14px; height: 22px; border-radius: 12px 12px 0 0; background: linear-gradient(#bfc4b4, var(--case)); box-shadow: inset 0 2px 0 rgba(255,255,255,.35); z-index: -1; }
+.tty28 .brandrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font: 800 12px var(--display); letter-spacing: .2em; color: #3a3e33; text-shadow: 0 1px 0 rgba(255,255,255,.4); }
+.tty28 .badge28 { background: #2c2f27; color: #d9dccd; padding: 4px 10px; border-radius: 3px; letter-spacing: .26em; text-shadow: none; }
+.tty28 .linelamp { display: inline-flex; align-items: center; gap: 7px; }
+.tty28 .linelamp i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #2a2c24; background: #4a2b22; }
+.tty28 .linelamp.on i { background: radial-gradient(circle at 35% 35%, #ffd8c8, #ff3b1f 50%, #a01600); box-shadow: 0 0 8px #ff3b1f; }
+.tty28 .keys { margin-top: 14px; padding: 12px 14px 10px; border-radius: 8px; background: linear-gradient(#5d6256, #4a4e44); box-shadow: inset 0 3px 8px rgba(0,0,0,.45); }
+.tty28 .krow { display: flex; justify-content: center; gap: 7px; margin: 0 0 7px; }
+.tty28 .krow:nth-child(2) { padding-left: 18px; } .tty28 .krow:nth-child(3) { padding-left: 36px; }
+.tty28 .k { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 800 12px var(--display); color: #f1f1ea;
+  background: radial-gradient(circle at 40% 35%, #4a4a45, #1d1d1b 70%); border: 2px solid #9a9f8e; box-shadow: 0 3px 0 #23251f; }
+.tty28 .k.down { transform: translateY(2px); box-shadow: 0 1px 0 #23251f; }
+.tty28 .ctrl { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.tty28 .space { flex: 1 1 260px; max-width: 420px; height: 40px; border-radius: 20px; cursor: pointer; font: 800 13px var(--display); letter-spacing: .3em; color: #f1f1ea;
+  background: linear-gradient(#3a3a36, #1d1d1b); border: 2px solid #9a9f8e; box-shadow: 0 4px 0 #23251f; }
+.tty28 .space:not(:disabled):active { transform: translateY(3px); box-shadow: 0 1px 0 #23251f; }
+.tty28 .space:disabled { opacity: .45; cursor: not-allowed; }
+.tty28 .space:focus-visible { outline: 3px solid var(--heat); outline-offset: 3px; }
+.tty28 .plate28 { font: 700 10.5px/1.35 var(--display); letter-spacing: .12em; color: #33362d; text-transform: uppercase; background: linear-gradient(#d8dacb, #b5b8a7); border: 1px solid #6f7566; border-radius: 2px; padding: 5px 9px; }
+@media (max-width: 640px) {
+  .tty28 .roll { margin: 0 2%; padding: 22px 14px 14px; font-size: 13.5px; }
+  .tty28 .k { width: 22px; height: 22px; font-size: 9px; } .tty28 .krow { gap: 4px; }
+  .tty28 .krow:nth-child(2) { padding-left: 10px; } .tty28 .krow:nth-child(3) { padding-left: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .tty28 .printing::after { animation: none; } }
+
+/* fuentes */
+.sources { font: 400 14.5px/1.5 var(--display); font-stretch: 92%; color: var(--ink-soft); padding: 48px 0; }
+.sources h2 { font: 800 30px var(--display); font-stretch: 72%; color: var(--ink); margin: 0 0 12px; }
+.sources ol { padding-left: 22px; columns: 2 380px; column-gap: 36px; }
+.sources li { margin: 0 0 6px; break-inside: avoid; }
+.sources li:target { background: color-mix(in srgb, var(--heat) 25%, transparent); }
+.sources .photos { margin-top: 24px; }
+
+@media (prefers-reduced-motion: reduce) { .icbm .part, .icbm-parts li { transition: none; } }
+@media (max-width: 860px) {
+  .mapgrid { grid-template-columns: 1fr; }
+  .timeline::before { left: 84px; }
+  .timeline li { grid-template-columns: 70px 28px minmax(0, 1fr); }
+  .newgame .row { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Secciones">
+  <a class="brand" href="#top">CAVALIER</a>
+  <a href="#historia" data-nav="historia">La crisis</a>
+  <a href="#personajes" data-nav="personajes">Personajes</a>
+  <a href="#cronologia" data-nav="cronologia">Cronología</a>
+  <a href="#fuerzas" data-nav="fuerzas">Fuerzas</a>
+  <a href="#mapa" data-nav="mapa">Mapa</a>
+  <a href="#al_borde_lista" data-nav="al_borde_lista">Al borde</a>
+  <a href="#glosario" data-nav="glosario">Glosario</a>
+  <a href="#como_funciona" data-nav="como_funciona">Cómo funciona</a>
+  <a href="#partidas" data-nav="partidas">Reescribe la historia</a>
+</nav>
+<header class="hero" id="top"></header>
+<main id="historia"></main>
+<section class="rewrite" id="partidas"></section>
+<footer class="sources wrap" id="fuentes"></footer>
+
+<script>
+const DATA = /*__DATA__*/null;
+const I = DATA.intro || {}, PH = DATA.photos || {}, WIKI = (DATA.intro || {}).wikipedia || {};
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const SIDE_NAME = {USA: "Estados Unidos", USSR: "Unión Soviética", CUBA: "Cuba"};
+const SIDE_CLS = {USA: "usa", USSR: "ussr", CUBA: "cuba"};
+const MONTHS = ["ene.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ago.", "sep.", "oct.", "nov.", "dic."];
+const WD = ["dom.", "lun.", "mar.", "mié.", "jue.", "vie.", "sáb."];
+const sourceN = {};
+(I.sources || []).forEach((s, k) => { sourceN[s.id] = k + 1; });
+
+/* Texto con párrafos, **negrita** y citas [s3, s7] → superíndices enlazados a las fuentes */
+function cite(txt) {
+  return txt.replace(/\[((?:s\d+)(?:\s*,\s*s\d+)*)\]/g, (_, ids) =>
+    "<sup>" + ids.split(/\s*,\s*/).map(id => sourceN[id] ? `<a href="#src-${id}" title="Fuente ${sourceN[id]}">${sourceN[id]}</a>` : "").join(",") + "</sup>");
+}
+function inline(txt) { return cite(esc(txt).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")); }
+function md(txt) { return String(txt || "").trim().split(/\n\s*\n/).map(p => `<p>${inline(p.replace(/\s*\n\s*/g, " "))}</p>`).join(""); }
+function fmtDate(d, time) {
+  const m = /^(\d{4})-(\d{2})(?:-(\d{2}))?/.exec(d || "");
+  if (!m) return esc(d);
+  if (!m[3]) return `${MONTHS[+m[2] - 1]} ${m[1]}`;
+  const dt = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  const core = `${+m[3]} ${MONTHS[+m[2] - 1]}`;
+  return (m[1] === "1962" && m[2] === "10" ? `${WD[dt.getUTCDay()]} ${core}` : `${core} ${m[1]}`) + (time ? `<br>${esc(time)}` : "");
+}
+function figure(file) {
+  const p = PH[file];
+  if (!p) return "";
+  return `<figure><img src="${esc(p.src)}" alt="${esc(p.caption)}" loading="lazy"><figcaption>${esc(p.caption)} Foto: ${esc(p.credit)}.</figcaption></figure>`;
+}
+
+/* ── Portada ── */
+function hero() {
+  const meta = I.meta || {};
+  const ph = PH["reconocimiento_1.jpg"] || Object.values(PH)[0];
+  document.getElementById("top").innerHTML = `
+    ${ph ? `<img src="${esc(ph.src)}" alt=""><p class="credit">${esc(ph.caption)} Foto: ${esc(ph.credit)}.</p>` : ""}
+    <div class="veil"></div>
+    <div class="inner">
+      <p class="kicker">Octubre de 1962 · La crisis de los misiles de Cuba</p>
+      <h1>${esc(meta.title || "Trece días de octubre")}</h1>
+      <p class="dek">${esc(meta.subtitle || "Durante trece días, Estados Unidos y la Unión Soviética estuvieron más cerca que nunca de una guerra nuclear. Esto es lo que pasó, quién decidía y por qué no acabó en desastre. Después, una IA vuelve a jugar esos días.")}</p>
+      <div class="ctas"><a class="btn solid" href="#historia">Qué pasó</a><a class="btn" href="#partidas">Reescribe la historia</a></div>
+    </div>`;
+}
+
+/* ── Bloques especiales que se intercalan entre las secciones narrativas ── */
+function peopleBlock() {
+  const people = I.people || [];
+  if (!people.length) return "";
+  const card = p => {
+    const ph = p.photo && PH[p.photo];
+    const ini = p.name.split(" ").filter(w => /^[A-ZÁÉÍÓÚ]/.test(w)).map(w => w[0]).slice(0, 2).join("");
+    return `<article class="person" data-side="${esc(p.side)}" data-id="${esc(p.id)}">
+      <div class="pic">${ph ? `<img src="${esc(ph.src)}" alt="${esc(p.name)}" loading="lazy">` : `<span class="ini" aria-hidden="true">${esc(ini)}</span>`}</div>
+      <div class="body">
+        ${p.in_game ? '<span class="badge">EN LA SIMULACIÓN</span>' : ""}
+        <h3>${esc(p.name)}</h3>
+        <p class="role"><span class="${SIDE_CLS[p.side] || ""}">${esc(SIDE_NAME[p.side] || p.side)}</span> · ${esc(p.role)}</p>
+        <p class="summary">${inline(p.summary || "")}</p>
+        <details><summary>Qué postura tenía</summary>${md(p.stance)}${p.key_moment ? `<p><strong>Su momento:</strong> ${inline(p.key_moment)}</p>` : ""}<p class="evidence">Fuente de su postura: ${esc(p.evidence || "")}</p></details>
+        ${WIKI[p.id] ? `<p class="links"><a href="${esc(WIKI[p.id])}" target="_blank" rel="noopener">Wikipedia ↗</a></p>` : ""}
+      </div></article>`;
+  };
+  return `<section class="block paper" id="personajes"><div class="wrap">
+    <p class="eyebrow">Quién es quién</p>
+    <h2>Los personajes</h2>
+    <p class="kick">Dos líderes que decidían y, a su alrededor, consejeros que tiraban en direcciones opuestas. Los marcados «en la simulación» son los que la IA interpreta (los consejeros, solo si se activan).</p>
+    <div class="filters" role="group" aria-label="Filtrar por bando">
+      ${[["", "Todos"], ["USA", "Estados Unidos"], ["USSR", "Unión Soviética"], ["CUBA", "Cuba"], ["game", "En la simulación"]].map(([k, l], n) => `<button class="chip" data-f="${k}" aria-pressed="${n === 0}">${l}</button>`).join("")}
+    </div>
+    <div class="people" id="people">${people.map(card).join("")}</div>
+    ${(I.relations || []).length ? `<div class="mapgrid">
+      <div class="map" id="map"><svg id="mapsvg" viewBox="0 0 1000 640" role="img" aria-label="Mapa de relaciones entre los personajes"></svg>
+        <div class="legend">${Object.entries(KINDS).map(([k, v]) => `<span><i style="border-color:${v.color};${v.dash ? "border-top-style:dashed" : ""}"></i>${v.label}</span>`).join("")}</div></div>
+      <aside class="relpanel" id="relpanel" aria-live="polite"></aside>
+    </div>` : ""}
+  </div></section>`;
+}
+
+const KINDS = {
+  confianza: {label: "Confianza", color: "var(--calm)"},
+  canal_secreto: {label: "Canal secreto", color: "var(--heat)", dash: true},
+  tension: {label: "Tensión", color: "var(--ussr)"},
+  rivalidad: {label: "Rivalidad", color: "#8a3ab9"},
+  alianza_dificil: {label: "Alianza difícil", color: "var(--cuba)"},
+  mando: {label: "Mando", color: "var(--ink-soft)"},
+};
+
+function drawMap() {
+  const svg = document.getElementById("mapsvg");
+  if (!svg) return;
+  const people = I.people || [], rels = I.relations || [];
+  const used = new Set(rels.flatMap(r => [r.a, r.b]));
+  const nodes = people.filter(p => used.has(p.id));
+  const groups = {USA: nodes.filter(n => n.side === "USA"), USSR: nodes.filter(n => n.side === "USSR"), CUBA: nodes.filter(n => n.side === "CUBA")};
+  const pos = {};
+  const column = (list, x0, x1, y0, y1) => {
+    const cols = list.length > 7 ? 2 : 1, per = Math.ceil(list.length / cols);
+    list.forEach((n, k) => {
+      const c = Math.floor(k / per), r = k % per, rows = Math.min(per, list.length - c * per);
+      pos[n.id] = [cols === 1 ? (x0 + x1) / 2 : x0 + (x1 - x0) * c, y0 + (y1 - y0) * (rows === 1 ? .5 : r / (rows - 1)) + (c ? 28 : 0)];
+    });
+  };
+  column(groups.USA, 190, 370, 55, groups.CUBA.length ? 470 : 580);
+  column(groups.USSR, 630, 810, 55, groups.CUBA.length ? 470 : 580);
+  groups.CUBA.forEach((n, k) => { pos[n.id] = [500 + (k - (groups.CUBA.length - 1) / 2) * 160, 585]; });
+  const color = s => `var(--${SIDE_CLS[s] || "ink"})`;
+  const edges = rels.filter(r => pos[r.a] && pos[r.b]).map((r, k) => {
+    const [x1, y1] = pos[r.a], [x2, y2] = pos[r.b];
+    const same = people.find(p => p.id === r.a)?.side === people.find(p => p.id === r.b)?.side;
+    const mx = (x1 + x2) / 2 + (same ? (x1 < 500 ? -90 : 90) : 0), my = (y1 + y2) / 2 + (same ? 0 : -40);
+    const kd = KINDS[r.kind] || KINDS.mando;
+    return `<path class="edge" data-a="${esc(r.a)}" data-b="${esc(r.b)}" d="M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}" stroke="${kd.color}" ${kd.dash ? 'stroke-dasharray="7 6"' : ""}><title>${esc(r.text)}</title></path>`;
+  }).join("");
+  const label = n => n.name.replace(/^(Robert|John|Nikita|Fidel|Anastás|Anastas|Rodión|Rodion|Llewellyn|Adlai|Maxwell|Curtis|Dean|McGeorge|Andréi|Andrei|Anatoli|Anatoly|Vasili|Issa|Rudolf|Aleksandr|Theodore|Robert S\.|John F\.|Robert F\.)\s+/, "")
+    .replace(/^F\.\s+|^S\.\s+/, "") + (n.id === "rfk" ? " (Robert)" : "");
+  const dots = nodes.map(n => {
+    const [x, y] = pos[n.id], right = n.side === "USSR" ? true : n.side === "CUBA" ? x >= 500 : false;
+    return `<g class="node" data-id="${esc(n.id)}" tabindex="0" role="button" aria-label="${esc(n.name)}"><circle cx="${x}" cy="${y}" r="${n.in_game ? 13 : 9}" fill="${color(n.side)}"/><text x="${x + (right ? 20 : -20)}" y="${y + 5}" text-anchor="${right ? "start" : "end"}">${esc(label(n))}</text></g>`;
+  }).join("");
+  svg.innerHTML = `<text x="225" y="22" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="15" fill="var(--usa)" letter-spacing="1.5">ESTADOS UNIDOS</text>
+    <text x="775" y="22" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="15" fill="var(--ussr)" letter-spacing="1.5">UNIÓN SOVIÉTICA</text>
+    ${groups.CUBA.length ? `<text x="500" y="628" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="15" fill="var(--cuba)" letter-spacing="1.5">CUBA</text>` : ""}
+    ${edges}${dots}`;
+  const map = document.getElementById("map");
+  const select = id => {
+    const p = people.find(q => q.id === id);
+    if (!p) return;
+    map.classList.add("focus");
+    svg.querySelectorAll(".edge").forEach(e => e.classList.toggle("on", e.dataset.a === id || e.dataset.b === id));
+    const linked = new Set([id, ...rels.filter(r => r.a === id || r.b === id).flatMap(r => [r.a, r.b])]);
+    svg.querySelectorAll(".node").forEach(g => g.classList.toggle("on", linked.has(g.dataset.id)));
+    const name = q => (people.find(x => x.id === q) || {}).name || q;
+    const mine = rels.filter(r => r.a === id || r.b === id);
+    document.getElementById("relpanel").innerHTML = `<h3 class="${SIDE_CLS[p.side] || ""}">${esc(p.name)}</h3><p class="role" style="margin:0;font:500 14px var(--display);color:var(--ink-soft)">${esc(p.role)}</p>
+      <ul>${mine.map(r => `<li><span class="kind" style="color:${(KINDS[r.kind] || KINDS.mando).color}">${esc((KINDS[r.kind] || {}).label || r.kind)} · ${esc(name(r.a === id ? r.b : r.a))}</span>${inline(r.text)}</li>`).join("")}</ul>`;
+  };
+  svg.querySelectorAll(".node").forEach(g => {
+    g.addEventListener("click", () => select(g.dataset.id));
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(g.dataset.id); } });
+  });
+  select(nodes.find(n => n.id === "kennedy") ? "kennedy" : nodes[0]?.id);
+}
+
+function forcesBlock() {
+  const rows = I.forces || [];
+  if (!rows.length) return "";
+  const GROUPS = {estrategico: "El equilibrio nuclear", en_cuba: "En Cuba", alrededor_de_cuba: "Alrededor de Cuba", europa_turquia: "En Europa y Turquía"};
+  const sides = ["USA", "USSR", "CUBA"].filter(s => rows.some(r => r.side === s));
+  const tables = Object.entries(GROUPS).filter(([g]) => rows.some(r => r.group === g)).map(([g, title]) => {
+    const cols = sides.filter(s => rows.some(r => r.group === g && r.side === s)).map(s =>
+      `<div class="fcol" data-side="${s}"><h4>${esc(SIDE_NAME[s])}</h4><dl>${rows.filter(r => r.group === g && r.side === s).map(r =>
+        `<div class="row"><dt>${esc(r.label)}</dt><dd><span class="v">${esc(r.value)}</span><span class="n">${inline(r.note || "")}${(r.sources || []).length ? cite(" [" + r.sources.join(", ") + "]") : ""}</span></dd></div>`).join("")}</dl></div>`).join("");
+    return `<div class="fgroup"><h3>${esc(title)}</h3><div class="fcols">${cols}</div></div>`;
+  }).join("");
+  return `<section class="block" id="fuerzas"><div class="wrap"><div class="forcegrid">
+    <figure class="icbm" id="icbm">${icbmSVG()}<figcaption>Esquema genérico de un misil balístico intercontinental de dos etapas y combustible líquido, como el R-16 soviético o el Titan I estadounidense. No está a escala.</figcaption></figure>
+    <div>
+      <p class="eyebrow">Qué había en juego</p><h2>Las fuerzas</h2>
+      <p class="kick">Estados Unidos tenía muchas más armas nucleares. La Unión Soviética tenía algo que Washington no sabía.</p>
+      ${tables}
+    </div>
+    <aside class="icbm-parts" aria-label="Partes de un misil intercontinental"><h3>Un ICBM, pieza a pieza</h3><ol>${ICBM_PARTS.map((q, k) => `<li data-k="${k}"><b>${esc(q[0])}</b>${inline(q[1])}</li>`).join("")}</ol></aside>
+  </div></div></section>`;
+}
+
+/* ── El misil: siete piezas que se separan al avanzar por la sección ── */
+const ICBM_PARTS = [
+  ["Vehículo de reentrada", "Lleva la ojiva nuclear y la protege del calor al volver a entrar en la atmósfera. Es lo único que llega al objetivo."],
+  ["Guiado inercial", "Giróscopos y acelerómetros que calculan dónde está el misil sin señales de fuera y corrigen el rumbo."],
+  ["Segunda etapa: depósitos", "Combustible y oxidante, en depósitos separados. Esta etapa se enciende ya fuera de la atmósfera."],
+  ["Motor de la segunda etapa", "Da el último empujón, que fija la trayectoria hacia el objetivo."],
+  ["Interetapa", "La pieza que une las dos etapas; se suelta cuando la primera se agota."],
+  ["Primera etapa: depósitos", "La parte más grande: el combustible para despegar y cruzar la atmósfera. En muchos misiles de 1962 era líquido y había que cargarlo antes de lanzar, lo que llevaba de minutos a horas [s3]."],
+  ["Motores de la primera etapa", "Queman unos pocos minutos y caen con la etapa vacía."],
+];
+const ICBM_GAP = 24;
+function icbmSVG() {
+  const c = 120, w = 30, top = 200;  // centro, medio ancho y altura donde empieza (montado)
+  const L = "var(--ink-soft)", F = "var(--paper)", H = "var(--heat)";
+  const parts = [
+    // [y0, y1, dibujo]
+    [top, top + 78, `<path d="M${c} ${top} C${c + 10} ${top + 22} ${c + w - 4} ${top + 50} ${c + w} ${top + 70} L${c + w} ${top + 78} L${c - w} ${top + 78} L${c - w} ${top + 70} C${c - w + 4} ${top + 50} ${c - 10} ${top + 22} ${c} ${top}Z" fill="${F}" stroke="${H}" stroke-width="2.5"/><circle cx="${c}" cy="${top + 56}" r="7" fill="${H}"/>`],
+    [top + 78, top + 108, `<rect x="${c - w}" y="${top + 78}" width="${2 * w}" height="30" fill="${F}" stroke="${L}" stroke-width="2"/><circle cx="${c - 10}" cy="${top + 93}" r="5" fill="none" stroke="${L}" stroke-width="1.5"/><circle cx="${c + 10}" cy="${top + 93}" r="5" fill="none" stroke="${L}" stroke-width="1.5"/>`],
+    [top + 108, top + 218, `<rect x="${c - w}" y="${top + 108}" width="${2 * w}" height="110" fill="${F}" stroke="${L}" stroke-width="2"/><line x1="${c - w}" x2="${c + w}" y1="${top + 160}" y2="${top + 160}" stroke="${L}" stroke-width="1.5" stroke-dasharray="4 3"/>`],
+    [top + 218, top + 246, `<path d="M${c - 10} ${top + 218} L${c + 10} ${top + 218} L${c + 18} ${top + 246} L${c - 18} ${top + 246}Z" fill="${F}" stroke="${L}" stroke-width="2"/>`],
+    [top + 246, top + 274, `<rect x="${c - w}" y="${top + 246}" width="${2 * w}" height="28" fill="none" stroke="${L}" stroke-width="2"/><path d="M${c - w} ${top + 246} L${c + w} ${top + 274} M${c + w} ${top + 246} L${c - w} ${top + 274} M${c} ${top + 246} L${c - w} ${top + 260} M${c} ${top + 246} L${c + w} ${top + 260}" stroke="${L}" stroke-width="1.2"/>`],
+    [top + 274, top + 494, `<rect x="${c - w}" y="${top + 274}" width="${2 * w}" height="220" fill="${F}" stroke="${L}" stroke-width="2"/><line x1="${c - w}" x2="${c + w}" y1="${top + 380}" y2="${top + 380}" stroke="${L}" stroke-width="1.5" stroke-dasharray="4 3"/>`],
+    [top + 494, top + 536, `<path d="M${c - 22} ${top + 494} L${c - 8} ${top + 494} L${c - 4} ${top + 536} L${c - 26} ${top + 536}Z M${c + 8} ${top + 494} L${c + 22} ${top + 494} L${c + 26} ${top + 536} L${c + 4} ${top + 536}Z" fill="${F}" stroke="${L}" stroke-width="2"/>`],
+  ];
+  return `<svg viewBox="0 0 240 ${top + 560}" role="img" aria-label="Un misil intercontinental que se separa en sus siete partes">
+    ${parts.map(([y0, y1, d], k) => `<g class="part" data-k="${k}">${d}<g class="badge2" opacity="0"><line x1="${c + w + 4}" x2="${c + w + 34}" y1="${(y0 + y1) / 2}" y2="${(y0 + y1) / 2}" stroke="${H}" stroke-width="1.5"/><circle cx="${c + w + 46}" cy="${(y0 + y1) / 2}" r="12" fill="${H}"/><text x="${c + w + 46}" y="${(y0 + y1) / 2 + 4.5}" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="13" fill="#141a1c">${k + 1}</text></g></g>`).join("")}
+  </svg>`;
+}
+function updateIcbm() {
+  const sec = document.getElementById("fuerzas");
+  if (!sec) return;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const r = sec.getBoundingClientRect(), vh = innerHeight;
+  const p = reduce ? 1 : Math.min(1, Math.max(0, (vh * 0.45 - r.top) / Math.max(1, r.height - vh * 0.6)));
+  const n = ICBM_PARTS.length, gaps = n - 1;
+  const s = [...Array(gaps)].map((_, j) => Math.min(1, Math.max(0, p * (gaps + 1) - j)));  // la junta j se abre después de la j-1
+  document.querySelectorAll("#icbm .part").forEach(g => {
+    const k = +g.dataset.k;
+    const up = s.slice(k).reduce((a, b) => a + b, 0) * ICBM_GAP;  // cada pieza sube lo que se han abierto las juntas de debajo
+    g.setAttribute("transform", `translate(0 ${(-up).toFixed(1)})`);
+    const shown = k < gaps ? s[k] > 0.5 : s[gaps - 1] > 0.9;
+    g.querySelector(".badge2").setAttribute("opacity", shown ? 1 : 0);
+    const li = document.querySelector(`.icbm-parts li[data-k="${k}"]`);
+    if (li) li.classList.toggle("on", shown);
+  });
+}
+
+/* ── Mapa de la crisis (Natural Earth, dominio público; posiciones aproximadas) ── */
+function mapBlock() {
+  const M = DATA.map;
+  if (!M) return "";
+  return `<section class="block paper" id="mapa"><div class="wrap"><div class="read" style="max-width:none">
+    <p class="eyebrow">Dónde pasó</p><h2>El mapa de la crisis</h2>
+    <p class="kick">Los misiles estaban a unos 150 km de Florida. La línea de cuarentena, a cientos de kilómetros en el mar.</p>
+    <figure class="cmap">${mapSVG(M)}
+      <figcaption class="legend" style="padding:10px 14px">
+        <span style="color:var(--ussr)">●</span> Bases de misiles soviéticos ·
+        <span style="color:var(--heat)">●</span> Derribo del U-2 de Anderson (27 oct.) ·
+        <span style="color:var(--usa)">●</span> Base de Guantánamo ·
+        <span style="color:var(--usa)">– –</span> Línea de cuarentena, a unas 500 millas náuticas (aproximada). ${esc(M.source)}.</figcaption></figure>
+  </div></div></section>`;
+}
+function mapSVG(M, focus) {
+  const show = focus ? new Set(focus) : null;
+  const pts = M.places.filter(q => !show || show.has(q.id) || q.kind === "ciudad");
+  const right = new Set(["guanajay", "habana", "sagua", "remedios", "miami", "key_west"]);
+  return `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="Mapa del Caribe con Cuba, Florida, las bases de misiles y la línea de cuarentena">
+    <rect class="sea" width="${M.w}" height="${M.h}"/>
+    ${M.lands.map(l => `<path class="land${l.cuba ? " cuba" : ""}" d="${l.d}"><title>${esc(l.name)}</title></path>`).join("")}
+    ${!show || show.has("cuarentena") ? `<path class="q" d="${M.quarantine}"/>` : ""}
+    ${pts.map(q => `<g class="pt ${esc(q.kind)}"><circle cx="${q.x}" cy="${q.y}" r="${q.kind === "ciudad" ? 4 : 7}"/><text x="${q.x + (right.has(q.id) ? 10 : -10)}" y="${q.y + (q.id === "guanajay" ? -10 : q.id === "remedios" ? 16 : q.id === "mariel" ? -10 : 4)}" text-anchor="${right.has(q.id) ? "start" : "end"}">${esc(q.label)}</text></g>`).join("")}
+  </svg>`;
+}
+
+/* ── Glosario: la primera vez que aparece un término en cada sección, se explica al pasar por encima ── */
+function glossaryBlock() {
+  const G = I.glossary || [];
+  if (!G.length) return "";
+  return `<section class="block paper" id="glosario"><div class="wrap">
+    <p class="eyebrow">Palabras de la época</p><h2>Glosario</h2>
+    <p class="kick">Los términos técnicos que aparecen en esta historia. En el texto, las palabras subrayadas con puntos se explican al pasar el ratón o al tocarlas.</p>
+    <dl class="glossary">${G.map(g => `<div id="g-${esc(g.term.replace(/\s+/g, "_"))}"><dt>${esc(g.term)}</dt><dd>${inline(g.def)}</dd></div>`).join("")}</dl>
+  </div></section>`;
+}
+function applyGlossary() {
+  const G = I.glossary || [];
+  if (!G.length) return;
+  const forms = G.flatMap((g, k) => (g.match || [g.term]).map(m => [m, k])).sort((a, b) => b[0].length - a[0].length);
+  const rx = new RegExp(`(?<![\\p{L}\\p{N}])(${forms.map(f => f[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})(?![\\p{L}\\p{N}])`, "giu");
+  const lookup = m => forms.find(f => f[0].toLowerCase() === m.toLowerCase())?.[1];
+  // primera aparición en la página; las secciones de consulta vuelven a explicar los suyos
+  let seen = new Set();
+  document.querySelectorAll("#historia section.block:not(#glosario)").forEach(sec => {
+    if (["fuerzas", "al_borde_lista", "como_funciona"].includes(sec.id)) seen = new Set();
+    const walker = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, {acceptNode: n =>
+      n.parentElement.closest("h2, h3, .eyebrow, .chip, button, a, sup, svg, .term, figcaption, .filters") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      const txt = node.nodeValue;
+      rx.lastIndex = 0;
+      let m, last = 0, frag = null;
+      while ((m = rx.exec(txt))) {
+        const k = lookup(m[1]);
+        if (k === undefined || seen.has(k)) continue;
+        seen.add(k);
+        frag = frag || document.createDocumentFragment();
+        frag.append(txt.slice(last, m.index));
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "term"; b.dataset.g = k; b.textContent = m[1];
+        b.setAttribute("aria-describedby", "gpop");
+        frag.append(b);
+        last = m.index + m[1].length;
+      }
+      if (frag) { frag.append(txt.slice(last)); node.replaceWith(frag); }
+    }
+  });
+  const pop = document.createElement("div");
+  pop.className = "gpop"; pop.id = "gpop"; pop.setAttribute("role", "tooltip"); pop.hidden = true;
+  document.body.append(pop);
+  let pinned = null;
+  const show = b => {
+    const g = G[+b.dataset.g];
+    pop.innerHTML = `<b>${esc(g.term)}</b>${inline(g.def)}`;
+    pop.hidden = false;
+    const r = b.getBoundingClientRect(), w = pop.offsetWidth;
+    pop.style.left = Math.max(16, Math.min(scrollX + r.left, scrollX + innerWidth - w - 16)) + "px";
+    pop.style.top = (scrollY + r.bottom + 8) + "px";
+  };
+  const hide = () => { if (!pinned) pop.hidden = true; };
+  document.addEventListener("mouseover", e => { const b = e.target.closest(".term"); if (b && !pinned) show(b); });
+  document.addEventListener("mouseout", e => { if (e.target.closest(".term")) hide(); });
+  document.addEventListener("focusin", e => { const b = e.target.closest(".term"); if (b) show(b); });
+  document.addEventListener("focusout", e => { if (e.target.closest(".term")) { pinned = null; hide(); } });
+  document.addEventListener("click", e => {
+    const b = e.target.closest(".term");
+    if (b) { pinned = pinned === b ? null : b; if (pinned) show(b); else pop.hidden = true; }
+    else if (!e.target.closest(".gpop")) { pinned = null; pop.hidden = true; }
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") { pinned = null; pop.hidden = true; } });
+}
+
+function howBlock() {
+  const H = I.how || [];
+  if (!H.length) return "";
+  return `<section class="block" id="como_funciona"><div class="wrap">
+    <p class="eyebrow">El simulador</p><h2>Cómo funciona por dentro</h2>
+    <p class="kick">Qué son los agentes, qué saben, cómo se les ocultan los nombres reales y qué decide el motor.</p>
+    <div class="how">${H.map(h => `<article><h3>${esc(h.title)}</h3>${md(h.body)}</article>`).join("")}</div>
+  </div></section>`;
+}
+
+function timelineBlock() {
+  const ev = I.timeline || [];
+  if (!ev.length) return "";
+  return `<section class="block paper" id="cronologia"><div class="wrap"><div class="read">
+    <p class="eyebrow">Día a día</p><h2>Cronología</h2>
+    <ol class="timeline">${ev.map(e => `<li class="t${e.danger || 0}"><span class="d">${fmtDate(e.date, e.time)}</span><span class="dot" aria-hidden="true"></span>
+      <div><h3>${esc(e.title)}</h3><p>${inline(e.text)}</p></div></li>`).join("")}</ol></div></div></section>`;
+}
+
+function missesBlock() {
+  const ms = I.near_miss || [];
+  if (!ms.length) return "";
+  const EV = {documentado: "Documentado", testimonios: "Según testimonios", disputado: "Discutido por los historiadores"};
+  return `<section class="block" id="al_borde_lista"><div class="wrap">
+    <p class="eyebrow">Por qué estuvimos a un paso</p><h2>Momentos al borde</h2>
+    <p class="kick">Ninguno lo decidió un líder. Por eso asustan tanto.</p>
+    <div class="misses">${ms.map(m => `<article class="miss"><p class="d">${fmtDate(m.date)}</p><h3>${esc(m.title)}</h3>${md(m.text)}
+      <span class="ev ${esc(m.evidence)}">${esc(EV[m.evidence] || m.evidence)}</span>${(m.sources || []).length ? cite(" [" + m.sources.join(", ") + "]") : ""}</article>`).join("")}</div></div></section>`;
+}
+
+/* ── Historia: secciones en orden, con los bloques intercalados ── */
+function story() {
+  const secs = I.sections || [];
+  const done = new Set();
+  let html = "";
+  const once = (key, fn) => { if (done.has(key)) return ""; done.add(key); return fn(); };
+  secs.forEach((s, k) => {
+    html += `<section class="block${k % 2 ? "" : " paper"}" id="${esc(s.id)}"><div class="wrap"><div class="read">
+      <p class="eyebrow">Capítulo ${k + 1}</p><h2>${esc(s.title)}</h2>${s.kicker ? `<p class="kick">${inline(s.kicker)}</p>` : ""}
+      <div class="prose">${md(s.body)}</div>${s.photo ? figure(s.photo) : ""}</div></div></section>`;
+    if (s.id === "despliegue" || s.id === "descubrimiento") html += once("people", peopleBlock);
+    if (s.id === "trece_dias") html += once("timeline", timelineBlock) + once("forces", forcesBlock) + once("map", mapBlock);
+    if (s.id === "al_borde") html += once("misses", missesBlock);
+  });
+  html += once("people", peopleBlock) + once("timeline", timelineBlock) + once("forces", forcesBlock) + once("map", mapBlock) +
+    once("misses", missesBlock) + glossaryBlock() + howBlock();
+  if (!secs.length && !html) html = `<section class="block"><div class="wrap read"><p>La introducción histórica todavía no está escrita (falta <code>data/intro/cuba1962.toml</code>).</p></div></section>`;
+  document.getElementById("historia").innerHTML = html;
+  document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c === b));
+    const f = b.dataset.f;
+    document.querySelectorAll(".person").forEach(card => {
+      const p = (I.people || []).find(x => x.id === card.dataset.id) || {};
+      card.hidden = f === "game" ? !p.in_game : f ? p.side !== f : false;
+    });
+  }));
+  drawMap();
+  applyGlossary();
+}
+
+/* ── Reescribe la historia: partidas jugadas y partida nueva ── */
+function gameCard(g) {
+  const agents = g.agents ? `${esc(g.agents.USA || "")} (EE. UU.) contra ${esc(g.agents.USSR || "")} (URSS)` : "";
+  return `<a class="game oc-${esc(g.outcome)}" href="${esc(g.href)}">
+    <span class="oc">${esc(g.outcome_label || "")}</span>
+    <h4>${esc(g.title || g.outcome_label || "Partida")}</h4>
+    ${g.note ? `<p>${esc(g.note)}</p>` : ""}
+    <span class="meta">Desde: ${esc(g.start_label || "")}${g.variant_label ? `<br>Contrafactual: ${esc(g.variant_label)}` : ""}<br>${g.turns} turnos · tensión máxima ${g.max_tension}${agents ? `<br>${agents}` : ""}</span></a>`;
+}
+
+function rewrite() {
+  const starts = Object.entries(DATA.starts || {});
+  document.getElementById("partidas").innerHTML = `<div class="wrap">
+    <p class="eyebrow">Ahora tú</p><h2>Reescribe la historia</h2>
+    <p class="kick">¿Y si Jrushchov no hubiera aceptado? ¿Y si no hubiera existido el canal secreto? ¿Y si un capitán de submarino hubiera disparado?</p>
+    <div class="prose read">
+      <p>En cada partida, dos agentes de IA hacen de Kennedy y de Jrushchov. Cada uno recibe solo lo que su líder sabía (con informes de inteligencia a veces falsos), elige hasta tres acciones cada medio día y puede escribir mensajes, en público, por la vía oficial o por un canal secreto. Un motor con reglas explícitas decide qué pasa: si la tensión sube, si un mando local dispara por su cuenta, si un acuerdo se cumple.</p>
+      <p>Los agentes juegan con nombres inventados («la Federación Atlántica», «la Isla») para que razonen sobre la situación y no recuerden cómo acabó. Al reproducir una partida, aquí se ven los nombres reales. Los resultados describen cómo se comportan estos modelos dentro de este motor: no son probabilidades de lo que pudo pasar en 1962.</p>
+    </div>
+    <div class="points">${starts.map(([k, v]) => `<div class="point"><b>${esc(v.split(":")[0])}</b>${esc(v.split(":").slice(1).join(":").trim())}</div>`).join("")}</div>
+    <h3>Partidas ya jugadas</h3>
+    <div class="games" id="games">${(DATA.games || []).map(gameCard).join("") || "<p>Todavía no hay partidas de ejemplo.</p>"}</div>
+    <h3 id="nueva">Simula una partida nueva</h3>
+    <div class="newgame" id="newgame"><p class="note">Comprobando si hay un servidor local…</p></div>
+  </div>`;
+  setupNewGame();
+}
+
+/* ── El teletipo: el formulario es el propio mensaje, en el papel; sin servidor, «línea fuera de servicio» ── */
+const T28 = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();  // sin tildes ni eñes
+const MON = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+function dtg(d = new Date()) {  // grupo fecha-hora militar: 151432Z OCT 26
+  const p = n => String(n).padStart(2, "0");
+  return `${p(d.getUTCDate())}${p(d.getUTCHours())}${p(d.getUTCMinutes())}Z ${MON[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}`;
+}
+const NOTES = `<div class="gap"></div><p class="dim">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</p>
+<p>NOTAS DEL OPERADOR</p>
+<p class="note"><b>Semilla.</b> Es un número que fija el azar del motor: qué incidentes ocurren, qué informes de inteligencia resultan falsos, cuándo se filtra un secreto. Con la misma semilla y agentes de reglas, la partida se repite exactamente igual. Con agentes de IA, el modelo tiene además su propio azar: Qwen en local usa la semilla y suele repetirse; OpenAI la usa sin garantizarlo; Anthropic no la admite. En blanco, al azar.</p>
+<p class="note"><b>Claves de los modelos comerciales.</b> No se escriben aquí: se configuran antes de arrancar el servidor, como variables de entorno, y la página nunca las ve. Después hay que volver a lanzar <code>cavalier serve</code>.</p>
+<pre>Windows (cmd):         set OPENAI_API_KEY=sk-...
+Windows (PowerShell):  $env:ANTHROPIC_API_KEY="sk-ant-..."
+macOS o Linux:         export OPENAI_API_KEY=sk-...</pre>
+<p class="note"><b>Modelo local, gratis.</b> Hace falta <a href="https://ollama.com">Ollama</a> con <code>ollama pull qwen3.5:9b</code> y una tarjeta gráfica de 8 GB. Cada turno tarda entre 30 s y 1 min: desde el Sábado Negro son unos 8 turnos y desde el 16 de octubre, unos 30. Con los agentes de reglas, segundos. Para jugar con otro modelo de Ollama: <code>cavalier serve --local-model llama3.1:8b</code>.</p>`;
+const OFFLINE_NOTE = `<p>LINEA FUERA DE SERVICIO</p>
+<p class="note">Esta es la versión publicada de la web: se pueden reproducir las partidas ya jugadas, pero para simular una nueva hay que ejecutar el simulador en tu ordenador. Se abrirá esta misma página en <code>http://localhost:8000</code>, con la línea en servicio. Una partida cuesta de 0 $ (modelo local) a unos 2 $ (los mejores modelos comerciales).</p>
+<pre>git clone https://github.com/alfonso-asenjo/cavalier
+cd cavalier
+pip install -e ".[llm]"
+cavalier serve</pre>`;
+
+function teletypeHTML(opts, health, offline) {
+  const ok = m => !offline && (!m.needs || (m.needs === "ollama" ? health.ollama : health.keys[m.needs]));
+  const why = m => m.needs === "ollama" ? "Ollama apagado" : `falta ${m.needs.toUpperCase()}_API_KEY`;
+  const first = Math.max(0, opts.models.findIndex(ok));
+  const models = () => opts.models.map((m, k) => `<option value="${esc(m.id)}" ${ok(m) || offline ? "" : "disabled"} ${k === first ? "selected" : ""}>${esc(m.label)}${ok(m) || offline ? "" : " (" + why(m) + ")"}</option>`).join("");
+  const chan = (name, on) => `${name} ${on ? "DISPONIBLE" : "SIN SERVICIO"}`;
+  const status = offline ? "LINEA FUERA DE SERVICIO" :
+    [chan("OLLAMA", health.ollama), chan("OPENAI", health.keys.openai), chan("ANTHROPIC", health.keys.anthropic)].join(" / ");
+  const dis = offline ? "disabled" : "";
+  const start = opts.starts.map(st => `<label class="opt"><input type="radio" name="start" value="${esc(st.id)}" ${st.id === "usa_sabado_negro" ? "checked" : ""}><span class="mk" data-off="( ) " data-on="(X) " data-dis="( ) "></span>${esc(T28(st.label))}</label>`).join("");
+  const changes = opts.variants.map(v => `<label class="opt"><input type="checkbox" name="variants" value="${esc(v.id)}" ${dis}><span class="mk" data-off="[ ] " data-on="[X] " data-dis="[-] "></span>${esc(T28(v.label))}</label>`).join("");
+  const keys = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"].map(r => `<div class="krow">${[...r].map(c => `<span class="k" data-k="${c}">${c}</span>`).join("")}</div>`).join("");
+  return `<form class="tty28" id="ngform" aria-label="Teletipo para simular una partida nueva">
+    <div class="roll" id="ng-roll">
+      <p>ZCZC CVL001 ${esc(dtg())}</p>
+      <p>ZZ</p>
+      <p>FM CAVALIER</p>
+      <p>TO CENTRO DE SIMULACION</p>
+      <p class="dim">ESTADO DE CANALES: ${esc(status)}</p>
+      <p>BT</p>
+      <p>SIN CLASIFICAR</p>
+      <p>ASUNTO: ORDEN DE SIMULACION</p>
+      <div class="gap"></div>
+      <p>PARTICIPANTES:</p>
+      <p class="opt">-   KENNEDY Y JRUSHCHOV: UN AGENTE DE IA CADA UNO, CON EL MODELO QUE ELIJAS EN LOS PUNTOS 3 Y 4. CADA 12 HORAS DE LA CRISIS RECIBEN LO QUE SU LIDER SABRIA Y DECIDEN HASTA 3 ACCIONES.</p>
+      <p class="opt">-   MANDOS LOCALES, SUBMARINOS Y DEFENSAS ANTIAEREAS: NO SON UNA IA. LOS DECIDE EL MOTOR, CON UNA PROBABILIDAD QUE SUBE CON LA TENSION.</p>
+      <label class="opt"><input type="checkbox" name="advisors" value="1"><span class="mk" data-off="[ ] " data-on="[X] " data-dis="[-] "></span>CON CONSEJEROS: MCNAMARA, TAYLOR, THOMPSON Y STEVENSON CON KENNEDY; MIKOYAN, MALINOVSKI Y DOBRYNIN CON JRUSHCHOV. CADA TURNO, CADA UNO ACONSEJA POR SEPARADO, CON SU FICHA HISTORICA, Y LUEGO DECIDE SU LIDER. MULTIPLICA POR UNOS 3 LA ESPERA Y POR 3 O 4 EL COSTE.</label>
+      <p class="opt">-   CASTRO Y CUBA: NO SON UN BANDO EN LA SIMULACION.</p>
+      <div class="gap"></div>
+      <fieldset style="border:0;margin:0;padding:0"><legend>1. COMIENZO DE LA PARTIDA:</legend>${start}</fieldset>
+      <div class="gap"></div>
+      <fieldset style="border:0;margin:0;padding:0"><legend>2. CAMBIOS RESPECTO A LA HISTORIA (VARIOS A LA VEZ; NINGUNO, LA CRISIS TAL COMO FUE):</legend>${changes}</fieldset>
+      <div class="gap"></div>
+      <p><label for="ng-usa">3. WASHINGTON (KENNEDY): </label><select class="field" id="ng-usa" name="usa">${models()}</select></p>
+      <p><label for="ng-ussr">4. MOSCU (JRUSHCHOV): </label><select class="field" id="ng-ussr" name="ussr">${models()}</select></p>
+      <p><label for="ng-seed">5. SEMILLA: </label><input class="field" id="ng-seed" name="seed" inputmode="numeric" maxlength="4" placeholder="____" autocomplete="off" ${dis}> <span class="dim">(EN BLANCO, AL AZAR)</span></p>
+      <div class="gap"></div>
+      <p>6. ESTIMACION (APROXIMADA):</p>
+      <p class="opt" id="ng-est" aria-live="polite"></p>
+      <p>BT</p>
+      <p>NNNN</p>
+      <div id="ng-out" aria-live="polite">${offline ? '<div class="gap"></div>' + OFFLINE_NOTE : ""}${health && health.busy ? `<div class="gap"></div><p>AVISO: YA HAY UNA PARTIDA EN MARCHA. <a href="partida.html?id=${encodeURIComponent(health.busy)}">VERLA</a></p>` : ""}</div>
+      ${NOTES}
+    </div>
+    <div class="case">
+      <div class="brandrow"><span class="badge28">TELETYPE</span><span>MODEL 28 · CAVALIER</span><span class="linelamp${offline ? "" : " on"}"><i></i>LINEA</span></div>
+      <div class="keys" aria-hidden="true">${keys}</div>
+      <div class="ctrl"><span class="plate28">Centro de simulación<br>Washington – Moscú</span>
+        <button class="space" type="submit" id="ng-go" ${offline || (health && health.busy) ? "disabled" : ""}>TRANSMITIR</button>
+        <span class="plate28">Línea: ${offline ? "local" : "en servicio"}<br>${offline ? "sin conexión" : "localhost"}</span></div>
+    </div>
+  </form>`;
+}
+
+/* Estimación de turnos, espera y coste: se recalcula al cambiar el comienzo o los modelos */
+function estimate(form, opts) {
+  const el = document.getElementById("ng-est");
+  if (!el) return;
+  const [typical, max] = opts.end_turns || [31, 36];
+  const t0 = (opts.start_turns || {})[form.start.value] || 0;
+  const turns = Math.max(4, typical - t0), most = Math.max(turns, max - t0);
+  const m = id => opts.models.find(x => x.id === id) || {usd: 0, s: 0};
+  const a = m(form.usa.value), b = m(form.ussr.value);
+  const adv = form.advisors && form.advisors.checked ? (opts.advisors || {}) : null;
+  const n = side => adv ? (adv.counts || {})[side] || 0 : 0;
+  const per = (x, side) => ({usd: x.usd * (1 + n(side) * (adv ? adv.cost : 0)), s: x.s * (1 + n(side) * (adv ? adv.time : 0))});
+  const A = per(a, "USA"), B = per(b, "USSR");
+  const usd = turns * (A.usd + B.usd), usdMax = most * (A.usd + B.usd) * 1.25;
+  const secs = turns * (A.s + B.s), secsMax = most * (A.s + B.s) * 1.25;
+  const money = x => x === 0 ? "0 $" : x < 0.01 ? "MENOS DE 1 CENTIMO" : (x < 1 ? x.toFixed(2) : x.toFixed(1)).replace(".", ",") + " $";
+  const time = x => x < 60 ? "MENOS DE 1 MIN" : x < 3600 ? Math.round(x / 60) + " MIN" : (x / 3600).toFixed(1).replace(".", ",") + " H";
+  const local = [a, b].some(x => x.needs === "ollama");
+  const ai = [a, b].filter(x => x.needs).length;
+  const calls = (a.needs ? 1 + n("USA") : 0) + (b.needs ? 1 + n("USSR") : 0);
+  el.textContent = `-   UNOS ${turns} TURNOS (HASTA ${most})${ai ? `: UNAS ${turns * calls} LLAMADAS A LA IA` : ", SIN IA"}.\n` +
+    `-   ESPERA: ${time(secs)}${secsMax > secs * 1.1 ? " (HASTA " + time(secsMax) + ")" : ""}.${local ? " CON QWEN LOCAL DEPENDE DE TU TARJETA GRAFICA." : ""}\n` +
+    `-   COSTE: ${usd === 0 ? "GRATIS" : money(usd) + (usdMax > usd * 1.1 ? " (HASTA " + money(usdMax) + ")" : "")}${a.usd + b.usd > 0 ? ", QUE SE COBRA EN TU CUENTA DE OPENAI O ANTHROPIC" : ""}.`;
+}
+
+async function printLines(box, lines) {  // el papel imprime letra a letra (de golpe con movimiento reducido)
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const keys = [...document.querySelectorAll(".tty28 .k")];
+  for (const text of lines) {
+    const p = document.createElement("p");
+    box.append(p);
+    if (reduce) { p.textContent = text; continue; }
+    p.className = "printing";
+    for (const ch of text) {
+      p.textContent += ch;
+      const k = keys.find(x => x.dataset.k === ch);
+      if (k) { k.classList.add("down"); setTimeout(() => k.classList.remove("down"), 60); }
+      await new Promise(r => setTimeout(r, 22));
+    }
+    p.className = "";
+  }
+}
+
+async function setupNewGame() {
+  const box = document.getElementById("newgame");
+  const fallback = {starts: Object.entries(DATA.starts || {}).map(([id, label]) => ({id, label})),
+    variants: Object.entries(DATA.variants || {}).map(([id, label]) => ({id, label})), exclusive: DATA.exclusive || [],
+    models: DATA.models || [{id: "llm:historico@ollama:qwen3.5:9b", label: "Qwen 3.5 9B en local (Ollama)", usd: 0, s: 21}],
+    start_turns: DATA.start_turns || {}, end_turns: DATA.end_turns, advisors: DATA.advisors};
+  let health, opts;
+  try {
+    const r = await fetch("api/health", {cache: "no-store"});
+    if (!r.ok) throw new Error();
+    health = await r.json();
+    opts = await (await fetch("api/options")).json();
+  } catch (e) {
+    box.innerHTML = teletypeHTML(fallback, null, true);
+    const off = document.getElementById("ngform");
+    off.addEventListener("change", () => estimate(off, fallback));
+    off.addEventListener("submit", e => e.preventDefault());
+    estimate(off, fallback);
+    return;
+  }
+  try {
+    const mine = await (await fetch("api/games")).json();
+    const extra = mine.filter(g => g.turns).map(g => ({...g, href: `partida.html?id=${encodeURIComponent(g.id)}`, title: g.status === "running" ? "En marcha ahora" : g.outcome_label || "Partida"}));
+    if (extra.length) document.getElementById("games").insertAdjacentHTML("afterbegin", extra.map(gameCard).join(""));
+  } catch (e) { /* sin lista local */ }
+  box.innerHTML = teletypeHTML(opts, health, false);
+  const form = document.getElementById("ngform"), go = document.getElementById("ng-go"), out = document.getElementById("ng-out");
+  const seed = document.getElementById("ng-seed");
+  seed.addEventListener("input", () => { seed.value = seed.value.replace(/\D/g, "").slice(0, 4); });
+  const boxes = [...form.querySelectorAll('input[name="variants"]')];
+  const sync = () => {  // contrafactuales incompatibles: al marcar uno se tacha el otro
+    for (const [a, b] of opts.exclusive || []) {
+      const A = boxes.find(x => x.value === a), B = boxes.find(x => x.value === b);
+      if (A && B) { B.disabled = A.checked; A.disabled = B.checked; }
+    }
+  };
+  boxes.forEach(x => x.addEventListener("change", sync));
+  form.addEventListener("change", () => estimate(form, opts));
+  estimate(form, opts);
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    go.disabled = true;
+    const withAdv = v => form.advisors.checked && v.startsWith("llm:") ? v.replace(/^llm:([a-z]+)/, "llm:$1+asesores") : v;
+    const body = {start: form.start.value, variants: boxes.filter(x => x.checked).map(x => x.value),
+                  usa: withAdv(form.usa.value), ussr: withAdv(form.ussr.value), seed: seed.value};
+    out.innerHTML = '<div class="gap"></div>';
+    await printLines(out, ["ZCZC CVL002 " + dtg(), "TRANSMITIENDO ORDEN DE SIMULACION..."]);
+    try {
+      const r = await fetch("api/games", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || r.statusText);
+      await printLines(out, ["RECIBIDO. PARTIDA " + T28(d.id) + " EN MARCHA.", "ABRIENDO EL RELATO EN DIRECTO.", "NNNN"]);
+      location.href = `partida.html?id=${encodeURIComponent(d.id)}`;
+    } catch (err) {
+      await printLines(out, ["ERROR DE TRANSMISION: " + T28(err.message), "NNNN"]);
+      go.disabled = false;
+    }
+  });
+}
+
+/* ── Fuentes y créditos ── */
+function footer() {
+  const src = I.sources || [];
+  const photos = Object.values(PH);
+  document.getElementById("fuentes").innerHTML = `
+    ${src.length ? `<h2>Fuentes</h2><ol>${src.map(s => `<li id="src-${esc(s.id)}">${esc(s.author ? s.author + ". " : "")}${s.url ? `<a href="${esc(s.url)}">${esc(s.title)}</a>` : esc(s.title)}${s.year ? ` (${esc(s.year)})` : ""}.</li>`).join("")}</ol>` : ""}
+    <div class="photos"><p><strong>Fotografías:</strong> ${photos.map(p => `${esc(p.caption)} ${esc(p.credit)}, ${esc(p.license)}${p.source ? ` (<a href="${esc(p.source)}">fuente</a>)` : ""}.`).join(" ")}</p>
+    <p>Cavalier es un proyecto de código abierto. Las partidas las juegan agentes de IA en un motor con supuestos explícitos; no describen lo que ocurrió ni lo que habría ocurrido. Código y metodología: <a href="https://github.com/alfonso-asenjo/cavalier">github.com/alfonso-asenjo/cavalier</a>.</p></div>`;
+}
+
+hero(); story(); rewrite(); footer();
+
+function onScroll() {
+  updateIcbm();
+  const line = innerHeight * 0.3;
+  let current = null;
+  document.querySelectorAll("#historia > section, #partidas").forEach(sec => {
+    if (sec.getBoundingClientRect().top <= line) current = sec.id;
+  });
+  const key = ["personajes", "cronologia", "fuerzas", "mapa", "al_borde_lista", "glosario", "como_funciona", "partidas"].includes(current) ? current
+    : current ? "historia" : null;
+  document.querySelectorAll(".topnav a[data-nav]").forEach(a => a.classList.toggle("active", a.dataset.nav === key));
+  const active = document.querySelector(".topnav a.active");
+  if (active && active.dataset.nav !== onScroll.last) {  // en móvil el menú se desliza: que se vea el enlace activo
+    onScroll.last = active.dataset.nav;
+    const nav = active.parentElement;
+    if (nav.scrollWidth > nav.clientWidth) nav.scrollLeft = active.offsetLeft - nav.clientWidth / 2 + active.offsetWidth / 2;
+  }
+}
+addEventListener("scroll", onScroll, {passive: true});
+addEventListener("resize", onScroll);
+onScroll();
+</script>
+</body>
+</html>

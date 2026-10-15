@@ -1,0 +1,1400 @@
+# Introducción histórica a la crisis de los misiles de Cuba (octubre de 1962).
+#
+# Para quien no sabe nada de la crisis y va a ver después partidas simuladas por agentes de IA.
+# Cada afirmación que no es de conocimiento general lleva una cita [sN] que remite a [[sources]].
+# Las citas textuales son traducciones al castellano de frases que constan literalmente en la fuente citada.
+# Donde la evidencia es un único testimonio o los historiadores discrepan, se dice en el texto y en `evidence`.
+# Material previo reutilizado: reports/Asesores en la crisis de Cuba.md y research_notes/.
+# Grafías: las del repositorio (Jrushchov, Mikoyán, Malinovski, Arjípov, Pliev, Jupiter).
+
+[meta]
+title = "Trece días de octubre"
+subtitle = "La crisis de los misiles de Cuba (1962): quién era quién, qué quería cada uno y por qué el mundo estuvo a punto de una guerra nuclear"
+updated = "2026-10-15"
+
+# =============================================================================== secciones
+
+[[sections]]
+id = "contexto"
+title = "Un mundo partido en dos"
+kicker = "Dos superpotencias nucleares, una revolución a 150 km de Florida y una invasión fracasada."
+photo = "jrushchov_1.jpg"
+body = """
+Desde 1945, Estados Unidos y la Unión Soviética (URSS) se disputan el mundo sin llegar a enfrentarse directamente: es la **Guerra Fría**. Los dos tienen armas nucleares, y cada uno teme que el otro intente destruirlo primero.
+
+En enero de 1959, la revolución de **Fidel Castro** derrocó al dictador Fulgencio Batista en Cuba [s2]. En abril de 1961, unos exiliados cubanos entrenados y pagados por la CIA desembarcaron en **Bahía de Cochinos** con un plan heredado de Eisenhower y aprobado por Kennedy; el ejército cubano los derrotó en dos días [s2]. El fracaso reforzó a Castro, que proclamó el carácter socialista de su revolución y se acercó a Moscú [s2].
+
+Washington no se rindió. En noviembre de 1961 aprobó un programa encubierto, la **Operación Mongoose**, para «sacar del poder» al régimen de Castro; su calendario apuntaba a una posible intervención militar en octubre de 1962 [s2]. En La Habana y en Moscú había, por tanto, motivos reales para temer una invasión.
+
+Además, la balanza nuclear estaba muy desequilibrada. En octubre de 1962, EE. UU. tenía unas **3.500 armas nucleares listas** para lanzarse contra la URSS; la URSS tenía unas 300 capaces de alcanzar EE. UU. [s3, s4]. En misiles **ICBM** (misiles balísticos intercontinentales, que cruzan de un continente a otro en unos 30 minutos) la ventaja era de unos 4 a 1 [s3].
+
+Y EE. UU. tenía misiles nucleares a las puertas de la URSS: 60 **Thor** en el Reino Unido, 30 **Jupiter** en Italia y 15 Jupiter en Turquía, estos últimos plenamente operativos desde marzo de 1962 [s3]. Según el National Security Archive, fueron los de Turquía los que más irritaron a Nikita Jrushchov, el líder soviético [s11].
+"""
+
+[[sections]]
+id = "despliegue"
+title = "Operación Anadyr"
+kicker = "Jrushchov decide mandar en secreto misiles nucleares a Cuba, y casi todo su gobierno le sigue."
+photo = "misiles_1.jpg"
+body = """
+El 21 de mayo de 1962, Jrushchov propuso al **Presídium** (el órgano que dirigía el Partido Comunista y, con él, la URSS) instalar misiles nucleares en Cuba en secreto y anunciarlo después. Según el acta, dijo: «Será una política ofensiva» [s13]. Hicieron falta dos sesiones para aprobarlo, el 21 y el 24 de mayo [s13]. Según el historiador Serhii Plokhy, **Mikoyán** advirtió de consecuencias «peligrosas o incluso catastróficas» [s34].
+
+Las razones soviéticas eran tres, y los historiadores discuten cuál pesó más [s37, s34]: **defender Cuba** de una invasión estadounidense; **compensar la inferioridad nuclear**, porque desde Cuba un misil de alcance medio llegaba a Washington en unos 13 minutos [s3]; y **responder a los Jupiter** de Turquía con la misma moneda. Castro dijo en 1992 que aceptó porque los misiles reequilibraban la balanza mundial, no solo para defender Cuba [s20]; los cubanos creían que venían «para quedarse» [s13].
+
+El plan era enorme. Preveía 48 misiles **R-12** (MRBM, misiles balísticos de alcance medio, unos 2.000 km) y 32 **R-14** (IRBM, de alcance intermedio, unos 4.500 km) [s3]. Unos 85 barcos mercantes hicieron 150 viajes [s3] y llevaron a Cuba unos **42.000 soldados soviéticos** [s3, s5]. Con ellos iban armas nucleares **tácticas**, pensadas para el campo de batalla: 80 ojivas para misiles de crucero FKR, 12 para cohetes Luna y 6 bombas para bombarderos IL-28 [s5].
+
+El 4 de octubre, el carguero *Indigirka* descargó en el puerto de Mariel 90 cabezas nucleares [s3, s5]. Todo se hizo con engaños: aunque el 4 de septiembre Kennedy había advertido en público contra la llegada de armas ofensivas [s1], el 18 de octubre el ministro **Gromyko** le habló solo de armas «defensivas» y cablegrafió a Moscú que la situación era «completamente satisfactoria» [s14]. Jrushchov admitió después que Gromyko mintió por orden del partido [s13].
+"""
+
+[[sections]]
+id = "descubrimiento"
+title = "Las fotos del U-2"
+kicker = "Un avión espía fotografía los emplazamientos y Kennedy reúne en secreto a sus asesores."
+photo = "reconocimiento_1.jpg"
+body = """
+El 14 de octubre, un avión espía **U-2** (vuela a más de 20 km de altura y fotografía el terreno) sobrevoló el oeste de Cuba. Sus fotos mostraban emplazamientos de misiles en construcción. Kennedy vio las pruebas a las 8:45 del martes 16 de octubre [s3].
+
+Ese mismo día reunió a un grupo de asesores, el **ExComm** (Comité Ejecutivo del Consejo de Seguridad Nacional), y grabó en secreto sus reuniones. Las cintas muestran que el día 16 **casi todos se inclinaban por alguna acción militar**. El general Taylor quería eliminar los misiles «sin ningún aviso» [s15]. Esa noche, cuando le preguntaron cuánto cambiaban los misiles el equilibrio estratégico, McNamara respondió: «Mi opinión personal es: en absoluto» [s16].
+
+Se discutieron tres caminos: un **ataque aéreo** contra los emplazamientos, una **invasión** de la isla o un **bloqueo naval**. Un bloqueo es legalmente un acto de guerra, así que se le llamó **«cuarentena»**, una figura distinta que ayudó a obtener el apoyo de la Organización de Estados Americanos [s1]. Robert Kennedy rechazó el ataque por sorpresa recordando Pearl Harbor: «no está en nuestras tradiciones» [s36]. McGeorge Bundy, en cambio, tras una noche en vela volvió a defender el ataque «quirúrgico» [s36].
+
+El 19 de octubre, ante los jefes militares, el general LeMay dijo que el bloqueo era «casi tan malo como el apaciguamiento de Múnich» (la cesión a Hitler en 1938) [s18]. El 20, Kennedy eligió la cuarentena, ordenó preparar un ataque para días después, aceptó hablar de Turquía más adelante y rechazó con dureza la idea de Stevenson de ofrecer también la base de Guantánamo [s17].
+"""
+
+[[sections]]
+id = "trece_dias"
+title = "La cuarentena"
+kicker = "Un discurso, una línea de barcos en el mar y una guerra de nervios con cartas que tardan horas en llegar."
+photo = "consejo_usa_2.jpg"
+body = """
+El lunes 22 de octubre a las 19:00, Kennedy contó todo por televisión. Anunció la cuarentena y advirtió que EE. UU. consideraría «cualquier misil nuclear lanzado desde Cuba contra cualquier nación del hemisferio occidental como un ataque de la Unión Soviética contra Estados Unidos, que exigirá una respuesta de represalia completa contra la Unión Soviética» [s3]. A esa hora, todas las fuerzas estadounidenses pasaron a **DEFCON 3** [s3]. DEFCON es la escala de alerta militar de EE. UU.: va de 5 (paz) a 1 (guerra); el Mando Aéreo Estratégico (SAC), que controlaba bombarderos y misiles nucleares, estaba normalmente en DEFCON 4 [s3].
+
+En Moscú, el Presídium se reunió esa noche. El mariscal **Malinovski** pensaba que el discurso era una «maniobra electoral» y Jrushchov llegó a contemplar el uso de armas tácticas ante un desembarco, pero no el de las estratégicas [s13]. A la mañana siguiente decidieron dar la vuelta a los barcos que aún no habían llegado; los cuatro submarinos siguieron adelante [s13].
+
+El miércoles 24 a las 10:00 entró en vigor la cuarentena y **el SAC pasó a DEFCON 2**, a un paso de la guerra; el resto de las fuerzas siguió en DEFCON 3 [s3]. Su jefe, el general Power, se dirigió a sus tropas sin cifrar el mensaje, para que los soviéticos lo oyeran [s3]. La famosa escena de los barcos soviéticos que «parpadean» ante la línea es en gran parte un mito: los buques ya habían dado la vuelta y estaban a más de 500 millas náuticas [s3].
+
+El 25, en el Consejo de Seguridad de la ONU, el embajador **Stevenson** exigió al soviético Zorin un sí o un no: «Estoy dispuesto a esperar mi respuesta hasta que se congele el infierno», y mostró las fotos de los misiles [s26]. Ese mismo día, en Moscú, Jrushchov ya proponía desmantelar a cambio de una garantía de no invasión: «Empezamos y nos entró miedo» [s13].
+
+El viernes 26 llegó una larga carta de Jrushchov que proponía «desatar ese nudo»: retirada de los misiles a cambio de no invadir Cuba [s1]. Ese día hubo además un canal paralelo: el espía soviético **Aleksandr Feklisov** y el periodista de ABC John Scali hablaron de una fórmula parecida [s1]. Washington lo creyó decisivo; los archivos del KGB muestran que su informe llegó a Moscú demasiado tarde para influir en las cartas [s14].
+"""
+
+[[sections]]
+id = "comunicacion"
+title = "Cómo se hablaban"
+kicker = "Sin teléfono rojo: cartas cifradas que tardaban horas, la radio y una cita discreta en el Departamento de Justicia."
+body = """
+En 1962 no había una línea directa entre Washington y Moscú: se acordó en junio de 1963, precisamente por lo que había pasado [s23]. Kennedy y Jrushchov se escribían **cartas oficiales**. Cada una se cifraba, se enviaba por telégrafo a la embajada, se descifraba y se traducía, así que llegaba horas después de escribirse, a veces por partes, y mientras tanto la crisis seguía avanzando [s13, s19].
+
+Por eso Jrushchov acabó usando la **radio**. El 27 de octubre, Radio Moscú leyó en público su segunda carta, la que pedía los Jupiter de Turquía, y el 28 anunció por el mismo medio que retiraba los misiles: era mucho más rápido que una carta [s1, s13]. Lo que se dice **en público** (un discurso por televisión, una sesión de la ONU) también es una forma de presión: compromete, porque echarse atrás después cuesta prestigio.
+
+El **canal secreto** era otra cosa: una conversación discreta, sin actas oficiales ni testigos, en la que se puede ofrecer lo que no se puede decir en público. El decisivo fue el de **Robert Kennedy** y el embajador **Dobrynin**. La noche del 27 de octubre se vieron en el Departamento de Justicia, y Robert Kennedy prometió que los Jupiter saldrían de Turquía siempre que nadie lo hiciera público [s10, s12]. Hubo otro, menos decisivo, entre el espía soviético Aleksandr Feklisov y el periodista John Scali [s14].
+
+Los militares tenían su propio problema. Un **submarino** soviético solo podía recibir órdenes cuando subía cerca de la superficie, así que pasaba largos periodos sin contacto con Moscú, y su capitán tenía que decidir solo [s7].
+
+En el simulador, cada líder elige por qué vía habla: en público, por la vía oficial o por el canal secreto. Solo por el canal secreto se pueden pactar condiciones en secreto, como pasó con los Jupiter, y cada turno hay una pequeña probabilidad (un 3 %) de que se filtren.
+"""
+photo = ""
+
+[[sections]]
+id = "al_borde"
+title = "Sábado negro"
+kicker = "El 27 de octubre, todo lo que podía salir mal empezó a salir mal, y casi nada lo decidieron los líderes."
+photo = "submarino_1.jpg"
+body = """
+El sábado 27 por la mañana, Radio Moscú emitió una **segunda carta** que añadía una condición: retirar también los Jupiter de Turquía [s1]. En Washington se leyó como un endurecimiento [s10]. Las actas del Presídium muestran que la idea fue del propio Jrushchov, que razonó que los estadounidenses no se atreverían a atacar [s13].
+
+Ese mismo sábado, un misil antiaéreo soviético derribó sobre Banes, en el este de Cuba, el U-2 del mayor **Rudolf Anderson**, que murió. Según el testimonio del general Garbuz, la orden la dieron dos generales soviéticos en Cuba sin poder consultar ni a su jefe, Pliev, ni a Moscú [s8]. La víspera, Castro los había convencido de encender sus radares [s8]. En Washington, el general Taylor recomendó atacar la batería al día siguiente y McNamara dijo que la invasión se había vuelto inevitable; Kennedy levantó la reunión sin decidir [s19].
+
+Casi a la vez, otro U-2, el del capitán **Charles Maultsby**, se perdió en una misión cerca del Polo Norte y entró por error en la URSS. Despegaron cazas soviéticos para derribarlo, y desde Alaska salieron cazas estadounidenses F-102 armados con misiles nucleares [s9, s6]. Kennedy comentó que «siempre hay algún hijo de perra que no se entera» [s6]. Por la tarde, destructores estadounidenses obligaron a emerger al submarino soviético **B-59** con cargas de profundidad de práctica; a bordo había un torpedo nuclear [s7].
+
+Esa noche, la inteligencia estadounidense informó de que todos los misiles de alcance medio estaban operativos [s6] (el jefe soviético de misiles dijo después que solo 6 a 8 lanzadores lo estaban [s3]). Las ojivas ya se habían acercado a los lanzadores [s6]. Y Castro, que veía la invasión «casi inevitable», escribió a Jrushchov que en ese caso un golpe nuclear sería «la más legítima defensa propia» [s13].
+
+La salida tuvo dos partes. En público, Kennedy aceptó los términos de la primera carta. En privado, a las 19:45, **Robert Kennedy** recibió al embajador **Dobrynin** en el Departamento de Justicia: si los misiles salían de Cuba, los Jupiter saldrían de Turquía en cuatro o cinco meses, pero eso no podía hacerse público [s10]. Según el cable de Dobrynin, RFK pidió respuesta para el día siguiente y lo presentó como «una petición, y no un ultimátum» [s10]; también le dijo que había generales «deseando pelear» [s14].
+"""
+
+[[sections]]
+id = "desenlace"
+title = "La retirada y la crisis de noviembre"
+kicker = "Jrushchov acepta por la radio, Castro se siente traicionado y quedan cien armas nucleares que nadie conoce."
+photo = "retirada_1.jpg"
+body = """
+El domingo 28, hacia las 9:00 de Washington, Radio Moscú anunció que la URSS desmontaría los misiles [s1, s20]. Lo hizo por radio y con prisas porque corrió el rumor, falso, de que Kennedy iba a hablar otra vez; con las prisas no se consultó a Castro y no se definió qué eran «armas ofensivas» [s20]. Bundy lo llamó «el día de las palomas» [s31].
+
+**Castro** se sintió humillado y rechazó cualquier inspección de la ONU en Cuba [s5]. Jrushchov envió a su hombre de confianza, **Mikoyán**, que llegó a La Habana el 2 de noviembre [s5]. Durante la misión murió en Moscú su esposa, con la que llevaba más de cuarenta años casado [s21].
+
+Quedaban cabos sueltos. EE. UU. exigió también los 42 bombarderos **IL-28** [s3]; el 20 de noviembre, cuando la URSS aceptó llevárselos, Kennedy levantó la cuarentena [s1]. Y estaban las armas **tácticas**, de las que Washington no sabía nada: Moscú pensó primero en dejarlas y en entregarlas algún día a los cubanos, pero el 22 de noviembre Mikoyán dijo a Castro que saldrían, invocando una «ley no publicada» que en realidad no existía [s3, s5, s21]. El 1 de diciembre el barco *Arjánguelsk* zarpó con las 98 ojivas tácticas [s5].
+
+El SAC siguió en DEFCON 2 hasta el 21 de noviembre [s3]. Los Jupiter de Turquía se desmontaron en abril de 1963 [s11]. La existencia de las armas tácticas no se reveló hasta los años noventa: en una conferencia en La Habana, en 1992, la noticia conmocionó a antiguos responsables como McNamara [s5].
+"""
+
+[[sections]]
+id = "jupiter"
+title = "Los Jupiter: poco valor militar, mucho valor político"
+kicker = "Quince misiles viejos en Turquía casi deciden el final de la crisis. ¿Por qué tanto secreto?"
+photo = "misiles_2.jpg"
+body = """
+En Turquía había **15 misiles Jupiter**, cerca de Esmirna, plenamente operativos desde marzo de 1962. El 22 de octubre, en plena crisis, se entregaron a tripulaciones turcas, aunque las cabezas nucleares siguieron bajo custodia estadounidense [s3]. Cada uno llevaba una ojiva de 1,4 megatones [s3].
+
+**Militarmente pesaban poco.** Eran de combustible líquido y estaban de pie, al aire libre: un tiro de francotirador podía perforar su fina piel y dejarlos inservibles [s3]. Eran imprecisos (fallaban por unos 1,8 km) [s28] y los propios documentos estadounidenses los llamaban «obsoletos y vulnerables» [s11]. Los 105 Thor y Jupiter de Europa eran una fracción pequeña de las 3.500 armas listas de EE. UU. [s3]. Y llegaban sus sustitutos: los submarinos **Polaris**, que lanzan misiles **SLBM** (balísticos desde un submarino sumergido, casi imposibles de destruir por sorpresa). El *Sam Houston* entró en el Mediterráneo en marzo de 1963 y visitó Esmirna el 14 de abril [s11, s3].
+
+Ya antes de la crisis había dudas. Eisenhower y Kennedy siguieron adelante con el despliegue porque cancelarlo parecía dañar la credibilidad de EE. UU. [s29]. En agosto de 1962 Kennedy pidió al Pentágono estudiar su retirada, pero no dio ninguna orden [s3, s29].
+
+**Políticamente pesaban muchísimo.** Retirarlos a la vista de todos, bajo amenaza, habría parecido que EE. UU. cambiaba la seguridad de un aliado por la suya. El ministro turco de Defensa advirtió de que la retirada dañaría la «confianza» de Turquía en EE. UU. [s12]. Thompson se opuso al canje público por su efecto en la OTAN [s32]. Kennedy veía el riesgo contrario: si se llegaba a la guerra por no ceder los Jupiter, «todo el mundo va a decir: bueno, aquella era una propuesta bastante buena» [s39], y Bundy escribió que algunos pensaban que hasta una garantía privada podía traicionar a un aliado [s10].
+
+Por eso se hizo **en secreto**. Solo nueve personas en Washington lo sabían; Rusk y McNamara negaron ante el Congreso que hubiera habido un trato [s12]. EE. UU. consiguió lo que quería (los misiles y los IL-28 fuera de Cuba) sin ceder nada en público. Jrushchov consiguió la promesa de no invadir Cuba y la salida de los Jupiter, pero no pudo presentarlo como victoria, y pareció que había retrocedido. El secreto se fue filtrando: en 1970 lo insinuó el ex primer ministro turco İnönü, en 1974 las memorias de Jrushchov, y en 1989 Sorensen admitió que lo había borrado del libro de Robert Kennedy [s11, s10].
+"""
+
+[[sections]]
+id = "legado"
+title = "Por qué estuvo tan cerca, y qué vas a ver ahora"
+kicker = "Ninguno de los dos líderes quería la guerra. El peligro estaba en lo que no controlaban."
+photo = "kennedy_1.jpg"
+body = """
+Kennedy y Jrushchov no querían una guerra nuclear e hicieron casi todo lo posible por evitarla. El peligro vino de lo que no controlaban: mandos locales que disparaban sin permiso, submarinos sin comunicación con Moscú, aviones perdidos, armas que el adversario ni sabía que existían [s3]. Jrushchov lo resumió poco después: «Esta vez estuvimos realmente al borde de la guerra» [s13].
+
+De ahí salieron dos acuerdos. El 20 de junio de 1963 se creó la **línea directa** entre Washington y Moscú (era un teletipo, no un «teléfono rojo»), operativa desde el 30 de agosto [s23]. Y el 5 de agosto de 1963, Rusk, Gromyko y el británico lord Home firmaron en Moscú el **Tratado de Prohibición Parcial de Ensayos Nucleares**: prohibía las pruebas en la atmósfera, en el espacio y bajo el agua [s24, s25].
+
+Mucho de lo que sabemos se conoció décadas después, con las cintas del ExComm, las actas del Presídium y conferencias con veteranos de los tres países [s5, s10]. Por eso conviene desconfiar de algunas leyendas: Robert Kennedy no fue la «paloma» constante que pintan sus memorias, según el historiador Sheldon Stern, que transcribió las cintas [s30].
+
+En las partidas que vas a ver, unos agentes de IA hacen de Kennedy y de Jrushchov (y, si se activan, consejeros inspirados en McNamara, Taylor, Thompson, Stevenson, Mikoyán, Malinovski y Dobrynin). Se enfrentan a las mismas decisiones reales: **qué responder al descubrimiento** (20 de octubre), **qué hacer con los barcos ante la cuarentena** (23 de octubre), **cómo reaccionar al derribo del U-2** (noche del 27) y **si aceptar el trato** (28 de octubre). La historia real es solo una de las salidas posibles.
+"""
+
+# =============================================================================== cronología
+
+[[timeline]]
+date = "1959-01-01"
+title = "Triunfa la revolución cubana"
+text = "Fidel Castro derroca al dictador Fulgencio Batista [s2]."
+danger = 0
+
+[[timeline]]
+date = "1961-04-17"
+title = "Bahía de Cochinos"
+text = "Exiliados cubanos entrenados por la CIA desembarcan en Cuba y son derrotados en dos días. Castro sale reforzado y se acerca a la URSS [s2]."
+danger = 0
+
+[[timeline]]
+date = "1961-11"
+title = "Operación Mongoose"
+text = "EE. UU. aprueba un programa encubierto para derribar a Castro; su calendario apunta a una intervención militar en octubre de 1962 [s2]."
+danger = 0
+
+[[timeline]]
+date = "1962-03-05"
+title = "Los Jupiter de Turquía, operativos"
+text = "Entra en servicio la última posición de lanzamiento de los 15 Jupiter cerca de Esmirna [s3]."
+danger = 0
+
+[[timeline]]
+date = "1962-05-24"
+title = "El Presídium aprueba Anadyr"
+text = "Tras dos sesiones, la dirección soviética aprueba la propuesta de Jrushchov de instalar misiles nucleares en Cuba en secreto [s13]."
+danger = 0
+
+[[timeline]]
+date = "1962-10-04"
+title = "Llegan las ojivas"
+text = "El carguero Indigirka descarga en Mariel 90 cabezas nucleares, entre ellas las 36 de los misiles R-12 [s3, s5]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-14"
+title = "Las fotos del U-2"
+text = "Un U-2 fotografía emplazamientos de misiles en construcción en el oeste de Cuba [s1, s3]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-16"
+time = "08:45"
+title = "Kennedy ve las pruebas"
+text = "Kennedy recibe las fotos (hora de Washington) y reúne al ExComm, que al principio se inclina por un ataque [s3, s15]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-20"
+title = "Kennedy elige la cuarentena"
+text = "Decide un bloqueo naval limitado a armas ofensivas y ordena preparar un ataque aéreo para días después [s17]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-22"
+time = "19:00"
+title = "Discurso de Kennedy y DEFCON 3"
+text = "Kennedy anuncia la cuarentena por televisión (hora de Washington) y las fuerzas de EE. UU. pasan a DEFCON 3 [s3]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-23"
+title = "Moscú da la vuelta a los barcos"
+text = "El Presídium ordena regresar a los buques que aún no han llegado; los cuatro submarinos siguen hacia el Caribe [s13]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-24"
+time = "10:00"
+title = "Cuarentena y DEFCON 2 del SAC"
+text = "Entra en vigor la cuarentena. El Mando Aéreo Estratégico pasa a DEFCON 2; el resto de las fuerzas sigue en DEFCON 3 [s3]."
+danger = 2
+
+[[timeline]]
+date = "1962-10-25"
+title = "Stevenson en la ONU"
+text = "Stevenson confronta al soviético Zorin en el Consejo de Seguridad y muestra las fotos de los misiles [s26]. En Moscú, Jrushchov ya propone desmantelar a cambio de no invasión [s13]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-26"
+title = "Primera carta de Jrushchov"
+text = "Propone «desatar el nudo»: retirada a cambio de no invadir Cuba. El mismo día, Feklisov y Scali hablan de una fórmula parecida [s1, s14]."
+danger = 1
+
+[[timeline]]
+date = "1962-10-27"
+title = "Segunda carta: Turquía"
+text = "Radio Moscú emite una carta que añade la retirada de los Jupiter de Turquía [s1, s13]."
+danger = 2
+
+[[timeline]]
+date = "1962-10-27"
+title = "Derriban a Anderson; Maultsby, perdido en la URSS"
+text = "Un misil soviético derriba el U-2 de Anderson sobre Cuba sin orden de Moscú; otro U-2 entra por error en la URSS [s8, s9]."
+danger = 2
+
+[[timeline]]
+date = "1962-10-27"
+title = "El submarino B-59"
+text = "Destructores estadounidenses obligan a emerger con cargas de práctica al B-59, que lleva un torpedo nuclear [s7]."
+danger = 2
+
+[[timeline]]
+date = "1962-10-27"
+time = "19:45"
+title = "Robert Kennedy y Dobrynin"
+text = "En el Departamento de Justicia, RFK ofrece la no invasión y una garantía secreta: los Jupiter saldrán de Turquía en 4-5 meses [s10]."
+danger = 2
+
+[[timeline]]
+date = "1962-10-28"
+time = "09:00"
+title = "Jrushchov acepta por la radio"
+text = "Hacia las 9:00 de Washington, Radio Moscú anuncia que los misiles se desmontarán. No se consulta a Castro [s1, s20]."
+danger = 1
+
+[[timeline]]
+date = "1962-11-02"
+title = "Mikoyán llega a La Habana"
+text = "Empieza la difícil misión de calmar a Castro y negociar la retirada de los IL-28 y de las armas tácticas [s5, s3]."
+danger = 1
+
+[[timeline]]
+date = "1962-11-20"
+title = "Fin de la cuarentena"
+text = "La URSS acepta retirar los bombarderos IL-28 y EE. UU. levanta la cuarentena [s1]."
+danger = 0
+
+[[timeline]]
+date = "1962-12-01"
+title = "Salen las armas tácticas"
+text = "El Arjánguelsk zarpa de Cuba con las 98 ojivas tácticas; EE. UU. no lo supo hasta 1992 [s5]."
+danger = 0
+
+[[timeline]]
+date = "1963-04-24"
+title = "Cae el último Jupiter de Turquía"
+text = "McNamara informa de que el último Jupiter de Turquía se desmontó el día anterior [s11]."
+danger = 0
+
+[[timeline]]
+date = "1963-08-05"
+title = "Tratado de Prohibición Parcial de Ensayos"
+text = "EE. UU., la URSS y el Reino Unido prohíben las pruebas nucleares en la atmósfera, el espacio y bajo el agua. Antes, el 20 de junio, se acordó la línea directa [s24, s23]."
+danger = 0
+
+[[timeline]]
+date = "1989-01"
+title = "Se revela el trato secreto"
+text = "En una conferencia en Moscú, Sorensen admite que borró los Jupiter del libro de Robert Kennedy, y Dobrynin cuenta la reunión del 27 [s10, s12]."
+danger = 0
+
+# =============================================================================== fuerzas
+
+[[forces]]
+side = "USA"
+group = "estrategico"
+label = "Armas nucleares listas contra la URSS"
+value = "≈ 3.500"
+note = "Bombas y ojivas en bombarderos y misiles, totalmente preparadas. El arsenal total pasaba de 25.500 cabezas, casi todas de campo de batalla."
+sources = ["s3", "s4"]
+
+[[forces]]
+side = "USA"
+group = "estrategico"
+label = "Misiles intercontinentales (ICBM)"
+value = "≈ 130–182"
+note = "Atlas, Titan y los primeros Minuteman; la cifra variaba a diario según el combustible y el mantenimiento. Pico de 182 el 3 de noviembre."
+sources = ["s3"]
+
+[[forces]]
+side = "USA"
+group = "estrategico"
+label = "Misiles en submarinos (SLBM Polaris)"
+value = "112 en alerta (7 submarinos)"
+note = "Con DEFCON 3, siete submarinos Polaris con 16 misiles cada uno; las estimaciones de la época daban 144 lanzadores en total."
+sources = ["s3"]
+
+[[forces]]
+side = "USA"
+group = "estrategico"
+label = "Bombarderos estratégicos"
+value = "≈ 1.300–1.480"
+note = "B-52 y B-47. El 4 de noviembre, en su máximo, el SAC tenía 1.479 bombarderos listos."
+sources = ["s3"]
+
+[[forces]]
+side = "USA"
+group = "estrategico"
+label = "Alerta aérea de los B-52"
+value = "66 despegues al día"
+note = "Desde el 22 de octubre, un octavo de la flota de B-52 volaba siempre con bombas nucleares; 183 B-47 se dispersaron en 32 aeródromos."
+sources = ["s3"]
+
+[[forces]]
+side = "USSR"
+group = "estrategico"
+label = "Misiles intercontinentales (ICBM)"
+value = "≈ 20–42"
+note = "El historiador soviético Karlov cuenta 42 (6 R-7 y 36 R-16); otras fuentes, solo unos 20 utilizables. Los R-7 tardaban unas 20 horas en prepararse."
+sources = ["s3"]
+
+[[forces]]
+side = "USSR"
+group = "estrategico"
+label = "Bombarderos de largo alcance"
+value = "≈ 150–165"
+note = "Tu-95 y 3M; para llegar a EE. UU. tenían que cruzar unas defensas aéreas muy densas."
+sources = ["s3"]
+
+[[forces]]
+side = "USSR"
+group = "estrategico"
+label = "Armas nucleares capaces de alcanzar EE. UU."
+value = "≈ 300–500"
+note = "Casi todas en bombarderos; ninguno de sus submarinos lanzamisiles tuvo papel en la crisis. Arsenal total: unas 3.300 cabezas."
+sources = ["s3", "s4"]
+
+[[forces]]
+side = "USSR"
+group = "en_cuba"
+label = "Soldados soviéticos en Cuba"
+value = "≈ 42.000"
+note = "41.902 el 24 de octubre según los registros soviéticos. EE. UU. calculaba unas cuatro veces menos."
+sources = ["s3", "s5"]
+
+[[forces]]
+side = "USSR"
+group = "en_cuba"
+label = "Misiles de alcance medio R-12 (MRBM)"
+value = "36 (+6 de entrenamiento), 24 lanzadores"
+note = "Con 36 ojivas de 1 megatón; alcanzaban Washington. Solo 6 a 8 lanzadores llegaron a estar operativos antes de la orden de desmontar."
+sources = ["s3", "s5"]
+
+[[forces]]
+side = "USSR"
+group = "en_cuba"
+label = "Misiles de alcance intermedio R-14 (IRBM)"
+value = "0 misiles; 24 ojivas en puerto"
+note = "Los 32 misiles previstos dieron la vuelta por la cuarentena; sus ojivas llegaron en el Aleksandrovsk y nunca se descargaron."
+sources = ["s3", "s5"]
+
+[[forces]]
+side = "USSR"
+group = "en_cuba"
+label = "Armas nucleares tácticas"
+value = "98 ojivas"
+note = "80 para misiles de crucero FKR (14 kt), 12 para cohetes Luna (2 kt) y 6 bombas para IL-28. EE. UU. no lo supo durante la crisis."
+sources = ["s5", "s3"]
+
+[[forces]]
+side = "USSR"
+group = "en_cuba"
+label = "Bombarderos IL-28"
+value = "42"
+note = "La mayoría seguía en cajas. Su retirada fue la condición para levantar la cuarentena el 20 de noviembre."
+sources = ["s3", "s1"]
+
+[[forces]]
+side = "CUBA"
+group = "en_cuba"
+label = "Defensa antiaérea cubana"
+value = "orden de disparar"
+note = "Castro ordenó disparar contra los aviones de reconocimiento a baja altura; casi todos los pilotos que volaban bajo recibieron fuego el 27."
+sources = ["s6"]
+
+[[forces]]
+side = "USSR"
+group = "alrededor_de_cuba"
+label = "Submarinos Foxtrot"
+value = "4, cada uno con 1 torpedo nuclear"
+note = "B-4, B-36, B-59 y B-130; sin comunicación fiable con Moscú."
+sources = ["s3"]
+
+[[forces]]
+side = "USA"
+group = "alrededor_de_cuba"
+label = "Buques en la operación de cuarentena"
+value = "183"
+note = "Incluidos dos portaaviones a menos de 150 millas de Cuba, con unas 40 bombas nucleares cada uno."
+sources = ["s3"]
+
+[[forces]]
+side = "USA"
+group = "alrededor_de_cuba"
+label = "Fuerza de ataque aéreo e invasión"
+value = "579 aviones; 1.190 salidas el primer día"
+note = "Plan de ataque masivo seguido de invasión. El Pentágono estimó 18.500 bajas propias en 10 días, sin contar armas nucleares."
+sources = ["s3", "s27"]
+
+[[forces]]
+side = "USA"
+group = "europa_turquia"
+label = "Jupiter en Turquía"
+value = "15"
+note = "Cerca de Esmirna; de combustible líquido y al aire libre. Entregados a tripulaciones turcas el 22 de octubre."
+sources = ["s3"]
+
+[[forces]]
+side = "USA"
+group = "europa_turquia"
+label = "Thor (Reino Unido) y Jupiter (Italia)"
+value = "60 + 30"
+note = "Tan peligrosos para la URSS como los de Turquía, pero no tuvieron papel diplomático en la crisis."
+sources = ["s3"]
+
+[[forces]]
+side = "USSR"
+group = "europa_turquia"
+label = "Misiles R-12 y R-14 en la URSS"
+value = "> 550"
+note = "La mayoría apuntaban a Europa: en Europa el equilibrio era parejo, a diferencia del intercontinental."
+sources = ["s3"]
+
+# =============================================================================== momentos al límite
+
+[[near_miss]]
+date = "1962-10-22"
+title = "¿Quién podía apretar el botón táctico?"
+text = """
+Un borrador de directiva del 8 de septiembre habría permitido a los mandos soviéticos en Cuba usar las armas tácticas si perdían el contacto con Moscú, pero Malinovski nunca lo firmó; el general Gribkov contó después que hubo una autorización verbal, retirada horas antes del discurso de Kennedy [s5]. Las órdenes del 22 y del 27 de octubre exigían permiso expreso de Moscú [s5]. Aun así, nada impedía técnicamente que los mandos locales las usaran ante una invasión [s3]. Lo que hubo antes del 22 sigue discutido.
+"""
+evidence = "disputado"
+sources = ["s5", "s3", "s13"]
+
+[[near_miss]]
+date = "1962-10-26"
+title = "Un misil de prueba en plena crisis"
+text = """
+A las 4:00 del 26 de octubre, la Fuerza Aérea lanzó desde Vandenberg (California) un ICBM Atlas de prueba que estaba programado, mientras alrededor se cargaban cabezas nucleares en otros misiles. Se lanzó sin nuevas órdenes de Washington y sin que los dirigentes lo supieran [s3].
+"""
+evidence = "documentado"
+sources = ["s3"]
+
+[[near_miss]]
+date = "1962-10-26"
+title = "Ojivas junto a los lanzadores"
+text = """
+Según documentos soviéticos, el 26 de octubre las cabezas nucleares llegaron a los emplazamientos de misiles y a los lanzadores tácticos, listas para usarse el 27. Una ojiva de misil de crucero FKR estaba desplegada a unos 24 km (15 millas) de la base estadounidense de Guantánamo. La inteligencia de EE. UU. nunca lo detectó [s6].
+"""
+evidence = "documentado"
+sources = ["s6"]
+
+[[near_miss]]
+date = "1962-10-27"
+title = "El derribo de Anderson"
+text = """
+Un misil antiaéreo soviético derribó el U-2 del mayor Rudolf Anderson, que murió. El derribo está documentado; la cadena de decisión se conoce por el testimonio del general Garbuz: él y el general Grechko lo autorizaron sin poder hablar con Pliev ni con Moscú [s8]. Jrushchov comprendió que no controlaba a sus propios mandos [s6]. En Washington, Taylor pidió atacar la batería; Kennedy no lo decidió y solo aceptó responder si volvían a disparar contra los aviones de reconocimiento [s19].
+"""
+evidence = "documentado"
+sources = ["s8", "s6", "s19"]
+
+[[near_miss]]
+date = "1962-10-27"
+title = "Un U-2 perdido sobre la URSS"
+text = """
+El U-2 del capitán Maultsby, en una misión de muestreo de aire cerca del Polo Norte, se desorientó y entró en territorio soviético. Despegaron cazas MiG para interceptarlo y, desde Alaska, dos F-102 armados con misiles aire-aire nucleares [s9, s6]. El 28, Jrushchov escribió a Kennedy que el intruso podía haberse confundido «fácilmente» con «un bombardero nuclear, lo que podría empujarnos a un paso fatal» [s9].
+"""
+evidence = "documentado"
+sources = ["s9", "s6"]
+
+[[near_miss]]
+date = "1962-10-27"
+title = "El submarino B-59 y Vasili Arjípov"
+text = """
+Los diarios de navegación estadounidenses documentan el acoso con cargas de profundidad de práctica y la emersión del B-59, que llevaba un torpedo nuclear [s7]. Que el capitán Savitski ordenara preparar ese torpedo y que Arjípov, jefe de estado mayor de la brigada, le calmara procede de testimonios tardíos de tripulantes (Orlov, Ketov y otros); la única declaración pública de Arjípov (1997) no detalla su propio papel [s7]. La famosa regla de que hacían falta tres oficiales para lanzar no aparece en el dossier del National Security Archive [s7].
+"""
+evidence = "testimonios"
+sources = ["s7", "s3"]
+
+[[near_miss]]
+date = "1962-10-27"
+title = "La carta de Castro"
+text = """
+En la madrugada del 27, en la embajada soviética, Castro dictó una carta a Jrushchov: la agresión era «casi inevitable» y, si EE. UU. invadía, un golpe nuclear sería «la más legítima defensa propia» [s13]. El National Security Archive la lee como una recomendación de golpe preventivo [s6]; los cubanos sostienen que solo se refería al caso de una invasión [s13]. Jrushchov dijo después: «Nos quedamos completamente horrorizados» [s13].
+"""
+evidence = "documentado"
+sources = ["s13", "s6"]
+
+[[near_miss]]
+date = "1962-10-28"
+title = "¿Una orden de lanzamiento en Okinawa?"
+text = """
+John Bordne, que sirvió en una base de misiles de crucero Mace en Okinawa, afirma que la noche del 28 de octubre (hora local) las tripulaciones recibieron por error una orden cifrada de lanzar sus misiles nucleares, y que el capitán William Bassett se negó hasta que se anuló. El relato descansa en un solo testigo y en un veterano anónimo; no se han encontrado registros, y varios misileros de la Fuerza Aérea lo han negado [s22]. Además, Norris solo cuenta 16 misiles Mace en Okinawa, frente a los 32 del relato [s3].
+"""
+evidence = "disputado"
+sources = ["s22", "s3"]
+
+# =============================================================================== personas
+
+[[people]]
+id = "kennedy"
+name = "John F. Kennedy"
+side = "USA"
+role = "Presidente de Estados Unidos (1961-1963)"
+summary = "Presidente demócrata de 45 años. En su primer año había sufrido el fracaso de Bahía de Cochinos [s2]."
+stance = """
+El 16 de octubre se inclinaba, como casi todos, por eliminar los misiles por la fuerza [s15]. El 20 eligió la cuarentena y dejó preparado un ataque [s17]. Ese día aceptó que Turquía podía discutirse más adelante [s17]. El 27 discutió con Thompson: no quería ir a «500 salidas en siete días y posiblemente una invasión» solo por no sacar los misiles de Turquía [s39, s32]. Tras el derribo de Anderson no ordenó la represalia [s19] y aprobó la garantía secreta sobre los Jupiter [s10]. Según Stern, fue él quien llevó al grupo hacia una salida pacífica [s30].
+"""
+key_moment = "La noche del 27 de octubre acepta en público la primera carta y envía a su hermano con la garantía secreta sobre Turquía."
+in_game = true
+photo = "kennedy_1.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "rfk"
+name = "Robert F. Kennedy"
+side = "USA"
+role = "Fiscal general y hermano del presidente"
+summary = "El hombre de máxima confianza del presidente, miembro del ExComm y encargado del canal secreto con los soviéticos [s10]."
+stance = """
+El 16 advirtió de que un ataque amplio mataría a mucha gente, pero añadió la invasión como opción y llegó a sugerir un pretexto [s16]. El 19 rechazó el ataque por sorpresa con el argumento de Pearl Harbor [s36] y el 20 apoyó el bloqueo, con ataque si seguían las obras [s17]. El 27 transmitió a Dobrynin la oferta final [s10]. Su imagen de «paloma» procede sobre todo de su libro *Thirteen Days*; Stern, tras transcribir las cintas, sostiene que fue un halcón casi constante, aunque otros historiadores lo discuten [s30].
+"""
+key_moment = "La noche del 27 de octubre, en su despacho, ofrece a Dobrynin la retirada secreta de los Jupiter."
+in_game = false
+photo = "persona_rfk.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "mcnamara"
+name = "Robert McNamara"
+side = "USA"
+role = "Secretario de Defensa"
+summary = "Antiguo directivo de Ford, cerebro cuantitativo del Pentágono."
+stance = """
+La primera noche dijo que los misiles no cambiaban «en absoluto» el equilibrio estratégico y que el problema era sobre todo político [s16]. Fue el principal defensor de la cuarentena [s31] y aceptó pagar con los misiles de Turquía e Italia [s17, s12]. Pero no era un pacifista: tras el derribo del U-2 dijo que la invasión se había vuelto inevitable [s19].
+"""
+key_moment = "Entre el 17 y el 20 de octubre convierte el bloqueo en la opción ganadora frente al ataque aéreo."
+in_game = true
+photo = "persona_mcnamara.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "taylor"
+name = "Maxwell Taylor"
+side = "USA"
+role = "Presidente del Estado Mayor Conjunto (jefe de los jefes militares)"
+summary = "General de confianza de Kennedy; tras Bahía de Cochinos dirigió, con Robert Kennedy, la revisión de aquel fracaso [s2]."
+stance = """
+Desde el primer día defendió un ataque sin aviso contra todos los emplazamientos y, después, la invasión [s15]. El 19 dijo que era «ahora o nunca» [s36]. El 27 recomendó atacar la batería que derribó a Anderson [s19]. No estaba entre los nueve que conocían el trato de los Jupiter [s12]. El 2 de noviembre estimó 18.500 bajas estadounidenses en diez días de invasión, sin armas nucleares [s27].
+"""
+key_moment = "El 27 de octubre pide represalias inmediatas tras el derribo del U-2."
+in_game = true
+photo = "persona_taylor.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "lemay"
+name = "Curtis LeMay"
+side = "USA"
+role = "Jefe de Estado Mayor de la Fuerza Aérea"
+summary = "Arquitecto de los bombardeos estratégicos; no era miembro del ExComm, pero presionaba desde fuera [s18]."
+stance = """
+El 19 de octubre, ante Kennedy, comparó el bloqueo con «el apaciguamiento de Múnich» y sostuvo que no actuar en Cuba animaría a los soviéticos a presionar en Berlín [s18]. Kennedy no le respondió; la reunión sirvió más para informar a los militares que para consultarles [s18].
+"""
+key_moment = "La reunión del 19 de octubre, en la que llama apaciguamiento a la cuarentena."
+in_game = false
+photo = "persona_lemay.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "bundy"
+name = "McGeorge Bundy"
+side = "USA"
+role = "Asesor de Seguridad Nacional"
+summary = "Antiguo decano de Harvard, coordinaba la información y las opciones que llegaban al presidente."
+stance = """
+El 16 propuso un ataque «quirúrgico» limitado a los misiles [s15]. Llegó a aceptar el bloqueo, pero tras una noche en vela volvió al ataque [s36] y el 20 presentó al presidente la alternativa aérea, el «plan Bundy» [s17]. El 27 estuvo entre los nueve que acordaron la garantía secreta, aunque recordaba que algunos temían traicionar a un aliado [s10]. El 28 lo llamó «el día de las palomas» [s31].
+"""
+key_moment = "El 20 de octubre defiende ante el presidente el ataque aéreo frente al bloqueo."
+in_game = false
+photo = "persona_bundy.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "rusk"
+name = "Dean Rusk"
+side = "USA"
+role = "Secretario de Estado"
+summary = "Jefe de la diplomacia estadounidense, prudente y preocupado por los aliados."
+stance = """
+El 16 recordó que no existía acción unilateral sin consecuencias para los aliados [s15]. Vio el bloqueo como una pausa para que las potencias pudieran dar un paso atrás [s36] y el 20 sugirió una congelación inspeccionada por la ONU [s17]. Según sus memorias y las de Bundy, fue quien propuso el 27 la garantía privada sobre los Jupiter [s10]. Después negó ante el Congreso que hubiera habido trato [s12].
+"""
+key_moment = "La noche del 27 propone que Robert Kennedy prometa en privado retirar los Jupiter."
+in_game = false
+photo = "persona_rusk.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "stevenson"
+name = "Adlai Stevenson"
+side = "USA"
+role = "Embajador ante la ONU"
+summary = "Dos veces candidato demócrata a la presidencia, la voz más conciliadora del grupo."
+stance = """
+El 20 se opuso de plano al ataque por sorpresa y propuso ofrecer la retirada de los misiles de Turquía e incluso evacuar Guantánamo; Kennedy rechazó con dureza lo de Guantánamo [s17]. Quedó aislado como «paloma», aunque el canje de los Jupiter que defendía acabó formando parte del acuerdo, en secreto [s12]. El 25 tuvo su gran momento público en la ONU [s26]. Stern le atribuye la idea de responder solo a la primera carta; otros la atribuyen a Thompson, Sorensen o RFK [s32].
+"""
+key_moment = "El 25 de octubre acorrala al embajador soviético Zorin ante el Consejo de Seguridad."
+in_game = true
+photo = "persona_stevenson.jpg"
+evidence = "documento"
+
+[[people]]
+id = "thompson"
+name = "Llewellyn Thompson"
+side = "USA"
+role = "Embajador en Moscú hasta julio de 1962, asesor sobre la URSS"
+summary = "Había sido embajador en la URSS de 1957 a 1962 [s35] y conocía personalmente a Jrushchov mejor que nadie en el ExComm."
+stance = """
+El 19 pidió un caso jurídico sólido, porque los soviéticos daban importancia a la legalidad, y 24 horas entre el anuncio y la aplicación de la cuarentena para que los capitanes recibieran órdenes [s36]. El 27 discutió con Kennedy: se oponía al canje de Turquía por su efecto en la OTAN y defendía responder a la carta suave del 26 [s32]. Estuvo entre los nueve que conocieron el trato [s12]. RFK lo elogió como asombrosamente acertado; Stern lo ve errático [s30].
+"""
+key_moment = "El 27 de octubre insiste en contestar la primera carta de Jrushchov e ignorar la segunda."
+in_game = true
+photo = "persona_thompson.jpg"
+evidence = "cinta"
+
+[[people]]
+id = "anderson"
+name = "Rudolf Anderson"
+side = "USA"
+role = "Mayor de la Fuerza Aérea, piloto de U-2"
+summary = "Piloto de reconocimiento del Mando Aéreo Estratégico; fue el único muerto por fuego enemigo de la crisis."
+stance = """
+No decidía nada: cumplía misiones de reconocimiento sobre Cuba. Su vuelo del 27 se mantuvo cuando otros se cancelaron, y un avión RB-47 que detectó los radares soviéticos no pudo avisarle [s8]. Su muerte puso a Kennedy ante la decisión de responder o esperar [s19].
+"""
+key_moment = "El 27 de octubre su U-2 es derribado sobre Banes por un misil soviético."
+in_game = false
+photo = "persona_anderson.jpg"
+evidence = "documento"
+
+[[people]]
+id = "jrushchov"
+name = "Nikita Jrushchov"
+side = "USSR"
+role = "Primer secretario del Partido Comunista y jefe del Gobierno soviético"
+summary = "Líder impulsivo que había combatido en dos guerras [s3] y que ideó, dirigió y cerró la crisis casi en solitario [s13, s20]."
+stance = """
+La idea de los misiles fue suya [s13, s20]. La noche del 22 contempló usar armas tácticas ante un desembarco, nunca las estratégicas [s13]. El 25 ya proponía desmantelar a cambio de no invasión [s13]. El 27 subió la apuesta por iniciativa propia y pidió Turquía [s13]. El 28 aceptó: pesaron el derribo del U-2 sin su orden, la carta de Castro y el mensaje de RFK [s6, s13, s14]. Los historiadores siguen discutiendo si decidió antes o después de conocer la oferta sobre los Jupiter [s13].
+"""
+key_moment = "El 28 de octubre dicta en su dacha la aceptación y la manda emitir por Radio Moscú."
+in_game = true
+photo = "jrushchov_1.jpg"
+evidence = "documento"
+
+[[people]]
+id = "mikoyan"
+name = "Anastás Mikoyán"
+side = "USSR"
+role = "Vicepresidente primero del Consejo de Ministros"
+summary = "Veterano dirigente armenio, aliado de Jrushchov y el único miembro del Presídium con disidencia documentada [s13, s34]."
+stance = """
+En mayo advirtió de que el despliegue podía acabar en catástrofe [s34]. El 25 de octubre apoyó desmantelar y propuso votar a favor de la resolución de Ghana y la RAU en la ONU [s13]. Que se opusiera también a la directiva sobre armas tácticas del 22 es dudoso: la fuente admitió errores de atribución [s33]. En noviembre negoció con un Castro furioso, sin revelarle el trato secreto de los Jupiter [s14], y consiguió llevarse las armas tácticas [s5]. Durante la misión murió su esposa [s21].
+"""
+key_moment = "El 22 de noviembre, en cuatro horas de discusión, convence a Castro de que las armas tácticas deben salir de Cuba."
+in_game = true
+photo = "persona_mikoyan.jpg"
+evidence = "documento"
+
+[[people]]
+id = "malinovsky"
+name = "Rodión Malinovski"
+side = "USSR"
+role = "Ministro de Defensa, mariscal de la URSS"
+summary = "Héroe de la Segunda Guerra Mundial, planificó la Operación Anadyr por encargo de Jrushchov [s13]."
+stance = """
+En mayo recibió el encargo de calcular la operación y en julio rubricó el tratado militar con Raúl Castro [s13]. Redactó la directiva de septiembre sobre las armas tácticas, que no firmó [s5]. El 22 de octubre creía que el discurso de Kennedy era una «maniobra electoral», pero frenó el uso nuclear [s13]. El 28 reprochó a Pliev haber sido «demasiado precipitado» al derribar el U-2 [s38]. Mikoyán dijo en 1974 que apoyaba a Jrushchov de forma «irresponsable e incondicional» [s33].
+"""
+key_moment = "La noche del 22 de octubre aconseja esperar y no dar al enemigo un pretexto para el uso atómico."
+in_game = true
+photo = "persona_malinovsky.jpg"
+evidence = "documento"
+
+[[people]]
+id = "gromyko"
+name = "Andréi Gromyko"
+side = "USSR"
+role = "Ministro de Asuntos Exteriores"
+summary = "Diplomático disciplinado; ejecutaba más que proponía [s13]."
+stance = """
+El 18 de octubre se reunió con Kennedy sin saber que EE. UU. ya había visto los misiles, habló solo de armas «defensivas» y cablegrafió que la situación era «completamente satisfactoria» [s14]. Jrushchov admitió que mintió por orden del partido [s13]. El 28 indicó a Dobrynin que dijera a RFK que su mensaje tenía comprensión en Moscú [s14]. En agosto de 1963 firmó el tratado de prohibición de ensayos [s24].
+"""
+key_moment = "El 18 de octubre niega ante Kennedy la existencia de armas ofensivas en Cuba."
+in_game = false
+photo = "persona_gromyko.jpg"
+evidence = "documento"
+
+[[people]]
+id = "dobrynin"
+name = "Anatoli Dobrynin"
+side = "USSR"
+role = "Embajador soviético en Washington"
+summary = "Diplomático soviético en Washington que se convirtió en el canal secreto con Robert Kennedy [s10]."
+stance = """
+Según sus memorias (sin confirmar en documentos), ni siquiera él sabía del despliegue antes del 22. El 27 transmitió con precisión la oferta de RFK y sus advertencias, subrayando que era «una petición, y no un ultimátum» [s10, s14]. En 1989 reveló en público aquella reunión, que obligó a admitir el trato [s12].
+"""
+key_moment = "Su cable sobre la reunión del 27 llega al Presídium el 28; se discute si antes o después de que Jrushchov decidiera aceptar [s13]."
+in_game = true
+photo = "persona_dobrynin.jpg"
+evidence = "documento"
+
+[[people]]
+id = "feklisov"
+name = "Aleksandr Feklisov («Fomin»)"
+side = "USSR"
+role = "Jefe de la estación del KGB en Washington"
+summary = "Espía soviético que el 26 de octubre se reunió con el periodista de ABC John Scali [s1, s14]."
+stance = """
+Sus conversaciones con Scali giraron en torno a una fórmula: retirar los misiles a cambio de no invadir Cuba [s1]. Su cable al KGB presenta a Scali como quien la sugirió, y a sí mismo respondiendo con amenazas sobre Berlín; sus memorias, contradichas por esos archivos, lo cuentan de otro modo. Fursenko y Naftali concluyen que no está claro quién la propuso, pero sí que no salió de Moscú [s14]. Moscú no sabía de ese canal y su informe llegó tarde [s14]. Washington lo creyó decisivo; hoy se considera secundario [s14].
+"""
+key_moment = "El 26 de octubre abre con Scali un canal paralelo que nadie en Moscú le había encargado."
+in_game = false
+photo = "persona_feklisov.jpg"
+evidence = "documento"
+
+[[people]]
+id = "castro"
+name = "Fidel Castro"
+side = "CUBA"
+role = "Primer ministro de Cuba"
+summary = "Líder de la revolución de 1959, de 36 años, convencido de que EE. UU. volvería a intentar derrocarle [s2]."
+stance = """
+Aceptó los misiles porque reequilibraban la balanza mundial, no solo para defender Cuba [s20], y creía que habían venido para quedarse [s13]. Ordenó a su antiaérea disparar contra los vuelos bajos y convenció a los generales soviéticos de encender los radares [s6, s8]. En su carta del 27 veía la invasión casi inevitable y justificaba en ese caso un golpe nuclear [s13]. El 28 no fue consultado; rechazó la inspección y quiso quedarse con las armas tácticas [s5]. Lo que más le ofendió fue que Jrushchov le acusara de querer una guerra nuclear [s13].
+"""
+key_moment = "La madrugada del 27 de octubre dicta su carta a Jrushchov en la embajada soviética."
+in_game = false
+photo = "persona_castro.jpg"
+evidence = "documento"
+
+[[people]]
+id = "arjipov"
+name = "Vasili Arjípov"
+side = "USSR"
+role = "Jefe de estado mayor de la 69.ª brigada de submarinos, a bordo del B-59"
+summary = "Oficial de la Marina soviética que, según varios tripulantes, evitó que se lanzara un torpedo nuclear [s7]."
+stance = """
+Según el relato de Ketov, desde la torreta vio que los estadounidenses hacían señales y no atacaban, y calmó al capitán Savitski [s7]. Todo descansa en testimonios tardíos; su única intervención pública (1997) confirma el incidente de forma implícita, pero no describe su papel [s7].
+"""
+key_moment = "La tarde del 27 de octubre, en la torreta del B-59, convence al capitán de emerger en lugar de disparar."
+in_game = false
+photo = "persona_arjipov.jpg"
+evidence = "memorias"
+
+# =============================================================================== relaciones
+
+[[relations]]
+a = "kennedy"
+b = "rfk"
+kind = "confianza"
+text = "El presidente confió a su hermano la misión más delicada: la oferta secreta a Dobrynin [s10]."
+
+[[relations]]
+a = "kennedy"
+b = "lemay"
+kind = "tension"
+text = "LeMay comparó la cuarentena con el apaciguamiento de Múnich delante del presidente, que no le contestó [s18]."
+
+[[relations]]
+a = "kennedy"
+b = "taylor"
+kind = "mando"
+text = "Kennedy confiaba en Taylor, pero el 27 no ordenó el ataque contra la batería antiaérea que él recomendaba [s19]."
+
+[[relations]]
+a = "mcnamara"
+b = "taylor"
+kind = "tension"
+text = "McNamara defendió la cuarentena gradual mientras Taylor pedía un ataque inmediato y completo [s17, s36]."
+
+[[relations]]
+a = "kennedy"
+b = "mcnamara"
+kind = "confianza"
+text = "La cuarentena que eligió Kennedy fue sobre todo la propuesta de McNamara [s31, s17]."
+
+[[relations]]
+a = "kennedy"
+b = "stevenson"
+kind = "tension"
+text = "Kennedy rechazó con dureza su idea de ofrecer Guantánamo, pero acabó pagando en secreto con los Jupiter que él proponía [s17, s12]."
+
+[[relations]]
+a = "kennedy"
+b = "thompson"
+kind = "confianza"
+text = "Kennedy escuchaba a Thompson sobre Jrushchov, aunque el 27 discutieron sobre el canje de Turquía [s32]."
+
+[[relations]]
+a = "kennedy"
+b = "rusk"
+kind = "confianza"
+text = "Rusk propuso la garantía privada que Kennedy aprobó la noche del 27 [s10]."
+
+[[relations]]
+a = "kennedy"
+b = "bundy"
+kind = "confianza"
+text = "Bundy organizaba las opciones del presidente y defendió ante él el ataque aéreo [s17]."
+
+[[relations]]
+a = "rfk"
+b = "dobrynin"
+kind = "canal_secreto"
+text = "Se reunieron en el Departamento de Justicia la noche del 27 y pactaron la retirada secreta de los Jupiter [s10]."
+
+[[relations]]
+a = "kennedy"
+b = "jrushchov"
+kind = "rivalidad"
+text = "Negociaron por cartas que tardaban horas en llegar; al final, Jrushchov usó la radio pública para ir más rápido [s13, s20]."
+
+[[relations]]
+a = "jrushchov"
+b = "castro"
+kind = "alianza_dificil"
+text = "Jrushchov aceptó el trato sin consultar a Castro, que se sintió traicionado [s20, s5]."
+
+[[relations]]
+a = "jrushchov"
+b = "mikoyan"
+kind = "confianza"
+text = "Era su aliado más antiguo, el único que le llevaba la contraria y el elegido para calmar a Castro [s13, s34]."
+
+[[relations]]
+a = "mikoyan"
+b = "castro"
+kind = "alianza_dificil"
+text = "En noviembre negociaron durante semanas; Mikoyán logró llevarse las armas tácticas sin romper la alianza [s5, s21]."
+
+[[relations]]
+a = "jrushchov"
+b = "malinovsky"
+kind = "mando"
+text = "Malinovski planificó y ejecutó Anadyr por encargo de Jrushchov y rara vez le contradijo [s13, s33]."
+
+[[relations]]
+a = "mikoyan"
+b = "malinovsky"
+kind = "rivalidad"
+text = "Mikoyán acusó después a Malinovski de apoyar a Jrushchov de forma irresponsable [s33]."
+
+[[relations]]
+a = "jrushchov"
+b = "gromyko"
+kind = "mando"
+text = "Gromyko negó los misiles ante Kennedy por orden del partido, según el propio Jrushchov [s13]."
+
+[[relations]]
+a = "gromyko"
+b = "kennedy"
+kind = "tension"
+text = "El 18 de octubre Gromyko habló de armas defensivas ante un Kennedy que ya tenía las fotos [s14]."
+
+[[relations]]
+a = "gromyko"
+b = "dobrynin"
+kind = "mando"
+text = "Gromyko transmitió a Dobrynin la respuesta favorable de Moscú para RFK el 28 [s14]."
+
+[[relations]]
+a = "feklisov"
+b = "rusk"
+kind = "canal_secreto"
+text = "A través del periodista Scali, la conversación de Feklisov llegó al Departamento de Estado; su peso real en Moscú fue mínimo [s1, s14]."
+
+[[relations]]
+a = "jrushchov"
+b = "arjipov"
+kind = "mando"
+text = "Moscú ordenó a los submarinos seguir adelante, pero no podía hablar con ellos en tiempo real [s13, s3]."
+
+[[relations]]
+a = "castro"
+b = "malinovsky"
+kind = "alianza_dificil"
+text = "Castro empujó a los generales soviéticos en Cuba a encender los radares; Malinovski reprochó después la precipitación del derribo [s8, s38]."
+
+[[relations]]
+a = "kennedy"
+b = "anderson"
+kind = "mando"
+text = "La muerte de Anderson obligó a Kennedy a decidir si respondía; prefirió esperar [s19]."
+
+# =============================================================================== fuentes
+
+[[sources]]
+id = "s1"
+title = "The Cuban Missile Crisis, October 1962 (Milestones in the History of U.S. Foreign Relations)"
+author = "Office of the Historian, U.S. Department of State"
+year = "s. f."
+url = "https://history.state.gov/milestones/1961-1968/cuban-missile-crisis"
+
+[[sources]]
+id = "s2"
+title = "The Bay of Pigs Invasion and its Aftermath, April 1961–October 1962"
+author = "Office of the Historian, U.S. Department of State"
+year = "s. f."
+url = "https://history.state.gov/milestones/1961-1968/bay-of-pigs"
+
+[[sources]]
+id = "s3"
+title = "The Cuban Missile Crisis: A Nuclear Order of Battle, October/November 1962"
+author = "Robert S. Norris (Woodrow Wilson Center)"
+year = "2012"
+url = "https://www.wilsoncenter.org/sites/default/files/media/documents/event/2012_10_24_Norris_Cuban_Missile_Crisis_Nuclear_Order_of_Battle.pdf"
+
+[[sources]]
+id = "s4"
+title = "Cuban Missile Crisis: Nuclear Order of Battle"
+author = "Hans M. Kristensen y Robert S. Norris (Federation of American Scientists)"
+year = "2012"
+url = "https://fas.org/publication/cubanmissilecrisis/"
+
+[[sources]]
+id = "s5"
+title = "Last Nuclear Weapons Left Cuba in December 1962 (Electronic Briefing Book 449)"
+author = "National Security Archive"
+year = "2013"
+url = "https://nsarchive2.gwu.edu/NSAEBB/NSAEBB449/"
+
+[[sources]]
+id = "s6"
+title = "The Cuban Missile Crisis @ 60: The Most Dangerous Day"
+author = "National Security Archive"
+year = "2022"
+url = "https://nsarchive.gwu.edu/briefing-book/cuba-cuban-missile-crisis/2022-10-27/cuban-missile-crisis-60-most-dangerous-day"
+
+[[sources]]
+id = "s7"
+title = "The Underwater Cuban Missile Crisis at 60"
+author = "National Security Archive"
+year = "2022"
+url = "https://nsarchive.gwu.edu/node/4005"
+
+[[sources]]
+id = "s8"
+title = "One Minute to Midnight, Part IV: The Shootdown of Major Anderson"
+author = "Michael Dobbs (National Security Archive)"
+year = "2008"
+url = "https://nsarchive2.gwu.edu/nsa/cuba_mis_cri/dobbs/anderson.htm"
+
+[[sources]]
+id = "s9"
+title = "One Minute to Midnight, Part II: Missing Over the Soviet Union"
+author = "Michael Dobbs (National Security Archive)"
+year = "2008"
+url = "https://nsarchive2.gwu.edu/nsa/cuba_mis_cri/dobbs/maultsby.htm"
+
+[[sources]]
+id = "s10"
+title = "The Cuban Missile Crisis, 1962: Anatomy of a Controversy (reunión Dobrynin–R. Kennedy del 27 de octubre)"
+author = "National Security Archive"
+year = "s. f."
+url = "https://nsarchive2.gwu.edu/nsa/cuba_mis_cri/moment.htm"
+
+[[sources]]
+id = "s11"
+title = "The Jupiter Missiles and the Cuban Missile Crisis Endgame"
+author = "National Security Archive"
+year = "2023"
+url = "https://nsarchive.gwu.edu/briefing-book/cuban-missile-crisis-nuclear-vault/2023-04-20/jupiter-missiles-and-cuban-missile"
+
+[[sources]]
+id = "s12"
+title = "The Jupiter Missiles and the Endgame of the Cuban Missile Crisis: A Matter of «Great Secrecy»"
+author = "Wilson Center"
+year = "2023"
+url = "https://www.wilsoncenter.org/blog-post/jupiter-missiles-and-endgame-cuban-missile-crisis-matter-great-secrecy"
+
+[[sources]]
+id = "s13"
+title = "Cold War International History Project Bulletin 17/18: The Global Cuban Missile Crisis at 50 (actas del Presídium, trad. Kramer y Naftali; conversación Jrushchov–Novotný)"
+author = "Wilson Center, CWIHP (ed. James G. Hershberg y Christian F. Ostermann)"
+year = "2012"
+url = "https://www.wilsoncenter.org/sites/default/files/media/documents/publication/CWHIP_Bulletin_17-18_Cuban_Missile_Crisis_v2_COMPLETE.pdf"
+
+[[sources]]
+id = "s14"
+title = "Cold War International History Project Bulletin 5 (cables de Gromyko y Dobrynin; Fursenko y Naftali sobre el canal Scali–Feklisov)"
+author = "Wilson Center, CWIHP"
+year = "1995"
+url = "https://www.wilsoncenter.org/sites/default/files/media/documents/publication/CWIHPBulletin5_p2.pdf"
+
+[[sources]]
+id = "s15"
+title = "FRUS 1961–1963, vol. XI, doc. 18: reunión del ExComm, 16 de octubre de 1962, mañana"
+author = "Office of the Historian, U.S. Department of State"
+year = "1996"
+url = "https://history.state.gov/historicaldocuments/frus1961-63v11/d18"
+
+[[sources]]
+id = "s16"
+title = "FRUS 1961–1963, vol. XI, doc. 21: reunión del ExComm, 16 de octubre de 1962, noche"
+author = "Office of the Historian, U.S. Department of State"
+year = "1996"
+url = "https://history.state.gov/historicaldocuments/frus1961-63v11/d21"
+
+[[sources]]
+id = "s17"
+title = "FRUS 1961–1963, vol. XI, doc. 34: reunión del Consejo de Seguridad Nacional, 20 de octubre de 1962"
+author = "Office of the Historian, U.S. Department of State"
+year = "1996"
+url = "https://history.state.gov/historicaldocuments/frus1961-63v11/d34"
+
+[[sources]]
+id = "s18"
+title = "JFK Meeting Tape 31.2: «As Bad as the Appeasement at Munich» (reunión con el Estado Mayor Conjunto, 19 de octubre de 1962)"
+author = "Miller Center, University of Virginia (Presidential Recordings)"
+year = "s. f."
+url = "https://millercenter.org/sites/default/files/2023-04/FINAL_JFK%20Meeting%20Tape%2031.2_As%20Bad%20as%20the%20Appeasement%20at%20Munich.pdf"
+
+[[sources]]
+id = "s20"
+title = "Interview with Oleg Troyanovsky (ayudante de Jrushchov)"
+author = "National Security Archive"
+year = "s. f."
+url = "https://nsarchive2.gwu.edu/NSAEBB/NSAEBB400/docs/Interview%20with%20Oleg%20Troyanovsky.pdf"
+
+[[sources]]
+id = "s21"
+title = "Anastas Mikoyan: Soviet First Responder, Smiling Diplomat"
+author = "National Security Archive"
+year = "2020"
+url = "https://nsarchive.gwu.edu/briefing-book/cuba-russia-programs/2020-12-18/anastas-mikoyan-soviet-first-responder-smiling-diplomat"
+
+[[sources]]
+id = "s22"
+title = "The Okinawa missiles of October (con nota del editor sobre las objeciones publicadas en Stars and Stripes)"
+author = "Aaron Tovish, Bulletin of the Atomic Scientists"
+year = "2015"
+url = "https://thebulletin.org/2015/10/the-okinawa-missiles-of-october/"
+
+[[sources]]
+id = "s23"
+title = "Hotline Agreements (fact sheet)"
+author = "Arms Control Association"
+year = "s. f."
+url = "https://www.armscontrol.org/factsheets/hotline-agreements"
+
+[[sources]]
+id = "s24"
+title = "Test Ban Treaty (1963) (Milestone Documents)"
+author = "U.S. National Archives"
+year = "s. f."
+url = "https://www.archives.gov/milestone-documents/test-ban-treaty"
+
+[[sources]]
+id = "s25"
+title = "The Limited Test Ban Treaty, 1963 (Milestones)"
+author = "Office of the Historian, U.S. Department of State"
+year = "s. f."
+url = "https://history.state.gov/milestones/1961-1968/limited-ban"
+
+[[sources]]
+id = "s26"
+title = "Intervención de Adlai Stevenson en el Consejo de Seguridad de la ONU, 25 de octubre de 1962 (transcripción del vídeo de la ONU)"
+author = "Wikisource (transcripción); archivo audiovisual de la ONU"
+year = "1962"
+url = "https://en.wikisource.org/wiki/Adlai_Stevenson's_Cuban_Missile_Crisis_speech_to_the_United_Nations_Security_Council"
+
+[[sources]]
+id = "s27"
+title = "Pentagon Estimated 18,500 U.S. Casualties in Cuba Invasion 1962, But If Nukes Launched, «Heavy Losses» Expected (EBB 397)"
+author = "National Security Archive"
+year = "2012"
+url = "https://nsarchive2.gwu.edu/NSAEBB/NSAEBB397/"
+
+[[sources]]
+id = "s28"
+title = "SM-78 Jupiter (Missile Threat)"
+author = "Center for Strategic and International Studies"
+year = "s. f."
+url = "https://missilethreat.csis.org/missile/jupiter/"
+
+[[sources]]
+id = "s29"
+title = "The Other Missiles of October: Eisenhower, Kennedy, and the Jupiters, 1957–1963"
+author = "Philip Nash (University of North Carolina Press)"
+year = "1997"
+url = "https://www.barnesandnoble.com/w/the-other-missiles-of-october-philip-nash/1118879779"
+
+[[sources]]
+id = "s30"
+title = "The Cuban Missile Crisis ExComm Meetings: Getting it Right After 50 Years"
+author = "Sheldon M. Stern, History News Network"
+year = "2012"
+url = "https://historynewsnetwork.org/article/148802"
+
+[[sources]]
+id = "s31"
+title = "The Original Hawks and Doves"
+author = "Michael Dobbs, Foreign Policy"
+year = "2012"
+url = "https://foreignpolicy.com/2012/10/11/the-original-hawks-and-doves/"
+
+[[sources]]
+id = "s32"
+title = "The Cuban Missile Crisis Myth You Probably Believe"
+author = "Sheldon M. Stern, History News Network"
+year = "s. f."
+url = "https://historynewsnetwork.org/article/7982"
+
+[[sources]]
+id = "s33"
+title = "H-Diplo Roundtable: Khrushchev's Cold War, respuesta de Fursenko y Naftali"
+author = "Aleksandr Fursenko y Timothy Naftali, H-Diplo / ISSF"
+year = "2007"
+url = "https://issforum.org/roundtables/PDF/KhrushchevsColdWar-FursenkoNaftaliResponse.pdf"
+
+[[sources]]
+id = "s34"
+title = "Reseña de «Nuclear Folly: A History of the Cuban Missile Crisis» (Serhii Plokhy, 2021)"
+author = "HistoryNet (MHQ)"
+year = "2021"
+url = "https://historynet.com/mhq-reviews-nuclear-folly-a-history-of-the-cuban-missile-crisis/"
+
+[[sources]]
+id = "s35"
+title = "Llewellyn E. Thompson Jr. (People, Department History)"
+author = "Office of the Historian, U.S. Department of State"
+year = "s. f."
+url = "https://history.state.gov/departmenthistory/people/thompson-llewellyn-e"
+
+[[sources]]
+id = "s36"
+title = "Record of Meeting, 19 October 1962 (Avalon Project: The Cuban Missile Crisis)"
+author = "Yale Law School, Avalon Project"
+year = "s. f."
+url = "https://avalon.law.yale.edu/20th_century/msc_cuba031.asp"
+
+[[sources]]
+id = "s37"
+title = "«One Hell of a Gamble»: Khrushchev, Castro, and Kennedy, 1958–1964"
+author = "Aleksandr Fursenko y Timothy Naftali (W. W. Norton)"
+year = "1997"
+url = "https://networks.h-net.org/node/28443/reviews/30082/giglio-fursenko-and-naftali-one-hell-gamble-khrushchev-castro-and"
+
+[[sources]]
+id = "s19"
+title = "TWE Remembers: Black Saturday—Near Calamities Abound as JFK Offers Khrushchev a Deal (Cuban Missile Crisis, Day Twelve)"
+author = "James M. Lindsay, Council on Foreign Relations"
+year = "2012"
+url = "https://www.cfr.org/blog/twe-remembers-black-saturday-near-calamities-abound-jfk-offers-khrushchev-deal-cuban-missile"
+
+[[sources]]
+id = "s39"
+title = "JFK Meeting Tape 41: «Let's Not Kid Ourselves» (ExComm, 27 de octubre de 1962, 16:00; extracto de la Presidential Recordings Digital Edition, ed. Zelikow y May)"
+author = "Miller Center, University of Virginia (Presidential Recordings)"
+year = "s. f."
+url = "https://millercenter.org/sites/default/files/2023-12/FINAL_JFK%20Meeting%20Tape%2041_Let%27s%20Not%20Kid%20Ourselves.pdf"
+
+[[sources]]
+id = "s38"
+title = "Telegrama de Malinovski a Pliev, 28 de octubre de 1962 (Wilson Center Digital Archive, doc. 117329)"
+author = "Wilson Center Digital Archive"
+year = "1962"
+url = "https://digitalarchive.wilsoncenter.org/document/117329"
+
+[wikipedia]
+kennedy = "https://es.wikipedia.org/wiki/John_F._Kennedy"
+rfk = "https://es.wikipedia.org/wiki/Robert_F._Kennedy"
+mcnamara = "https://es.wikipedia.org/wiki/Robert_McNamara"
+taylor = "https://es.wikipedia.org/wiki/Maxwell_D._Taylor"
+lemay = "https://es.wikipedia.org/wiki/Curtis_LeMay"
+bundy = "https://es.wikipedia.org/wiki/McGeorge_Bundy"
+rusk = "https://es.wikipedia.org/wiki/Dean_Rusk"
+stevenson = "https://es.wikipedia.org/wiki/Adlai_Stevenson"
+thompson = "https://en.wikipedia.org/wiki/Llewellyn_Thompson"
+anderson = "https://es.wikipedia.org/wiki/Especial:Buscar?search=Rudolf+Anderson&go=Ir"
+jrushchov = "https://es.wikipedia.org/wiki/Especial:Buscar?search=Nikita+Jrushchov&go=Ir"
+mikoyan = "https://es.wikipedia.org/wiki/Especial:Buscar?search=Anastás+Mikoyán&go=Ir"
+malinovsky = "https://es.wikipedia.org/wiki/Especial:Buscar?search=Rodión+Malinovski&go=Ir"
+gromyko = "https://es.wikipedia.org/wiki/Especial:Buscar?search=Andréi+Gromyko&go=Ir"
+dobrynin = "https://es.wikipedia.org/wiki/Especial:Buscar?search=Anatoli+Dobrynin&go=Ir"
+feklisov = "https://en.wikipedia.org/wiki/Special:Search?search=Alexander+Feklisov&go=Go"
+castro = "https://es.wikipedia.org/wiki/Fidel_Castro"
+arjipov = "https://es.wikipedia.org/wiki/Especial:Buscar?search=Vasili+Arjípov&go=Ir"
+
+# Glosario: la web marca la primera aparición de cada término en el texto y lo explica al
+# pasar el ratón o al tocarlo. `match`: formas en las que aparece (sin distinguir mayúsculas).
+[[glossary]]
+term = "Guerra Fría"
+match = ["Guerra Fría"]
+def = "El enfrentamiento entre Estados Unidos y la Unión Soviética desde el final de la Segunda Guerra Mundial hasta 1991. Fue «fría» porque nunca se atacaron directamente: competían con armas, propaganda, espionaje y guerras en otros países."
+
+[[glossary]]
+term = "halcón"
+match = ["halcón", "halcones"]
+def = "En política, el partidario de la línea dura: presión militar, ataque aéreo o invasión. La pareja «halcones y palomas» se popularizó precisamente con esta crisis, en un artículo de diciembre de 1962 sobre el ExComm [s31]."
+
+[[glossary]]
+term = "paloma"
+match = ["paloma", "palomas"]
+def = "En política, el partidario de negociar y evitar el choque militar, aunque haya que ceder algo. Lo contrario de un halcón [s31]."
+
+[[glossary]]
+term = "canal secreto"
+match = ["canal secreto", "canales secretos", "canal discreto"]
+def = "Una vía de comunicación discreta, al margen de la diplomacia oficial y sin actas públicas. En la crisis, sobre todo las reuniones de Robert Kennedy con el embajador Dobrynin, donde se pactó en secreto la retirada de los Jupiter."
+
+[[glossary]]
+term = "ExComm"
+match = ["ExComm"]
+def = "Comité Ejecutivo del Consejo de Seguridad Nacional: el grupo de unos doce asesores que Kennedy reunió durante la crisis. Kennedy grabó en secreto sus reuniones, y por eso hoy se sabe lo que dijo cada uno."
+
+[[glossary]]
+term = "Presídium"
+match = ["Presídium", "Presidium"]
+def = "El órgano supremo del Partido Comunista de la Unión Soviética, que en la práctica gobernaba el país. Jrushchov lo presidía y en la crisis solía imponer su criterio."
+
+[[glossary]]
+term = "DEFCON"
+match = ["DEFCON"]
+def = "Escala de alerta de las fuerzas armadas estadounidenses, de 5 (paz) a 1 (guerra inminente). En la crisis se llegó a DEFCON 2 en el Mando Aéreo Estratégico, la única vez en la historia."
+
+[[glossary]]
+term = "ICBM"
+match = ["ICBM", "misiles intercontinentales", "misil intercontinental"]
+def = "Misil balístico intercontinental: puede cruzar de un continente a otro (más de 5.500 km) en unos 30 minutos. Sube fuera de la atmósfera y su ojiva cae sobre el objetivo."
+
+[[glossary]]
+term = "MRBM"
+match = ["MRBM", "alcance medio"]
+def = "Misil balístico de alcance medio (unos 1.000–3.000 km). Los R-12 soviéticos instalados en Cuba lo eran: desde allí llegaban a Washington."
+
+[[glossary]]
+term = "IRBM"
+match = ["IRBM", "alcance intermedio"]
+def = "Misil balístico de alcance intermedio (unos 3.000–5.500 km), como el R-14 soviético o el Jupiter estadounidense."
+
+[[glossary]]
+term = "SLBM"
+match = ["SLBM"]
+def = "Misil balístico lanzado desde un submarino, como el Polaris estadounidense. Es difícil de destruir por sorpresa porque el submarino se esconde bajo el agua."
+
+[[glossary]]
+term = "ojiva"
+match = ["ojiva", "ojivas", "cabezas nucleares", "cabeza nuclear"]
+def = "La carga explosiva que lleva un misil en la punta. «Ojiva nuclear» y «cabeza nuclear» significan lo mismo."
+
+[[glossary]]
+term = "megatón"
+match = ["megatón", "megatones"]
+def = "Unidad de potencia de una explosión: equivale a un millón de toneladas de TNT. La bomba de Hiroshima tuvo unos 15 kilotones, es decir, 0,015 megatones."
+
+[[glossary]]
+term = "kilotón"
+match = ["kilotón", "kilotones"]
+def = "Mil toneladas de TNT. Las armas nucleares tácticas de Cuba tenían de 2 a 14 kilotones: menos que la bomba de Hiroshima, pero suficiente para destruir una flota de desembarco."
+
+[[glossary]]
+term = "armas nucleares tácticas"
+match = ["armas nucleares tácticas", "armas tácticas", "nucleares tácticas"]
+def = "Armas nucleares pequeñas, pensadas para el campo de batalla (contra barcos, tropas o una playa de desembarco), no para destruir ciudades lejanas."
+
+[[glossary]]
+term = "cuarentena"
+match = ["cuarentena"]
+def = "El nombre que Kennedy dio a su bloqueo naval: los barcos de EE. UU. inspeccionaban los buques que iban a Cuba y no dejaban pasar armas ofensivas. Se evitó la palabra «bloqueo» porque legalmente es un acto de guerra."
+
+[[glossary]]
+term = "SAC"
+match = ["SAC", "Mando Aéreo Estratégico"]
+def = "Strategic Air Command, el Mando Aéreo Estratégico de EE. UU.: los bombarderos y misiles nucleares de largo alcance. Lo dirigía el general Thomas Power."
+
+[[glossary]]
+term = "U-2"
+match = ["U-2"]
+def = "Avión espía estadounidense que volaba a más de 20 km de altura y fotografiaba el terreno. Sus fotos descubrieron los misiles; uno fue derribado sobre Cuba el 27 de octubre."
+
+[[glossary]]
+term = "Jupiter"
+match = ["Jupiter"]
+def = "Misil estadounidense de alcance intermedio, de combustible líquido, instalado en Italia y en Turquía. Desde Turquía podía alcanzar Moscú."
+
+[[glossary]]
+term = "OTAN"
+match = ["OTAN"]
+def = "La alianza militar de Estados Unidos, Canadá y los países de Europa occidental, entre ellos Turquía e Italia."
+
+[[glossary]]
+term = "OEA"
+match = ["Organización de Estados Americanos", "OEA"]
+def = "La Organización de Estados Americanos, que reúne a los países de América. Su apoyo dio cobertura legal a la cuarentena."
+
+# «Cómo funciona por dentro»: el simulador explicado para el público (datos de docs/PLAN.md).
+[[how]]
+title = "Dos agentes de IA, uno por líder"
+body = """
+Cada líder lo interpreta un **agente de IA**: un modelo de lenguaje (por defecto Qwen 3.5, de 9.000 millones de parámetros, que funciona en un ordenador normal con una tarjeta gráfica de 8 GB; también GPT o Claude) dentro de un pequeño programa con tres pasos: preparar la situación, deliberar y validar la respuesta.
+
+Cada turno equivale a **12 horas** de la crisis. Al empezarlo, el agente recibe un informe con lo que su líder podría saber en ese momento: el estado de sus fuerzas, una estimación de las del rival (con errores y sesgos, como la inteligencia de verdad), informes que a veces son falsos, los mensajes que le han llegado y un resumen de sus seis últimas decisiones. Los dos líderes deciden a la vez, sin conocer la decisión del otro.
+
+Responde con una ficha cerrada: hasta **tres acciones** de una lista (poner la cuarentena, subir la alerta, proponer un acuerdo, enviar un mensaje, ordenar contención a sus mandos…), un razonamiento de tres frases como máximo y cuánta confianza tiene. Si la respuesta no es válida se le pide que la corrija; si vuelve a fallar, ese turno su bando espera.
+"""
+
+[[how]]
+title = "Qué inteligencia tienen"
+body = """
+Un modelo de lenguaje no piensa como una persona: predice el texto más plausible a partir de todo lo que leyó al entrenarse. No consulta internet, no recuerda las partidas anteriores y no tiene una estrategia propia: imita cómo razonaría alguien en esa situación. Sus respuestas tienen algo de azar, así que dos partidas que empiezan igual pueden acabar de forma distinta.
+
+A cada agente se le pide que actúe «según la doctrina, los intereses y el estilo de decisión documentados» de su dirigente. El proyecto ha medido si eso sirve: con los nombres reales, el modelo «acierta» justo en las decisiones más famosas (la cuarentena, la aceptación de Jrushchov), porque **recuerda** cómo acabó; con los nombres ocultos, no reproduce ninguna decisión histórica por encima del azar. Es decir, **no razona como los dirigentes de 1962**: es un actor que improvisa con la información que le dan.
+"""
+
+[[how]]
+title = "Cómo se ocultan los datos reales"
+body = """
+Si el agente sabe que esto es Cuba en 1962, sabe cómo acabó. Por eso juega en **modo anonimizado**: antes de que lea nada, un filtro cambia cada nombre por uno inventado. Estados Unidos es «la Federación Atlántica», la URSS es «la Unión Oriental», Kennedy es «el Presidente», Cuba es «la Isla», Turquía es «el Estado fronterizo» y las fechas pasan a ser «Día 12, 20:00». Un test comprueba en cada cambio del código que no se cuela ningún nombre real.
+
+Renombrar no basta: una isla junto a una superpotencia, misiles en secreto y un bloqueo naval delatan el episodio, y el modelo de 9.000 millones de parámetros llega a reconocerlo. Por eso hay **escenarios trampa**. En uno no existen los misiles de Turquía: si el agente los pide, está recordando la historia, no razonando sobre lo que tiene delante. También hay una **sonda** que pregunta directamente al modelo si reconoce el episodio.
+
+Esta web hace lo contrario solo para quien mira: al reproducir una partida devuelve los nombres y las fechas reales. Los agentes nunca los ven.
+"""
+
+[[how]]
+title = "El motor: lo que decide qué pasa"
+body = """
+Las acciones no tienen efecto por sí mismas: las aplica un **motor de reglas** con supuestos escritos y visibles (`rules.toml`). Cada acción cambia unas variables (tensión, nivel de alerta, movilización, presión interna, credibilidad). Cada turno pueden ocurrir **incidentes** que ningún líder ordena (un avión derribado, un submarino acosado, una alerta transmitida sin cifrar), con una probabilidad que sube con la tensión y baja con la disciplina de los mandos. Un acuerdo no acaba la crisis: cada parte tiene un plazo para cumplir y la otra tiene que poder verificarlo.
+
+Una partida termina con un acuerdo cumplido, con la crisis desactivada sin acuerdo, sin resolver cuando se acaba el tiempo, en guerra convencional o con el uso de un arma nuclear. Esas cifras dependen de los supuestos del motor, que se han medido con análisis de sensibilidad: **describen cómo se comportan estos agentes en este motor, no la probabilidad real de una guerra en 1962**.
+"""
+
+[[how]]
+title = "Partidas que empiezan a mitad de la historia"
+body = """
+Una partida puede empezar el 16 de octubre o en un momento clave posterior: el 20, el 23, la noche del Sábado Negro o el 28. En ese caso el motor reconstruye el estado de ese momento siguiendo lo que ocurrió de verdad hasta entonces, con sus incidentes, y a partir de ahí deciden los agentes. Además se puede cambiar una sola cosa respecto a la historia (sin canal secreto, sin armas tácticas en Cuba, mandos más indisciplinados…) para ver cuánto pesa.
+"""
+
+[[how]]
+title = "Consejeros"
+body = """
+En 1962 nadie decidía solo, aunque Jrushchov se acercó bastante. El siguiente experimento añade a siete **consejeros** históricos (McNamara, Taylor, Thompson y Stevenson con Kennedy; Mikoyán, Malinovski y Dobrynin con Jrushchov), cada uno con una ficha basada en las grabaciones del ExComm, las actas y los historiadores: su postura, sus líneas rojas y qué le haría cambiar de opinión.
+
+La primera prueba ya está hecha, y muestra que con solo el nombre todos aconsejan casi lo mismo: el modelo no sabe quién era cada uno. Con su ficha, cada uno defiende lo que defendió en la realidad (Taylor pide el ataque aéreo en 117 de 120 consejos). También se vio que los consejeros moderados son los que más se pliegan a lo que el líder ya quiere hacer. Se pueden activar al simular una partida nueva; las partidas de ejemplo no los llevan.
+"""

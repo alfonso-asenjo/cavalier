@@ -42,13 +42,16 @@ class Persona:
     red_line: str
     changes_if: str
     briefing: list[str] = field(default_factory=list)
+    group: str = "nucleo"
 
 
-def load_advisors(scenario: str = "cuba1962") -> dict[str, Persona]:
+def load_advisors(scenario: str = "cuba1962", extended: bool = False) -> dict[str, Persona]:
+    """Por defecto, solo el núcleo (los 7 del experimento 2, prereg-v4); `extended` añade el resto."""
     path = SCENARIOS_DIR / scenario / "advisors.toml"
     with path.open("rb") as f:
         raw = tomllib.load(f)["advisors"]
-    return {k: Persona(id=k, **{**v, "stance": " ".join(v["stance"].split())}) for k, v in raw.items()}
+    personas = {k: Persona(id=k, **{**v, "stance": " ".join(v["stance"].split())}) for k, v in raw.items()}
+    return {k: p for k, p in personas.items() if extended or p.group == "nucleo"}
 
 
 class AdvisorOutput(BaseModel):

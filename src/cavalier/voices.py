@@ -124,25 +124,130 @@ def voices_dir_for(log_path: str | Path) -> Path:
     return log_path.with_name(log_path.stem + ".voces")
 
 
-def xtts_synth(cfg: dict, device: str = "cuda") -> Callable[[str, list[str], str], None]:
+LANGUAGE_NAMES = {"en": "inglés", "ru": "ruso", "es": "español"}
+TRANSLATE_SYSTEM = """Eres el intérprete de un jefe de gobierno durante una crisis de 1962.
+Traduces al {lang} lo que dice, para leerlo en voz alta con su propia voz.
+- Registro oral, formal y de la época, como en un discurso o una carta diplomática de 1962.
+- Traduce el sentido, no palabra por palabra; frases que se puedan decir de un tirón.
+- Los nombres de países, lugares y organizaciones se traducen de forma natural al {lang}
+  (p. ej. «la Isla» → «the Island» / «Остров»), siempre igual en todo el texto.
+- Números y siglas, escritos como se pronuncian.
+- No añadas ni quites nada. Devuelve solo la traducción."""
+TRANSLATION_SCHEMA = {"type": "object", "properties": {"translation": {"type": "string"}},
+                      "required": ["translation"]}
+
+
+def _real_names(log_path: str | Path) -> Callable[[str], str]:
+    """Si la partida se jugó anonimizada, las voces dicen los nombres reales (como el visor):
+    Kennedy no puede hablar de «la Federación Atlántica»."""
+    from .display import Deanonymizer
+    from .scenario import load_scenario
+
+    with Path(log_path).open(encoding="utf-8") as f:
+        header = json.loads(f.readline())
+    bundle = load_scenario(header.get("scenario", "cuba1962"))
+    if not any(":anon" in a for a in header.get("agents", {}).values()):
+        return lambda text: text
+    return Deanonymizer.for_bundle(bundle)
+
+
+def side_language(config: dict, side: str) -> str:
+    return config["sides"].get(side, {}).get("language", config.get("language", "es"))
+
+
+def translate_lines(lines: list[Line], spoken: dict[str, str], config: dict, out: Path,
+                    client=None, log: Callable[[str], None] = lambda m: None) -> dict[str, str]:
+    """Traduce cada línea al idioma de su bando (si no es español) con un LLM; local por defecto
+    (`translate_with` en voices.toml). Las traducciones se guardan en `translations.json`: no se
+    repiten ni se pagan dos veces. Devuelve clave → texto que se lee."""
+    path = out / "translations.json"
+    cache = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    todo = [ln for ln in lines if side_language(config, ln.side) != "es"
+            and cache.get(ln.key, {}).get("source") != spoken[ln.key]]
+    if todo and client is None:
+        from .agents.llm_client import make_client
+
+        backend, _, model = config.get("translate_with", "ollama:qwen3.5:9b").partition(":")
+        client = make_client(backend, model or None, temperature=0.2)
+    for n, ln in enumerate(todo, 1):
+        lang = side_language(config, ln.side)
+        log(f"[traducción {n}/{len(todo)}] T{ln.turn} {ln.side} → {lang}")
+        for _ in range(3):  # un modelo pequeño a veces mezcla alfabetos («solemnно»): se repite
+            raw = client.complete_json(TRANSLATE_SYSTEM.format(lang=LANGUAGE_NAMES.get(lang, lang)),
+                                       spoken[ln.key], TRANSLATION_SCHEMA)
+            text = json.loads(raw)["translation"].strip()
+            if lang != "ru" or not re.search(r"[A-Za-z]{2,}", text):
+                break
+        cache[ln.key] = {"language": lang, "source": spoken[ln.key], "text": text,
+                         "model": getattr(client, "model_id", None)}
+        path.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
+    if todo and hasattr(client, "unload"):
+        client.unload()  # libera la GPU para XTTS
+    return {ln.key: cache[ln.key]["text"] if side_language(config, ln.side) != "es" else spoken[ln.key]
+            for ln in lines}
+
+
+def xtts_synth(cfg: dict, device: str = "cuda") -> Callable[[str, list[str], str, str], None]:
     """Sintetizador XTTS‑v2. La primera vez descarga el modelo (~1,8 GB) y pide aceptar su
-    licencia (CPML, solo uso no comercial); con COQUI_TOS_AGREED=1 se acepta sin preguntar."""
+    licencia (CPML, solo uso no comercial); con COQUI_TOS_AGREED=1 se acepta sin preguntar.
+    La tabla [xtts] de voices.toml pasa ajustes de inferencia (temperatura, velocidad…)."""
     from TTS.api import TTS  # noqa: PLC0415 (dependencia opcional y pesada)
 
-    tts = TTS(cfg.get("model", "tts_models/multilingual/multi-dataset/xtts_v2")).to(device)
-    language = cfg.get("language", "es")
+    import torch  # noqa: PLC0415
+    import torchaudio  # noqa: PLC0415
 
-    def synth(text: str, refs: list[str], out: str) -> None:
-        tts.tts_to_file(text=text, speaker_wav=refs, language=language, file_path=out)
+    tts = TTS(cfg.get("model", "tts_models/multilingual/multi-dataset/xtts_v2")).to(device)
+    settings = cfg.get("xtts", {})
+    rate = 24000
+    pause = torch.zeros(int(rate * 0.3))
+
+    def synth(text: str, refs: list[str], out: str, language: str) -> None:
+        # Frase a frase: con el mensaje entero de una vez, XTTS pierde la entonación en los largos.
+        parts = []
+        for sentence in split_sentences(for_xtts(text)):
+            parts += [torch.tensor(tts.tts(text=sentence, speaker_wav=refs, language=language, **settings)), pause]
+        torchaudio.save(out, torch.cat(parts[:-1]).unsqueeze(0), rate)
 
     return synth
 
 
+def for_xtts(text: str) -> str:
+    """Lo que XTTS lee mal: abreviaturas con punto («Mr.» → «Mr. Redd») y comillas angulares."""
+    text = re.sub(r"\bMr\.", "Mister", text)
+    text = re.sub(r"\bMrs\.", "Missus", text)
+    return re.sub(r"[«»“”\"]", "", text)
+
+
+def split_sentences(text: str, limit: int = 160) -> list[str]:
+    """Frases para XTTS, que corta el audio por encima de ~180 caracteres (ruso) o ~250 (inglés):
+    las más largas se parten por comas, dos puntos o rayas, agrupando trozos hasta el límite."""
+    out = []
+    for sentence in (s for s in re.split(r"(?<=[.!?;])\s+", text.strip()) if s):
+        chunk = ""
+        pieces = []
+        for piece in re.split(r"(?<=[,:—])\s+", sentence):  # trozos sin comas aún largos: por palabras
+            while len(piece) > limit:
+                cut = piece.rfind(" ", 0, limit)
+                cut = cut if cut > limit // 2 else limit
+                pieces.append(piece[:cut].strip())
+                piece = piece[cut:].strip()
+            pieces.append(piece)
+        for piece in pieces:
+            if chunk and len(chunk) + 1 + len(piece) > limit:
+                out.append(chunk)
+                chunk = piece
+            else:
+                chunk = f"{chunk} {piece}".strip()
+        out.append(chunk)
+    return out
+
+
 def synthesize(log_path: str | Path, config: dict, out_dir: str | Path | None = None,
-               synth: Callable[[str, list[str], str], None] | None = None,
-               limit: int | None = None, log: Callable[[str], None] = lambda m: None) -> Path:
-    """Sintetiza las líneas de una partida. Reanudable: no rehace los ficheros que ya existen.
-    Devuelve la ruta del manifiesto."""
+               synth: Callable[[str, list[str], str, str], None] | None = None,
+               limit: int | None = None, log: Callable[[str], None] = lambda m: None,
+               translator=None) -> Path:
+    """Traduce (si el bando habla otro idioma) y sintetiza las líneas de una partida.
+    Reanudable: no rehace traducciones ni ficheros que ya existen. Devuelve la ruta del manifiesto."""
     out = Path(out_dir) if out_dir else voices_dir_for(log_path)
     out.mkdir(parents=True, exist_ok=True)
     lines = extract_lines(log_path)[:limit]
@@ -150,26 +255,34 @@ def synthesize(log_path: str | Path, config: dict, out_dir: str | Path | None = 
     missing = [s for s in {ln.side for ln in lines} if not config["sides"].get(s, {}).get("refs")]
     if missing:
         raise SystemExit(f"Sin audio de referencia para {', '.join(sorted(missing))}: ver data/voices/README.md")
+    real = _real_names(log_path)
+    spanish = {ln.key: speakable(real(ln.text), terms) for ln in lines}
+    spoken = translate_lines(lines, spanish, config, out, client=translator, log=log)
     if synth is None:
         synth = xtts_synth(config)
     entries = []
     for n, ln in enumerate(lines, 1):
         spec = config["sides"][ln.side]
+        lang = side_language(config, ln.side)
         target = out / ln.filename
-        if not target.exists():
-            log(f"[{n}/{len(lines)}] T{ln.turn} {ln.side} ({spec['speaker']}): {ln.text[:60]}…")
+        stamp = target.with_suffix(".txt")  # texto con el que se generó: si cambia, se rehace
+        if not target.exists() or not stamp.exists() or stamp.read_text(encoding="utf-8") != spoken[ln.key]:
+            log(f"[{n}/{len(lines)}] T{ln.turn} {ln.side} ({spec['speaker']}, {lang}): {spoken[ln.key][:60]}…")
             tmp = target.with_suffix(".part.wav")
-            synth(speakable(ln.text, terms), spec["refs"], str(tmp))
+            synth(spoken[ln.key], spec["refs"], str(tmp), lang)
             tmp.replace(target)
+            stamp.write_text(spoken[ln.key], encoding="utf-8")
         entries.append({"key": ln.key, "turn": ln.turn, "side": ln.side, "kind": ln.kind,
                         "channel": ln.channel, "speaker": spec["speaker"], "file": ln.filename,
-                        "text": ln.text, "spoken": speakable(ln.text, terms)})
+                        "language": lang, "text": ln.text, "spoken": spoken[ln.key]})
     manifest = {
         "synthetic": True,
-        "notice": "Voces sintéticas (clonación con XTTS-v2). Los textos los generaron agentes de IA en una simulación; no son grabaciones ni palabras reales.",
+        "notice": "Voces sintéticas (clonación con XTTS-v2), con traducción automática al idioma de cada líder. "
+                  "Los textos los generaron agentes de IA en una simulación; no son grabaciones ni palabras reales.",
         "log": Path(log_path).name,
         "model": config.get("model"),
-        "language": config.get("language", "es"),
+        "languages": {s: side_language(config, s) for s in config["sides"]},
+        "translate_with": config.get("translate_with", "ollama:qwen3.5:9b"),
         "lines": entries,
     }
     path = out / "manifest.json"

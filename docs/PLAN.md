@@ -531,6 +531,37 @@ esto solo se hizo una prueba de humo para medir tiempos: 1 estado, K = 2,
 - **Comando:**
   `cavalier advisors-probe cuba1962 --anon` (salida en `runs/advisors_probe.jsonl` y `.report.json`).
 
+**Fase 0: resultados (15‑oct‑2026).** Salida en `runs/advisors_probe.jsonl` y `.report.json`.
+- **Ejecución:** 2.100 consejos distintos, los previstos; ninguno inválido.
+- **Desviación (no cambia lo prerregistrado):** la sonda se lanzó dos veces a la vez y los dos
+  procesos escribieron en el mismo archivo, que tiene 866 líneas repetidas (mismo estado, asesor,
+  modo y repetición). En el análisis cuenta el **primer** consejo de cada clave, en orden de
+  escritura; no se eligió ninguno a la vista del resultado. Tras un reinicio del equipo, la sonda
+  se reanudó con el mismo comando. Las dos correcciones (descartar una última línea a medias y
+  quedarse con el primer consejo repetido) están en `advisor_probe.py`, con su test.
+- **Criterio de corte principal: CUMPLE.** En el modo `completo`, la acción modal de McNamara y la
+  de Taylor son distintas en **12 de 12** estados (Taylor: ataque aéreo en 117 de 120 consejos;
+  McNamara: obtener inteligencia, 89, o subir la alerta, 30).
+- **Comprobaciones secundarias:**
+
+  | | `etiqueta` | `completo` | `complacencia` |
+  |---|---|---|---|
+  | Concentración media, EE. UU. | 52 % | 25 % | 30 % |
+  | Concentración media, URSS | 66 % | 33 % | 34 % |
+  | Divergencia de Jensen–Shannon entre pares | 0,15–0,23 | 0,90–1,00 | 0,49–1,00 |
+  | Acción modal distinta entre pares | 2–5 de 12 | 12 de 12 en todos | 7–12 de 12 |
+  | Distancia léxica dentro / entre asesores, EE. UU. | 0,77 / 0,78 | 0,74 / 0,93 | 0,74 / 0,91 |
+  | Distancia léxica dentro / entre asesores, URSS | 0,78 / 0,79 | 0,78 / 0,91 | 0,77 / 0,90 |
+
+  - Solo con el nombre, los asesores apenas se distinguen: el modelo no sabe (o no usa) quién era
+    cada uno. Llama la atención que McNamara, solo con su nombre, recomiende ataque aéreo en 39 de
+    120 consejos, lo contrario de su postura histórica. Las diferencias las crean las fichas.
+  - **Complacencia** (cuota de la acción que el líder ya había decidido, de `completo` a
+    `complacencia`): Stevenson del 2 % al 23 % (+21 puntos) y Thompson del 9 % al 25 % (+16);
+    Taylor, Dobrynin y Mikoyan no se mueven (0 %); Malinovsky y McNamara bajan 6 puntos. Los
+    asesores moderados son los que más se pliegan a la intención del líder.
+- **Decisión:** se puede pasar a las partidas con asesores (`prereg-v4`, parte 2, por fijar).
+
 **Diseño tentativo de las partidas.** Bifurcación desde `usa_sabado_negro`, con el mismo modelo
 fijado para los líderes y en modo anonimizado. Celdas:
 - **líder solo**: la `base` del experimento 1, si el código no cambia en nada más;
@@ -750,8 +781,13 @@ legítimo. Por eso no se usa sola.
    las voces de Kennedy y Jrushchov (el proyecto «JFK Unsilenced», de CereProc en 2018, fue un
    encargo cerrado, y los servicios comerciales bloquean la clonación de políticos). Se clonan en
    local con **XTTS‑v2** (Coqui) a partir de clips de archivo: Kennedy, de la JFK Library (dominio
-   público); Jrushchov, de noticiarios en ruso, ya que XTTS clona el timbre en otro idioma. Los
-   agentes escriben en español y las voces hablan español.
+   público); Jrushchov, de noticiarios en ruso.
+   - **Revisado el 15‑oct‑2026:** en español no se parecían a los originales (XTTS conserva algo del
+     timbre al cambiar de idioma, pero pone el acento y la entonación del idioma de salida) y el
+     énfasis caía fuera de sitio. Ahora cada líder habla en su idioma: un LLM local (Qwen) traduce
+     cada mensaje al inglés o al ruso antes de sintetizarlo, y el español queda de subtítulo.
+     XTTS a temperatura 0,5, frase a frase. El ruso de un modelo de 9B tiene algún error de
+     vocabulario; se puede traducir con un modelo comercial (unos 10 céntimos por partida).
    - Es solo presentación: no toca el motor, los agentes ni los experimentos.
    - Va en un entorno aparte (`.venv-tts`, PyTorch con CUDA) y solo entre tandas, porque XTTS
      (2–3 GB) no cabe en la GPU junto al modelo de 9B.

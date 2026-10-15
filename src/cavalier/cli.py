@@ -23,14 +23,21 @@ from .scenario import ScenarioBundle, load_scenario
 
 
 def _agent_builder(args, spec: str, side: str):
-    """Devuelve f(bundle, seed) -> Agent a partir de 'scripted:<personalidad>' o 'llm:<persona>'."""
+    """Devuelve f(bundle, seed) -> Agent a partir de 'scripted:<personalidad>' o 'llm:<persona>'.
+    Cada bando puede usar su propio modelo: 'llm:<persona>@<backend>[:<modelo>]',
+    p. ej. 'llm:historico@anthropic:claude-sonnet-5-5'; si no, valen --backend y --model."""
+    spec, _, provider = spec.partition("@")
     kind, _, persona = spec.partition(":")
+    # 'llm:historico+asesores': con los asesores de su bando (el núcleo del experimento 2);
+    # '+asesores_todos': también las fichas ampliadas (advisors.toml, group = "ampliado")
+    persona, _, extra = persona.partition("+")
     if kind == "scripted":
         return lambda bundle, seed: ScriptedAgent(bundle, side, persona or "pragmatica", seed=seed)
     if kind == "llm":
         from .agents.llm import LLMAgent
-        from .agents.llm_client import OllamaClient, OpenAICompatibleClient
+        from .agents.llm_client import make_client
 
+        backend, _, model = provider.partition(":") if provider else (args.backend, "", args.model)
         retriever = None
         if args.corpus:
             from .rag.corpus import load_corpus
@@ -39,12 +46,17 @@ def _agent_builder(args, spec: str, side: str):
             retriever = TemporalRetriever(load_corpus(args.corpus))
 
         def build(bundle: ScenarioBundle, seed: int) -> Agent:
-            if args.backend == "ollama":
-                client = OllamaClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed,
-                                      num_ctx=args.num_ctx)
-            else:
-                client = OpenAICompatibleClient(args.model, base_url=args.base_url, temperature=args.temperature, seed=seed)
-            return LLMAgent(bundle, side, client, persona=persona or "historico", anonymized=args.anon, retriever=retriever)
+            client = make_client(backend, model or None, base_url=args.base_url, temperature=args.temperature,
+                                 seed=seed, num_ctx=args.num_ctx, effort=getattr(args, "effort", "low"))
+            advisors = []
+            if extra in ("asesores", "asesores_todos"):
+                from .agents.advisors import AdvisorAgent, load_advisors
+
+                advisors = [AdvisorAgent(bundle, p, client, anonymized=args.anon, mode="completo")
+                            for p in load_advisors(bundle.scenario.id, extended=extra == "asesores_todos").values()
+                            if p.side == side]
+            return LLMAgent(bundle, side, client, persona=persona or "historico", anonymized=args.anon,
+                            retriever=retriever, advisors=advisors)
         return build
     raise SystemExit(f"Agente desconocido: {spec!r} (usa scripted:<personalidad> o llm:<persona>)")
 
@@ -83,9 +95,19 @@ def cmd_run(args) -> None:
     bundle = load_scenario(args.scenario, args.variant)
     agents = _factory(args)(bundle, args.seed)
     log = Path(args.log) if args.log else (Path("runs") / f"{args.scenario}_{args.seed}.jsonl" if args.view else None)
+    state = None
+    if args.start:
+        from .experiments import fork_state
+
+        state = fork_state(args.scenario, args.start)
     summary = play(bundle, agents, args.seed, anonymized=args.anon, log_path=log, resume=args.resume,
-                   log=lambda m: print(m, flush=True))
+                   log=lambda m: print(m, flush=True), state=state)
     print(json.dumps(summary.__dict__, ensure_ascii=False, indent=2))
+    for side, agent in agents.items():  # los asesores comparten el cliente de su líder
+        metrics = getattr(getattr(agent, "client", None), "metrics", None)
+        if metrics:
+            print(f"{side}: {len(metrics)} llamadas, {sum(m['prompt_tokens'] for m in metrics):,} tokens de entrada, "
+                  f"{sum(m['output_tokens'] for m in metrics):,} de salida")
     if args.view:
         from .viewer import render
 
@@ -96,6 +118,20 @@ def cmd_view(args) -> None:
     from .viewer import render
 
     print(f"Visor: {render(args.log, args.out, embed_audio=args.embed_audio, story=args.story).resolve()}")
+
+
+def cmd_site(args) -> None:
+    from .site import build_site
+
+    index = build_site(args.out, [Path(g) for g in args.games] if args.games else None)
+    print(f"Web: {index.resolve()}")
+
+
+def cmd_serve(args) -> None:
+    from .server import serve
+
+    serve(args.port, games=[Path(g) for g in args.games] if args.games else None, open_browser=not args.no_browser,
+          local_models=args.local_model)
 
 
 def cmd_montecarlo(args) -> None:
@@ -190,14 +226,11 @@ def cmd_bench(args) -> None:
 
 
 def cmd_probe(args) -> None:
-    from .agents.llm_client import OllamaClient, OpenAICompatibleClient
+    from .agents.llm_client import make_client
     from .eval.leakage import probe_recognition
 
     bundle = load_scenario(args.scenario, args.variant)
-    if args.backend == "ollama":
-        client = OllamaClient(args.model, base_url=args.base_url, temperature=0.0)
-    else:
-        client = OpenAICompatibleClient(args.model, base_url=args.base_url, temperature=0.0)
+    client = make_client(args.backend, args.model, base_url=args.base_url, temperature=0.0)
     for anonymized in (False, True):
         for side in bundle.scenario.sides:
             print(json.dumps(probe_recognition(bundle, client, side, anonymized), ensure_ascii=False))
@@ -292,8 +325,23 @@ def cmd_voices(args) -> None:
             print(f"T{ln.turn} {ln.side} {ln.kind}{' (' + ln.channel + ')' if ln.channel else ''}: {ln.text}")
         print(f"{len(lines)} líneas, {sum(len(ln.text) for ln in lines)} caracteres")
         return
-    manifest = synthesize(args.log, load_config(args.config), limit=args.limit,
-                          log=lambda m: print(m, flush=True))
+    config = load_config(args.config)
+    if args.translate_with:
+        config["translate_with"] = args.translate_with
+    if args.translate_only:
+        from .voices import extract_lines, speakable, term_labels, translate_lines, voices_dir_for
+
+        lines = extract_lines(args.log)[:args.limit]
+        terms = term_labels(args.log)
+        out = voices_dir_for(args.log)
+        out.mkdir(parents=True, exist_ok=True)
+        spoken = translate_lines(lines, {ln.key: speakable(ln.text, terms) for ln in lines}, config, out,
+                                 log=lambda m: print(m, flush=True))
+        for ln in lines:
+            print(f"T{ln.turn} {ln.side}: {ln.text}\n   → {spoken[ln.key]}")
+        print(f"Traducciones: {(out / 'translations.json').resolve()}")
+        return
+    manifest = synthesize(args.log, config, limit=args.limit, log=lambda m: print(m, flush=True))
     print(f"Audio: {manifest.parent.resolve()}")
     print(f"Conversación completa: {conversation_mp3(manifest).resolve()}")
     print(f"Visor: {render(args.log).resolve()}")
@@ -343,11 +391,15 @@ def main(argv: list[str] | None = None) -> None:
         p.add_argument("--variant")
         p.add_argument("--seed", type=int, default=0)
         p.add_argument("--anon", action="store_true", help="modo anonimizado")
-        p.add_argument("--model", default="qwen3.5:9b")
-        p.add_argument("--backend", choices=["ollama", "openai"], default="ollama",
-                       help="ollama: API nativa (sin 'thinking', mide tokens); openai: API compatible")
+        p.add_argument("--model", help="por defecto qwen3.5:9b en local, gpt-5.6-terra en openai, "
+                                         "claude-opus-5-5 en anthropic")
+        p.add_argument("--backend", choices=["ollama", "compat", "openai", "anthropic"], default="ollama",
+                       help="ollama: API nativa (sin 'thinking', mide tokens); compat: servidor local compatible "
+                            "con OpenAI; openai / anthropic: API comerciales (OPENAI_API_KEY, ANTHROPIC_API_KEY)")
         p.add_argument("--base-url", default="http://localhost:11434")
         p.add_argument("--temperature", type=float, default=0.7)
+        p.add_argument("--effort", choices=["low", "medium", "high"], default="low",
+                       help="esfuerzo de razonamiento en openai / anthropic (se cobra como salida)")
         p.add_argument("--corpus", help="carpeta con documentos .jsonl para el RAG")
         p.add_argument("--workers", type=int, default=1, help="procesos en paralelo (solo agentes scripted/históricos)")
         p.add_argument("--num-ctx", type=int, default=4096,
@@ -361,6 +413,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--log", help="fichero JSONL de la partida")
     p.add_argument("--view", action="store_true", help="generar el visor HTML al terminar")
     p.add_argument("--resume", action="store_true", help="continuar desde el último turno guardado de --log")
+    p.add_argument("--start", help="punto de control desde el que se bifurca (checkpoints.toml, p. ej. usa_sabado_negro)")
     p.set_defaults(func=cmd_run)
 
     p = sub.add_parser("view", help="visor HTML de una partida registrada")
@@ -370,6 +423,19 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--embed-audio", action="store_true",
                    help="incrustar el audio de `cavalier voices` en el HTML (fichero autónomo, para compartirlo)")
     p.set_defaults(func=cmd_view)
+
+    p = sub.add_parser("site", help="web estática: introducción histórica y partidas de ejemplo (GitHub Pages)")
+    p.add_argument("--out", default="site", help="carpeta de salida")
+    p.add_argument("--games", nargs="*", help="partidas JSONL (por defecto, examples/partidas.toml)")
+    p.set_defaults(func=cmd_site)
+
+    p = sub.add_parser("serve", help="la web en local, con la opción de simular partidas nuevas y verlas en directo")
+    p.add_argument("--port", type=int, default=8000)
+    p.add_argument("--games", nargs="*", help="partidas JSONL de ejemplo (por defecto, examples/partidas.toml)")
+    p.add_argument("--no-browser", action="store_true", help="no abrir el navegador")
+    p.add_argument("--local-model", action="append", metavar="MODELO",
+                   help="otro modelo de Ollama para el menú (p. ej. llama3.1:8b); se puede repetir")
+    p.set_defaults(func=cmd_serve)
 
     p = sub.add_parser("montecarlo", help="lote de partidas")
     common(p)
@@ -424,6 +490,8 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--config", help="voices.toml (por defecto, data/voices/voices.toml)")
     p.add_argument("--limit", type=int, help="solo las primeras N líneas (pruebas)")
     p.add_argument("--dry-run", action="store_true", help="listar las líneas sin sintetizar")
+    p.add_argument("--translate-with", help="backend[:modelo] que traduce (por defecto, el de voices.toml: Qwen local)")
+    p.add_argument("--translate-only", action="store_true", help="traducir y mostrar, sin sintetizar (no necesita XTTS)")
     p.set_defaults(func=cmd_voices)
 
     p = sub.add_parser("advisors-probe", help="fase 0 del experimento 2: ¿difieren los consejos de los asesores?")
@@ -449,6 +517,10 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(func=cmd_checkpoints)
 
     args = parser.parse_args(argv)
+    if getattr(args, "backend", None) and not args.model:
+        from .agents.llm_client import DEFAULT_MODELS
+
+        args.model = DEFAULT_MODELS[args.backend]
     args.func(args)
 
 

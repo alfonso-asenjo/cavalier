@@ -6,3 +6,7 @@ runs/
 .venv-tts/
 # Audio de referencia de las voces (se descarga de los archivos; ver data/voices/README.md)
 data/voices/*/
+site/
+
+# Notas privadas
+inicial.md

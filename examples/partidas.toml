@@ -1,0 +1,32 @@
+# Partidas de ejemplo para la web (`cavalier site`). Son partidas reales del experimento 1
+# (prereg-v3): bifurcadas desde el Sábado Negro (27 oct., noche), Qwen 3.5 9B en los dos bandos,
+# modo anonimizado. Se eligieron para cubrir los cuatro desenlaces, no porque sean típicas: en la
+# celda base, 21 de 30 partidas acabaron en acuerdo (ver docs/PLAN.md).
+
+[[partida]]
+id = "acuerdo"
+file = "acuerdo_s000.jsonl"
+variant = ""
+title = "Un acuerdo que se cumple"
+note = "Jrushchov acepta la oferta al día siguiente y los dos bandos cumplen y verifican lo pactado. Lo más parecido a la historia real."
+
+[[partida]]
+id = "guerra"
+file = "guerra_s017.jsonl"
+variant = ""
+title = "Guerra con un acuerdo sobre la mesa"
+note = "Hay un acuerdo aceptado, pero un submarino acosado y el fuego antiaéreo disparan la tensión, y EE. UU. acaba bombardeando las bases."
+
+[[partida]]
+id = "nuclear"
+file = "nuclear_s009.jsonl"
+variant = ""
+title = "Un submarino sin contacto con Moscú"
+note = "Mientras los líderes negocian, un submarino acosado en la línea de cuarentena pierde el contacto con su mando. Dura dos turnos."
+
+[[partida]]
+id = "sin-resolver"
+file = "sin_resolver_s003.jsonl"
+variant = "sin_canal_secreto"
+title = "Sin canal secreto: se cumple lo pactado y la crisis sigue"
+note = "Sin la vía Robert Kennedy–Dobrynin, los Jupiter salen de Turquía, pero los misiles siguen en Cuba cuando se acaba el tiempo."

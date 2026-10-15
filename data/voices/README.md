@@ -19,7 +19,8 @@ Es una capa de presentación: no interviene en la simulación ni en los experime
 ## 1. Entorno (aparte del proyecto)
 
 XTTS necesita PyTorch con CUDA, y el Python global tiene PyTorch solo para CPU. Por eso va en
-su propio entorno virtual, `.venv-tts` (fuera de git):
+su propio entorno virtual, `.venv-tts` (fuera de git; en Linux y macOS, `.venv-tts/bin/` en lugar de
+`.venv-tts/Scripts/`):
 
 ```bash
 python -m venv .venv-tts
@@ -58,14 +59,20 @@ Las grabaciones completas pueden quedarse en una subcarpeta (`kennedy/fuente/`):
 ficheros sueltos de la carpeta del líder. Para comprobar que cada clip es del líder y no de un
 locutor o un intérprete, se puede transcribir con Whisper (`faster-whisper` en `.venv-tts`).
 
-**Idioma.** Los agentes escriben en español, así que las dos voces hablan español con el timbre
-(y algo de acento) de cada líder. Que la referencia de Jrushchov esté en ruso no es problema:
-XTTS clona el timbre en otro idioma.
+**Idioma.** Cada líder habla en su idioma: Kennedy en inglés y Jrushchov en ruso (`language` de
+cada bando en `voices.toml`). Los agentes escriben en español; antes de sintetizar, un LLM traduce
+cada mensaje (por defecto Qwen en local, gratis: `translate_with`) y el español queda como
+subtítulo en el visor. Al principio hablaban en español, pero así no se parecían: XTTS conserva
+algo del timbre al cambiar de idioma, pero el acento y la entonación son los del idioma de salida.
+Las traducciones se guardan en `translations.json` y no se repiten. El ruso de un modelo de 9B es
+correcto, pero tiene algún error de vocabulario; para mejorarlo, `--translate-with anthropic:claude-sonnet-5-5`
+(unos 10 céntimos por partida).
 
 ## 3. Sintetizar una partida
 
 ```bash
 .venv-tts/Scripts/cavalier voices runs/exp1/base/s001.jsonl --dry-run      # ver qué se va a leer
+cavalier voices runs/exp1/base/s001.jsonl --translate-only                 # solo traducir (sin XTTS; con Ollama)
 .venv-tts/Scripts/cavalier voices runs/exp1/base/s001.jsonl --limit 4      # prueba corta
 .venv-tts/Scripts/cavalier voices runs/exp1/base/s001.jsonl                # todo (reanudable)
 ```

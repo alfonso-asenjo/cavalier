@@ -2,12 +2,27 @@
 #
 # Cada bando usa los clips de audio que haya en data/voices/<speaker>/ (.wav, .flac o .mp3)
 # como referencia para clonar el timbre. Los clips NO se versionan (.gitignore).
+#
+# Cada líder habla en su idioma: los agentes escriben en español y un LLM traduce cada mensaje
+# antes de leerlo (el español queda como subtítulo en el visor). Al cambiar de idioma, XTTS
+# conserva algo del timbre pero pone la entonación del idioma de salida, así que en español no
+# se parecían a los originales.
 
 model = "tts_models/multilingual/multi-dataset/xtts_v2"
-language = "es"   # los agentes escriben en español; XTTS mantiene el timbre al cambiar de idioma
+language = "es"                       # idioma por defecto si un bando no fija el suyo
+translate_with = "ollama:qwen3.5:9b"  # backend[:modelo], como en los agentes (gratis en local)
+
+# Ajustes de inferencia de XTTS. Los de serie (temperatura 0,75) daban
+# una entonación errática y énfasis fuera de sitio en los mensajes largos.
+[xtts]
+temperature = 0.5
+top_p = 0.8
+
 
 [sides.USA]
 speaker = "kennedy"
+language = "en"
 
 [sides.USSR]
 speaker = "jrushchov"
+language = "ru"

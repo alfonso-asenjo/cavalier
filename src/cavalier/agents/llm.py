@@ -94,6 +94,7 @@ class LLMAgent:
         retriever: TemporalRetriever | None = None,
         max_attempts: int = 2,
         history_turns: int = 6,
+        advisors: list | None = None,
     ):
         self.bundle = bundle
         self.side = side
@@ -105,7 +106,11 @@ class LLMAgent:
         self.history_turns = history_turns
         self.history: list[str] = []
         self.errors: list[str] = []  # motivos de reintento de la última decisión (diagnóstico)
-        self.name = f"llm:{client.model_id}:{persona}{':anon' if anonymized else ''}"
+        # Asesores (AdvisorAgent): cada turno aconsejan por separado antes de que el líder decida.
+        self.advisors = list(advisors or [])
+        self._advice: list[dict] = []
+        self.name = (f"llm:{client.model_id}:{persona}{':anon' if anonymized else ''}"
+                     f"{f':asesores{len(self.advisors)}' if self.advisors else ''}")
 
         actions = list(bundle.rules.actions)
         terms = list(bundle.scenario.deal_terms)
@@ -192,6 +197,13 @@ class LLMAgent:
         if docs:
             lines += ["", "### Documentos disponibles"]
             lines += [f"[{d.id}] {d.title} ({d.date:%Y-%m-%d}): {d.text[:700]}" for d in docs]
+        if self._advice:  # solo con asesores: sin ellos, el prompt es el de siempre, byte a byte
+            out["asesores"] = lines = ["", "### Consejos de tus asesores (cada uno por separado; decides tú)"]
+            for a in self._advice:
+                if a.get("valid"):
+                    lines.append(f"- {a['who']}: recomienda {self._action_to_code[a['recommendation']]} "
+                                 f"({obs.legal_actions.get(a['recommendation'], a['recommendation'])}). "
+                                 f"{a.get('argument', '')} Riesgo: {a.get('risk', '')}")
         out["acciones"] = lines = ["", f"### Acciones disponibles (máximo {obs.max_actions})"]
         lines += [f"- {self._action_to_code[k]}: {label}{_FIELD_HINTS.get(k, '')}"
                   for k, label in obs.legal_actions.items()]
@@ -324,8 +336,11 @@ class LLMAgent:
 
     def decide(self, obs: Observation) -> Decision:
         self.errors = []
+        self._advice = [{"advisor": a.persona.id, "who": a.who(), **a.advise(obs)} for a in self.advisors]
         result = self.graph.invoke({"obs": obs, "attempts": 0, "error": None})
         decision: Decision = result["decision"]
+        if self._advice:
+            decision.advice, self._advice = self._advice, []
         summary = ", ".join(self._action_to_code[a.kind] for a in decision.actions)
         self.history.append(self.anon(f"- Turno {obs.turn}: {summary}. Motivo: {decision.reasoning[:200]}"))
         return decision

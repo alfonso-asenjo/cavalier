@@ -41,7 +41,7 @@ def test_synthesize_is_resumable_and_feeds_viewer(tmp_path):
     log, cfg = _log(tmp_path), _config(tmp_path)
     calls = []
 
-    def fake(text, refs, out):
+    def fake(text, refs, out, language):
         calls.append((text, refs))
         open(out, "wb").write(b"RIFF")
 
@@ -74,3 +74,43 @@ def test_speakable_reads_protocol_codes():
         "aceptar la propuesta uno y retirada de misiles"
     assert speakable("los términos T4 y T5. URGENTE: DEFCON 2 en la ONU", terms) == \
         "los términos compromiso público de no invadir y retirada de los misiles fronterizos. Urgente: Défcon dos en la ONU"
+
+
+def test_each_leader_speaks_his_language_with_cached_translations(tmp_path):
+    from cavalier.agents.llm_client import FakeLLMClient
+
+    log, cfg = _log(tmp_path), _config(tmp_path)
+    cfg["sides"]["USA"]["language"], cfg["sides"]["USSR"]["language"] = "en", "ru"
+    client = FakeLLMClient(lambda system, user: json.dumps(
+        {"translation": f"[en] {user}" if 'al inglés' in system else "Мы отведём силы."}))
+    calls = []
+
+    def fake(text, refs, out, language):
+        calls.append((text, language))
+        open(out, "wb").write(b"RIFF")
+
+    manifest = json.loads(synthesize(log, cfg, synth=fake, translator=client).read_text(encoding="utf-8"))
+    assert calls == [("[en] Aceptamos la propuesta uno.", "en"), ("Мы отведём силы.", "ru")]
+    assert [ln["text"] for ln in manifest["lines"]] == ["Aceptamos P1.", "Retiraremos los medios."]  # subtítulo
+    assert manifest["languages"] == {"USA": "en", "USSR": "ru"}
+    synthesize(log, cfg, synth=fake, translator=client)
+    assert len(client.calls) == 2 and len(calls) == 2  # ni retraduce ni resintetiza
+
+
+def test_long_sentences_are_split_under_the_xtts_limit():
+    from cavalier.voices import split_sentences
+
+    text = ("Мы торжественно предупреждаем: если Федерация Атлантика попытается вторгнуться на Остров "
+            "или сохранит свои ракеты в приграничном штате, мы будем вынуждены принять катастрофические "
+            "меры ради нашего выживания. Мы требуем ответа.")
+    parts = split_sentences(text)
+    assert all(len(p) <= 160 for p in parts) and parts[-1] == "Мы требуем ответа."
+    assert " ".join(parts) == text
+
+
+def test_long_piece_without_commas_is_split_by_words():
+    from cavalier.voices import split_sentences
+
+    text = "Мы приглашаем " + "очень " * 40 + "внимательно."
+    parts = split_sentences(text)
+    assert len(parts) > 1 and all(len(p) <= 160 for p in parts) and " ".join(parts) == text

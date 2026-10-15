@@ -94,7 +94,49 @@ def test_probe_end_to_end_with_fake_model(bundle, personas, tmp_path):
     assert n == len(states) * 2 * (2 + 2 + 1)
     run_probe(bundle, client, mine, states, out, k=2, k_sycophancy=1)
     assert len(load_records(out)) == n  # reanudable: no repite nada
+    lines = out.read_text(encoding="utf-8").splitlines(keepends=True)
+    out.write_text("".join(lines[:-1]) + lines[-1][:20], encoding="utf-8")  # corte a mitad de línea
+    run_probe(bundle, client, mine, states, out, k=2, k_sycophancy=1)
+    assert len(load_records(out)) == n
+    with out.open("a", encoding="utf-8") as f:  # dos procesos a la vez: consejos repetidos
+        f.write(lines[0])
+    assert len(load_records(out)) == n
 
     rep = report(load_records(out))
     assert rep["criterio"]["cumple"]
     assert rep["modes"]["completo"]["pairs"]["mcnamara/taylor"]["js_media"] == pytest.approx(1)
+
+
+def test_leader_reads_advice_and_records_it(bundle, personas):
+    import json as _json
+
+    from cavalier.agents.advisors import AdvisorAgent
+    from cavalier.agents.llm import LLMAgent
+    from cavalier.agents.llm_client import FakeLLMClient
+    from cavalier.engine import Game
+    from cavalier.agents.scripted import ReplayAgent
+
+    game = Game(bundle, {s: ReplayAgent({}) for s in bundle.scenario.sides}, seed=0, anonymized=True)
+    obs = game.observe("USA")
+
+    def respond(system, user):
+        if "asesor de" in system:  # consejo: recomienda la primera acción legal
+            code = next(iter(obs.legal_actions))
+            return _json.dumps({"recommendation": advisor_codes[code], "confidence": 0.7,
+                                "argument": "Argumento del asesor.", "risk": "Un riesgo.", "would_change_if": "Algo."})
+        return _json.dumps({"reasoning": "r", "actions": [{"code": leader._action_to_code["gather_intel"]}],
+                            "confidence": 0.6})
+
+    client = FakeLLMClient(respond)
+    usa = [p for p in personas.values() if p.side == "USA"]
+    advisors = [AdvisorAgent(bundle, p, client, anonymized=True) for p in usa]
+    advisor_codes = advisors[0].leader._action_to_code
+    leader = LLMAgent(bundle, "USA", client, anonymized=True, advisors=advisors)
+    plain = LLMAgent(bundle, "USA", FakeLLMClient([]), anonymized=True)
+    decision = leader.decide(obs)
+    prompt = client.calls[-1][1]
+    assert "Consejos de tus asesores" in prompt and prompt.count("Argumento del asesor.") == len(usa)
+    assert [a["advisor"] for a in decision.advice] == [p.id for p in usa] and all(a["valid"] for a in decision.advice)
+    assert "McNamara" not in prompt  # anonimizado: solo cargos
+    assert "Consejos de tus asesores" not in plain.render(obs, [])  # sin asesores, el prompt de siempre
+    assert leader.name.endswith(f":asesores{len(usa)}")
