@@ -80,11 +80,17 @@ ADVICE_COST, ADVICE_TIME = 0.7, 0.45
 
 
 def advisor_counts(scenario: str = "cuba1962") -> dict[str, int]:
-    from .agents.advisors import load_advisors
-
+    """Asesores del núcleo por bando. Lee el TOML directamente: `cavalier site` no debe necesitar
+    las dependencias de los LLM (`agents.advisors` importa langgraph), que la web publicada no instala."""
+    path = ROOT / "scenarios" / scenario / "advisors.toml"
+    if not path.exists():
+        return {}
+    with path.open("rb") as f:
+        raw = tomllib.load(f).get("advisors", {})
     counts: dict[str, int] = {}
-    for p in load_advisors(scenario).values():
-        counts[p.side] = counts.get(p.side, 0) + 1
+    for v in raw.values():
+        if v.get("group", "nucleo") == "nucleo":
+            counts[v["side"]] = counts.get(v["side"], 0) + 1
     return counts
 
 OUTCOME_LABELS = {
