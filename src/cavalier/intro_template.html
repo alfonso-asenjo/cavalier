@@ -1212,7 +1212,7 @@ function footer() {
   document.getElementById("fuentes").innerHTML = `
     ${src.length ? `<h2>Fuentes</h2><ol>${src.map(s => `<li id="src-${esc(s.id)}">${esc(s.author ? s.author + ". " : "")}${s.url ? `<a href="${esc(s.url)}">${esc(s.title)}</a>` : esc(s.title)}${s.year ? ` (${esc(s.year)})` : ""}.</li>`).join("")}</ol>` : ""}
     <div class="photos"><p><strong>Fotografías:</strong> ${photos.map(p => `${esc(p.caption)} ${esc(p.credit)}, ${esc(p.license)}${p.source ? ` (<a href="${esc(p.source)}">fuente</a>)` : ""}.`).join(" ")}</p>
-    <p>Cavalier es un proyecto de código abierto. Las partidas las juegan agentes de IA en un motor con supuestos explícitos; no describen lo que ocurrió ni lo que habría ocurrido. Código y metodología: <a href="https://github.com/alfonso-asenjo/cavalier">github.com/alfonso-asenjo/cavalier</a>.</p></div>`;
+    <p>Cavalier es un proyecto de código abierto, con licencia MIT. Las partidas las juegan agentes de IA en un motor con supuestos explícitos; no describen lo que ocurrió ni lo que habría ocurrido. Código y metodología: <a href="https://github.com/alfonso-asenjo/cavalier">github.com/alfonso-asenjo/cavalier</a>.</p></div>`;
 }
 
 hero(); story(); rewrite(); footer();

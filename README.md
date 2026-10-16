@@ -9,7 +9,6 @@ el comportamiento de los agentes dentro de un motor con supuestos explícitos (`
 no probabilidades reales.
 
 - Plan y evaluación punto por punto: [docs/PLAN.md](docs/PLAN.md)
-- Idea original: [inicial.md](inicial.md)
 
 ## La web: la crisis contada y reescrita
 
@@ -136,3 +135,8 @@ llama.cpp, vLLM). Dos advertencias:
 | `checkpoints.toml` | Puntos de control para medir fidelidad (prerregistro) |
 | `ranges.toml` | Rango plausible y justificación de cada supuesto (Morris) |
 | `variants/*.toml` | Contrafactuales y escenarios trampa |
+
+## Licencia
+
+El código es [MIT](LICENSE). Las fotografías de `data/photos` conservan su licencia original
+(dominio público o Creative Commons, con autor y fuente en `photos.toml` y en el pie de la web).
